@@ -46,6 +46,18 @@ honest-scoring discipline as every other engine in this framework:
 propose, then check against a real control, not another layer of the
 same geometry.
 
+## Correction, same day: the tree is a consequence, not the source
+
+`FourthAgePapers/FermatMonster/engine/fermat_monster_engine.py`'s own
+docstring states the actual foundational claim — the generalized Fermat
+equation (x^l+y^m=z^n, independent exponents) IS the Monster Group + 70
+Schellekens siblings (71 holomorphic c=24 VOAs), Cody's "Nightmare
+Group" — and explicitly lists the ZD-cascade/leaf-tree mechanism this
+project is built on as a **consequence** of that claim, not the bridge
+itself. See the wiki page for the full correction. Everything in this
+README describing the tree as foundational should be read with that
+hierarchy in mind.
+
 ## Structure
 
 ```

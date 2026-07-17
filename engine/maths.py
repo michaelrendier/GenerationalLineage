@@ -55,9 +55,11 @@ _H_RB_HAT_MODULE = os.path.join(_THEPLACE, 'AinulindaleBAK', 'ValaQuenta', 'modu
 # a pre-existing path bug in that file, not touched here. Inserting the real
 # location ourselves so the import resolves regardless.
 _FERMAT_MONSTER_ENGINE = os.path.join(_THEPLACE, 'FourthAgePapers', 'FermatMonster', 'engine')
+_TURINGSTACK = os.path.join(_THEPLACE, 'TuringStack')
 sys.path.insert(0, _ABRIKOSOV_ENGINE)
 sys.path.insert(0, _H_RB_HAT_MODULE)
 sys.path.insert(0, _FERMAT_MONSTER_ENGINE)
+sys.path.insert(0, _TURINGSTACK)
 
 from telperion_engine import (  # noqa: E402
     prime_sieve, classify_prime, cd_level_data, full_tower, prime_tower_path,
@@ -65,6 +67,56 @@ from telperion_engine import (  # noqa: E402
     ZD_CONSTELLATIONS_ODD, MOONSHINE_PRIMES, CD_NAMES,
 )
 from maths import RIEMANN_ZEROS, SIGMA_CRITICAL, SIGMA_FORBIDDEN  # noqa: E402  (h_rb_hat/maths.py)
+from udeo_poc import CayleyDickson  # noqa: E402
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# ROOT-REGION SATURATION — does the nilpotent (zero) outcome start to
+# DOMINATE the involutory (e0) outcome soon past T_256, and if so, at what
+# rate? Cody, 2026-07-17: "not at t_256, but soon after the dominant
+# appearance in the root is zeros...it's a xeno's paradoxical halfing...
+# the bifurcation tree branches" -- testing whether the GAP to full
+# nilpotent dominance (1 - nilpotent_fraction) halves at each dimension
+# doubling (each bifurcation level), the way Zeno's paradox halves the
+# remaining distance at each step.
+# ══════════════════════════════════════════════════════════════════════════
+
+import random as _random
+
+
+def nilpotent_fraction_at_dim(dim: int, n_samples: int = 30, seed: int = 20260717) -> float:
+    """Fraction of random dim-bit integers, embedded in T_dim/GF(2), that
+    are nilpotent (x^2=0) rather than involutory (x^2=e0). Reuses
+    CayleyDickson('gf2') unchanged from udeo_poc.py -- the same exact
+    Frobenius-theorem machinery, no reimplementation."""
+    cd = CayleyDickson(dim, 'gf2')
+    rng = _random.Random(seed + dim)
+    nilp = 0
+    for _ in range(n_samples):
+        bits = [rng.randint(0, 1) for _ in range(dim)]
+        sq = cd.multiply(bits, bits)
+        if cd.is_zero(sq):
+            nilp += 1
+    return nilp / n_samples
+
+
+def root_region_saturation(dims: List[int] = None, n_samples: int = 30) -> List[Dict[str, Any]]:
+    """Nilpotent fraction at increasing CD dimensions past T_256, and the
+    'gap' (1 - fraction) at each, to check the halving-at-each-doubling
+    conjecture directly against real numbers."""
+    if dims is None:
+        dims = [256, 512, 1024, 2048]
+    rows = []
+    prev_gap = None
+    for d in dims:
+        frac = nilpotent_fraction_at_dim(d, n_samples)
+        gap = 1.0 - frac
+        ratio = (gap / prev_gap) if prev_gap and prev_gap > 0 else None
+        rows.append({'dim': d, 'nilpotent_fraction': round(frac, 4),
+                      'gap_to_full_dominance': round(gap, 4),
+                      'gap_ratio_vs_prev_dim': round(ratio, 4) if ratio is not None else None})
+        prev_gap = gap
+    return rows
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -76,8 +128,12 @@ def quantized_pieces() -> Dict[str, Any]:
     here -- this is the inventory, read directly off the imported engines."""
     return {
         'cd_tower_levels': N_LEVELS,                       # 9, k=0..8
-        'leaf_level':       0,                              # ℝ, "The Unit"
-        'root_level':       8,                              # T_256
+        'leaf_level':       0,                              # ℝ, "The Unit" -- exact, singular
+        'root_level_start': 8,                              # T_256 AND ABOVE (k>=8) -- a
+                                                              # region, not a point: structure
+                                                              # saturates past here (Frobenius
+                                                              # theorem), further doubling adds
+                                                              # no new distinguishable boundary
         'first_zd_level':   FIRST_ZD_LEVEL,                 # 4, 𝕊 -- Fermat extinction threshold
         'n_shapes':         16,                              # p mod 16
         'prime_sector':     sorted(PRIME_SECTOR),           # 8 odd N-shapes

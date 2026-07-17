@@ -31,10 +31,61 @@ actual target precisely: not distance under a metric, but which numbers
 get extinguished and which survive — a discrete fall/no-fall condition,
 same shape as Fermat's, different facet.
 
+## Correction: the foundational claim is the Nightmare Group, not the tree
+
+Added 2026-07-17, same session, after Cody named and pointed at
+`FourthAgePapers/FermatMonster/engine/fermat_monster_engine.py` directly.
+Everything above and below this section had been implicitly treating the
+Zero Lattice tree (`telperion_engine.py`) as the load-bearing object.
+It isn't. Grounded straight from that engine's own docstring:
+
+**The one claim:** *"The Generalized N-Shape Fermat Equation (x^l + y^m
+= z^n for all exponent configurations) IS the Monster Group and its 70
+Schellekens siblings — the 71 holomorphic c=24 VOAs are the complete map
+of Fermat N-shapes in 𝕊."* This is the *generalized* Fermat equation —
+independent exponents l, m, n on each term, across every configuration —
+not the classic same-exponent FLT (aⁿ+bⁿ=cⁿ). Cody's own name for this
+unification: **the Nightmare Group** (playing on `telperion_engine.py`'s
+own "Fermat's Nightmare (FLT via ZD cascade)").
+
+**The chain** ("Fermat Defines. Riemann Fires."): generalized Fermat
+carves out a forbidden zone; what survives the exclusion is prime.
+Niemeier Coxeter numbers h mod 16 cover 13 N-shapes. The 3-shape gap
+{1,11,15} is a proven theorem — no A/D/E root system reaches it. The
+Monster fills exactly that gap via five Moonshine primes {17,11,59,31,47}.
+71 VOAs total = 24 lattice (23 Niemeier + Leech) + 47 non-lattice.
+Generalized Fermat across all N-shapes and the 71 VOAs are claimed
+**identical**, not merely related.
+
+**The reframe:** the engine's own docstring lists the ZD-cascade/leaf-tree
+mechanism — everything this project is built on — under *"Consequences
+(now understood as CONSEQUENCES not the bridge)"*, alongside FLT
+extinction, the Frey curve mapping, and j-coefficient parity. The tree is
+not the foundational object. The Monster/71-VOA identity is. The
+leaf/root walk, the dendritic/tap/clonal root-system classification, the
+Dirichlet-equidistribution control test — all of it is one consequence
+among several of the Nightmare Group claim, not the claim itself. Read
+everything below with that hierarchy in mind: this project has so far
+been instrumenting a downstream effect, not the source.
+
+Engine's own epistemic stance, unchanged and worth repeating here:
+*"Engine derives; does not prove. No renormalization. Failed predictions
+stay in data."*
+
 ## Orientation inside the tree: leaf, root, and three kinds of roots
 
 Corrected mid-session (Claude had this backwards initially): **k=0 (ℝ,
-"The Unit") is the leaf. k=8 (T_256) is the root.** Read as a recursion
+"The Unit") is the leaf. The root is T_256 AND ABOVE — k≥8, not a single
+point at k=8.** Asymmetric on purpose: the leaf is exact and singular
+(ℝ, dim=1, the one base case the recursion bottoms out at); the root is
+a region, not a point, because — Cody, 2026-07-17 — "the root becomes
+indistinguishable from contents around T_256": past that dimension the
+tower's own structure (per the T_n/GF(2) Frobenius theorem, `paper.tex`)
+saturates — every element is nilpotent or involutory, no third option —
+so any further doubling (T_512, T_1024, ...) adds dimension without
+adding new distinguishable structure at the boundary. The leaf end
+narrows to a point; the root end diffuses into an indistinguishable
+mass. Read as a recursion
 tree, not a botanical one — the Cayley-Dickson construction doubles
 outward from ℝ (T_256 = CD(T_128,T_128) = ... = CD(ℝ,ℝ) iterated), so
 k=0 is the base case where the recursion terminates (the leaf, in the
