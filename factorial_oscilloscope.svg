@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="446" viewBox="0 0 960 446">
+  <rect width="960" height="446" fill="#080810"/>
+  <text x="480" y="22" font-family="monospace" font-size="11" fill="#888" text-anchor="middle">FACTORIAL RELATIVITY OSCILLOSCOPE -- N=97  (N-shape=1, prime, monster_gap)</text>
+  <text x="480" y="40" font-family="monospace" font-size="9" fill="#555" text-anchor="middle">Fermat Defines. Riemann Fires. -- prompt above, response below</text>
+  <text x="172.6" y="64" font-family="monospace" font-size="8" fill="#ffd014" text-anchor="middle">0</text>
+  <text x="221.9" y="64" font-family="monospace" font-size="8" fill="#ff4050" text-anchor="middle">1</text>
+  <text x="271.1" y="64" font-family="monospace" font-size="8" fill="#3a5a8a" text-anchor="middle">2</text>
+  <text x="320.4" y="64" font-family="monospace" font-size="8" fill="#40c080" text-anchor="middle">3</text>
+  <text x="369.6" y="64" font-family="monospace" font-size="8" fill="#3a5a8a" text-anchor="middle">4</text>
+  <text x="418.9" y="64" font-family="monospace" font-size="8" fill="#40c080" text-anchor="middle">5</text>
+  <text x="468.1" y="64" font-family="monospace" font-size="8" fill="#3a5a8a" text-anchor="middle">6</text>
+  <text x="517.4" y="64" font-family="monospace" font-size="8" fill="#40c080" text-anchor="middle">7</text>
+  <text x="566.6" y="64" font-family="monospace" font-size="8" fill="#3a5a8a" text-anchor="middle">8</text>
+  <text x="615.9" y="64" font-family="monospace" font-size="8" fill="#40c080" text-anchor="middle">9</text>
+  <text x="665.1" y="64" font-family="monospace" font-size="8" fill="#3a5a8a" text-anchor="middle">10</text>
+  <text x="714.4" y="64" font-family="monospace" font-size="8" fill="#ff4050" text-anchor="middle">11</text>
+  <text x="763.6" y="64" font-family="monospace" font-size="8" fill="#3a5a8a" text-anchor="middle">12</text>
+  <text x="812.9" y="64" font-family="monospace" font-size="8" fill="#40c080" text-anchor="middle">13</text>
+  <text x="862.1" y="64" font-family="monospace" font-size="8" fill="#3a5a8a" text-anchor="middle">14</text>
+  <text x="911.4" y="64" font-family="monospace" font-size="8" fill="#ff4050" text-anchor="middle">15</text>
+  <rect x="148" y="70" width="788" height="140" fill="#140a0a" opacity="0.6"/>
+  <text x="142" y="86" font-family="monospace" font-size="10" fill="#ff8080" text-anchor="end">FERMAT</text>
+  <text x="142" y="98" font-family="monospace" font-size="7" fill="#885050" text-anchor="end">(prompt)</text>
+  <rect x="157.4" y="90.0" width="30.5" height="100.0" fill="#ffd014" opacity="0.30"/>
+  <rect x="206.6" y="90.0" width="30.5" height="100.0" fill="#ff4050" opacity="0.95"/>
+  <rect x="204.6" y="88.0" width="34.5" height="104.0" fill="none" stroke="#ffffff" stroke-width="1.2"/>
+  <rect x="255.9" y="90.0" width="30.5" height="100.0" fill="#3a5a8a" opacity="0.30"/>
+  <rect x="305.1" y="90.0" width="30.5" height="100.0" fill="#40c080" opacity="0.30"/>
+  <rect x="354.4" y="90.0" width="30.5" height="100.0" fill="#3a5a8a" opacity="0.30"/>
+  <rect x="403.6" y="90.0" width="30.5" height="100.0" fill="#40c080" opacity="0.30"/>
+  <rect x="452.9" y="90.0" width="30.5" height="100.0" fill="#3a5a8a" opacity="0.30"/>
+  <rect x="502.1" y="90.0" width="30.5" height="100.0" fill="#40c080" opacity="0.30"/>
+  <rect x="551.4" y="90.0" width="30.5" height="100.0" fill="#3a5a8a" opacity="0.30"/>
+  <rect x="600.6" y="90.0" width="30.5" height="100.0" fill="#40c080" opacity="0.30"/>
+  <rect x="649.9" y="90.0" width="30.5" height="100.0" fill="#3a5a8a" opacity="0.30"/>
+  <rect x="699.1" y="90.0" width="30.5" height="100.0" fill="#ff4050" opacity="0.30"/>
+  <rect x="748.4" y="90.0" width="30.5" height="100.0" fill="#3a5a8a" opacity="0.30"/>
+  <rect x="797.6" y="90.0" width="30.5" height="100.0" fill="#40c080" opacity="0.30"/>
+  <rect x="846.9" y="90.0" width="30.5" height="100.0" fill="#3a5a8a" opacity="0.30"/>
+  <rect x="896.1" y="90.0" width="30.5" height="100.0" fill="#ff4050" opacity="0.30"/>
+  <text x="148" y="206" font-family="monospace" font-size="7" fill="#666">gold=tap root(0)  red=Monster gap{1,11,15}  green=dendritic(Niemeier)  blue=even</text>
+  <line x1="221.9" y1="210.0" x2="221.9" y2="250.0" stroke="#ff4050" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.8"/>
+  <text x="227.9" y="230.0" font-family="monospace" font-size="8" fill="#ff4050">fires -&gt;</text>
+  <rect x="148" y="250" width="788" height="140" fill="#0a0a18" opacity="0.6"/>
+  <text x="142" y="266" font-family="monospace" font-size="10" fill="#80a0ff" text-anchor="end">RIEMANN</text>
+  <text x="142" y="278" font-family="monospace" font-size="7" fill="#505088" text-anchor="end">(response)</text>
+  <line x1="148" y1="320.0" x2="936" y2="320.0" stroke="#2a2a3a" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <text x="940" y="323.0" font-family="monospace" font-size="7" fill="#2a2a3a">0% dev</text>
+  <rect x="157.4" y="318.0" width="30.5" height="4" fill="none" stroke="#1a1a1a" stroke-width="0.4"/>
+  <rect x="206.6" y="320.0" width="30.5" height="58.8" fill="#ffffff" opacity="0.95"/>
+  <text x="221.9" y="388.8" font-family="monospace" font-size="8" fill="#ffffff" text-anchor="middle">-0.840%</text>
+  <rect x="255.9" y="318.0" width="30.5" height="4" fill="none" stroke="#1a1a1a" stroke-width="0.4"/>
+  <rect x="305.1" y="320.0" width="30.5" height="9.0" fill="#ff8080" opacity="0.55"/>
+  <rect x="354.4" y="318.0" width="30.5" height="4" fill="none" stroke="#1a1a1a" stroke-width="0.4"/>
+  <rect x="403.6" y="318.0" width="30.5" height="2.0" fill="#80a0ff" opacity="0.55"/>
+  <rect x="452.9" y="318.0" width="30.5" height="4" fill="none" stroke="#1a1a1a" stroke-width="0.4"/>
+  <rect x="502.1" y="307.2" width="30.5" height="12.8" fill="#80a0ff" opacity="0.55"/>
+  <rect x="551.4" y="318.0" width="30.5" height="4" fill="none" stroke="#1a1a1a" stroke-width="0.4"/>
+  <rect x="600.6" y="320.0" width="30.5" height="33.9" fill="#ff8080" opacity="0.55"/>
+  <rect x="649.9" y="318.0" width="30.5" height="4" fill="none" stroke="#1a1a1a" stroke-width="0.4"/>
+  <rect x="699.1" y="313.4" width="30.5" height="6.6" fill="#80a0ff" opacity="0.55"/>
+  <rect x="748.4" y="318.0" width="30.5" height="4" fill="none" stroke="#1a1a1a" stroke-width="0.4"/>
+  <rect x="797.6" y="272.9" width="30.5" height="47.1" fill="#80a0ff" opacity="0.55"/>
+  <rect x="846.9" y="318.0" width="30.5" height="4" fill="none" stroke="#1a1a1a" stroke-width="0.4"/>
+  <rect x="896.1" y="285.4" width="30.5" height="34.6" fill="#80a0ff" opacity="0.55"/>
+  <text x="148" y="386" font-family="monospace" font-size="7" fill="#666">real pi(x;16,k) deviation from Dirichlet equidistribution, N=200,000 (control run)</text>
+</svg>
