@@ -1,5 +1,5 @@
 """
-SedenionFactorialRelativity.engine.maths
+SedenionFactoralRelativity.engine.maths
 ==========================================
 Core pieces and pathways for the Fermat facet of H_hat_RB (the Zero
 Lattice tree, `AbrikosovTree/engine/telperion_engine.py`), plus the first
@@ -48,7 +48,11 @@ from typing import Dict, List, Any
 
 _THEPLACE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 _ABRIKOSOV_ENGINE = os.path.join(_THEPLACE, 'AbrikosovTree', 'engine')
-_H_RB_HAT_MODULE = os.path.join(_THEPLACE, 'AinulindaleBAK', 'ValaQuenta', 'modules', 'h_rb_hat')
+# FIXED 2026-08-21: this pointed at ThePlace/AinulindaleBAK/ValaQuenta/...,
+# a stale path from the pre-NVMe layout. That directory does not exist, so
+# `import engine` raised ModuleNotFoundError('maths') for anyone importing
+# the package rather than running a module directly. Real location below.
+_H_RB_HAT_MODULE = os.path.join(_THEPLACE, 'ValaQuenta', 'modules', 'h_rb_hat')
 # telperion_engine.py's OWN _FERMAT_DIR computation assumes it is nested one
 # directory deeper than it actually is (expects .../FourthAgePapers/AbrikosovTree/
 # engine/, but it actually lives at ThePlace/AbrikosovTree/engine/ directly) --

@@ -1,4 +1,4 @@
-# Sedenion Factorial Relativity
+# Sedenion Factoral Relativity
 
 Session origin: 2026-07-17, arising directly out of the SHA-1-first UDEO
 session (see `TuringStack`'s `.clauderc_context_1` entry) and Cody's own
@@ -22,14 +22,22 @@ facet instead, should produce its own "extinction" mechanism — not a
 metric (already tried, at chance — see Method 3 below), but a genuine
 structural fall/survive condition, the way Fermat's facet has one.
 
-**Why "factorial," not "spectral":** `UDEO_RSA_DEMO.py`'s Method 3
+**Why "factoral," not "spectral":** `UDEO_RSA_DEMO.py`'s Method 3
 ("Sedenion Spectral Relativity") already exists and already has a
 result — a σ-face geodesic-distance metric, tested against RSA's (e,d),
 AT CHANCE. Naming this new work "spectral" would risk quietly reusing
-that already-failed mechanism under a new name. "Factorial" names the
+that already-failed mechanism under a new name. "Factoral" names the
 actual target precisely: not distance under a metric, but which numbers
 get extinguished and which survive — a discrete fall/no-fall condition,
 same shape as Fermat's, different facet.
+
+**Why "factoral," not "factorial":** renamed 2026-08-21 (Cody), repo
+and directory together. *Factoral* — of, or pertaining to, factors. The
+old spelling collided with `n!` (nothing to do with the subject) and,
+worse, with `A!` in the `0_RB` context, which
+`.clauderc_canonical_maths` records explicitly as meaning **`A†`, the
+adjoint — "NOT factorial, do not conflate."** The naming *argument*
+above is unchanged and still load-bearing; only the collision is gone.
 
 ## Correction: the foundational claim is the Nightmare Group, not the tree
 
@@ -170,3 +178,118 @@ facet's fall condition is actually built — `facet_fermat()`'s own
 framing (FLT as the *negative* facet of H_hat_RB, "not a projection of
 what the operator produces") is the likely anchor for what "negative
 maths" means here, not yet connected further.
+
+
+## The factoral decomposition tool — `engine/lineage.py`
+
+Added 2026-08-21, at Cody's direction, carried over from
+`VAPMIP/engines/e10_generational_lineage.py` ("the anatomy of σ in ∅_RB",
+2026-08-20) so this repo holds the decomposition machinery locally rather
+than reaching across repos for it.
+
+**Why it belongs here rather than staying in VAPMIP.** This repo's whole
+premise is that factorisation is *relative to which σ-facet of `0_RB` you
+stand at*. A decomposition tool is therefore not an accessory — it is the
+instrument. Before you can ask which numbers a facet extinguishes, you
+need a way to say what any given operation *descends from*, and whether a
+named "geometry" is primitive or merely a count of something below it.
+
+`14/14` relations hold. `R1–R8` are the VAPMIP engine's σ relations,
+carried verbatim and re-measured here — not paraphrased, not re-derived.
+`F1–F6` are this repo's.
+
+| | relation | tier | what it measures |
+|---|---|---|---|
+| F1 | `two_trees_exact` | 2 | Telperion + Laurelin + Mingling = every integer, zero overlap |
+| F2 | `densities_conserve` | 3 | the two densities sum to 1 at every scale |
+| F3 | `mingling_point` | 2 | the crossings, and Laurelin's permanent dominance after them |
+| F4 | `gcd_is_lca` | 0 | shared lineage = gcd = lowest common ancestor, in one division |
+| F5 | `omega_is_lineage_length` | 3 | `Ω(n)` **is** the lineage length, not a statistic about it |
+| F6 | `pg32_is_edges` | 3 | the 15 are relationships, not positions; each factors 7 ways |
+
+### The domain: what the Two Trees actually partition
+
+    TELPERION   PRIME       defined by what it CANNOT be decomposed into
+    LAURELIN    COMPOSITE   defined by what it IS decomposed into
+    MINGLING    0 and 1     neither — the identities of ADD and SCALE
+
+Measured over `[0, 100000]`: `2 + 9,592 + 90,407 = 100,001 = N+1`, exact,
+zero overlap. **0 and 1 are on neither tree because they are the
+identities of the first two tier-0 primitives** — which is also the
+reason neither can be prime. Not a convention; a consequence.
+
+### The tier floor
+
+    tier 3   chirality, factorial, factoral, leverage, balance
+             ← COUNTS and RATIOS of the layer below
+    tier 2   vector, boundary, origin, fulcrum / anchor / balance
+             ← FIXED SETS, and products of reflect × scale
+    tier 1   reflect, rotate, contract / dilate   ← I − 2uuᵀ; gains {0, 1, √2}
+    tier 0   ADD (identity 0) · SCALE (identity 1) · SIGN (one bit)
+
+`decompose(name)` asks the four questions in order and the first to fire
+decides. An operation that lands in **no** tier is not a discovery — it
+is the emergence signal, and per §5 of the skill, claiming a genuinely
+new generator needs a far better measurement than a name.
+
+### The factoring map is on the EDGES, not the places
+
+`F6` is the relation that most directly earns this tool its place in this
+repo. Sixteen placeholders give `C(16,2) = 120` pairs; the 15 nonzero XOR
+differences partition those 120 **exactly 8 apiece**; there are 35 lines
+(`a ⊕ b = c`, so knowing two forces the third); and every difference lies
+in exactly 7 of them (`105 / 15 = 7`) — the seven ways to **factor one
+relation into two others**.
+
+So the 15 "points" of `PG(3,2)` are *relationships*, not positions, and
+`e₀` is not a point at all: in the edge reading it is the **root**, the
+node that owns no edge and does no work. When decomposing an operator
+here, decompose the **relation** it expresses — never the objects it
+connects.
+
+### A measured correction to the skill's own prose
+
+`F3` was written to check the generational-lineage skill's statement that
+the two trees reach equal brightness at *"n ~ 9, near e² = 7.389"*. It
+came back **MATHS-FAULT**, and the measurement was right: the counting
+functions cross **three** times — `n = 9, 11, 13` — because 11 and 13 are
+themselves prime, so Telperion catches up twice more before Laurelin
+pulls away for good.
+
+The first crossing is 1.61 from `e²`. The **last** is 5.61 from it. So
+the `e²` proximity, such as it is, holds for the first of three and not
+for the Mingling as a whole.
+
+The relation now tests what is actually structural — *after the last
+crossing Laurelin dominates forever*, verified to `N = 100,000` — and
+records the `e²` distance without making it part of the pass condition.
+One integer near one constant is not a result and is not dressed as one.
+**The skill's prose should be read as approximate here.**
+
+### Usage
+
+```python
+from engine.lineage import run, decompose, factor_lineage, two_trees
+
+run()                    # all 14 relations, tiered and self-checked
+decompose('chirality')   # → tier 3, DERIVED: a count of reflection parity
+decompose('gnarl')       # → UNPLACED: the emergence signal
+factor_lineage(360)      # → Ω=6, generations=5, leaves [2,2,2,3,3,5]
+two_trees(100_000)       # → the exact partition, measured
+```
+
+`engine/__init__.py` imports `lineage` **first and unconditionally** —
+it is stdlib + numpy only and depends on nothing outside this repo, so it
+stays usable even when the cross-repo Fermat-facet imports are not. Those
+are guarded behind `IMPORT_ERROR` rather than being allowed to take the
+package down.
+
+### Open, for this tool
+
+- **The `mingling_point` band.** Three crossings is measured; *why* the
+  band is `[9, 13]` rather than a single point is not derived.
+- **The tier table is a lookup, not a decision procedure.** `decompose()`
+  returns `UNPLACED` for anything not already in `TIERS`. It cannot yet
+  *derive* a tier for a new operation from its behaviour — it can only
+  tell you that the domain does not contain it. That is honest, and it is
+  also the obvious next piece of work.

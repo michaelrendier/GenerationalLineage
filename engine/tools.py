@@ -1,5 +1,5 @@
 """
-SedenionFactorialRelativity.engine.tools
+SedenionFactoralRelativity.engine.tools
 ==========================================
 Runnable reports over engine.maths. Simplified from ValaQuenta's full
 EquationModule/registry contract (h_rb_hat/tools.py's pattern) since this
@@ -69,3 +69,28 @@ if __name__ == "__main__":
     report_pieces_and_pathways()
     print()
     report_control_test()
+
+
+def report_factoral_lineage(verbose: bool = True):
+    """The factoral decomposition tool — 14 relations, tiered and self-checked.
+
+    R1-R8 are carried from VAPMIP/engines/e10_generational_lineage.py; F1-F6 are
+    this repo's, applying the same discipline to factorisation itself. Every
+    number is COMPUTED at run time -- nothing here is asserted.
+    """
+    from .lineage import run as _run, factor_lineage, decompose
+    result = _run(verbose=verbose)
+    if verbose:
+        print("\n  FACTORAL DECOMPOSITION -- worked examples:")
+        for n in (97, 360, 1024, 1):
+            fl = factor_lineage(n)
+            print(f"    n={n:<6} {fl['tree_class']:<42} "
+                  f"Omega={fl['omega']:<3} generations={fl['generations']:<3} "
+                  f"leaves={fl['leaves_telperion']}")
+        print("\n  THE FOUR-PART TEST -- worked examples:")
+        for op in ('chirality', 'fulcrum', 'dilate', 'add', 'factoral',
+                   'leverage', 'gnarl'):
+            d = decompose(op)
+            print(f"    {op:<12} tier={str(d['tier']):<5} {d['status']:<10} "
+                  f"{d['note'][:52]}")
+    return result
