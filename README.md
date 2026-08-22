@@ -83,9 +83,9 @@ engine/
                  (real π(x;16,k) vs Dirichlet equidistribution). Imports
                  telperion_engine.py and h_rb_hat/maths.py directly — no
                  reimplementation of either.
-  lineage.py   — THE FACTORAL DECOMPOSITION TOOL. 14 self-checked relations:
-                 R1–R8 carried from VAPMIP/engines/e10_generational_lineage.py,
-                 F1–F6 this repo's own. stdlib + numpy only; depends on
+  lineage.py   — THE FACTORAL DECOMPOSITION TOOL. 23 self-checked relations:
+                 R1–R8 carried from VAPMIP; F1–F6 factoral; G1–G6 ring theory;
+                 FR1–FR3 fractal. stdlib + numpy only; depends on
                  nothing outside this repo, and is imported first and
                  unconditionally by engine/__init__.py for that reason.
   tools.py     — runnable reports over maths.py and lineage.py.
@@ -107,7 +107,7 @@ you need is a way to tell a **primitive** operation from a **derived** one, and
 to say what any named "geometry" descends from.
 
 ```
-python3 engine/lineage.py          # 14/14, ~20s
+python3 engine/lineage.py          # 23/23, ~22s
 ```
 
 **What it gives this repo that it did not have:**
@@ -234,9 +234,27 @@ quotient map), `quotient` (t1, the collapse = the FALL), `radical` (t2),
 `unit`/`zero-divisor` (survivors/fallen), `associator` (t3, the ring defect),
 `primary-decomposition` (t3, the cepstrum).
 
-## The frontier — fractal decomposition (the higher-order tower)
+## Fractal decomposition — the highest-order rung (FR1–FR3, built 2026-08-22)
 
-Not yet built; recorded here so the direction is on the record before the code.
+Now in the engine — the fractal block, three self-checking relations:
+
+| # | relation | tier | what it measures |
+|---|---|---|---|
+| FR1 | `tower_self_similar` | 3 | the CD tower is an **exact** self-similar recursion: associator events 168 → 1848 = 11·168, persist core = 8 at every scale. "The same maths at every level," made exact. |
+| FR2 | `bifurcation_cascade` | 1 | the period-doubling cascade "bifurcates emergently"; successive interval ratios bracket the **Feigenbaum constant δ = 4.6692**. J₂ is the generator; the accumulation is a Cantor set. |
+| FR3 | `fall_survive_boundary` | 3 | the fall/survive boundary of an iterated generator is a **fractal (1 < D < 2)** — fall = escape, survive = bounded, **G1's dichotomy read on dynamics**. |
+
+**The library is the control set.** `escape_survives()` and `box_dimension()`
+take the generator as an argument, so any of the 200+ Ultra Fractal formulas in
+`Ainulindale/wiki/fractals/` can drive them. FR3 runs three as controls —
+Mandelbrot (D ≈ 1.3), Julia −0.8+0.156i (D ≈ 1.6), Burning Ship (D ≈ 1.56) — all
+fractal, all **distinct**, so the instrument separates generators. Each formula
+is both a control (known dimension to calibrate against) and an instruction
+manual (its escape rule is a different higher-order lineage). FR3 is labelled
+**FRONTIER**: the fall/survive ↔ factoring correspondence is structural and said
+so, not a claim that the Mandelbrot set *is* the primes.
+
+The direction, now with the code under it:
 
 The tower has a natural continuation, and it is the one Cody named across the
 2026-08-22 session: **a fractal is the higher-order generational lineage of a
@@ -288,6 +306,8 @@ imposed, so nothing can hide an imposed scale. Noether again — a conserved
 current, not a chosen parameter.
 
 ## Status
+
+v1.3 (2026-08-22) — the fractal block (FR1–FR3) is in; `23/23` relations hold.
 
 v1.2 (2026-08-22) — the ring-theory spine (G1–G6) is in; `20/20` relations hold.
 

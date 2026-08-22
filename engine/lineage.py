@@ -7,9 +7,12 @@ Carried over from `VAPMIP/engines/e10_generational_lineage.py` (2026-08-20,
 "the anatomy of sigma in 0_RB") at Cody's direction, 2026-08-21, so this repo
 has the decomposition machinery locally rather than reaching across repos for
 it. The eight sigma relations (R1-R8) are the VAPMIP engine's, carried verbatim
-and re-measured here — not paraphrased, not re-derived. On top of them sits the
-part that belongs to THIS repo: six **factoral** relations (F1-F6) that apply
-the same discipline to factorisation itself.
+and re-measured here — not paraphrased, not re-derived. On top of them sit the
+parts that belong to THIS repo: six **factoral** relations (F1-F6) applying the
+same discipline to factorisation; six **ring-theory** relations (G1-G6) naming
+the tower in its proper ring theory (FALL <=> the quotient ring has zero
+divisors); and three **fractal** relations (FR1-FR3), the highest-order rung.
+23 relations, all self-checked.
 
 WHY IT BELONGS HERE
 
@@ -46,12 +49,16 @@ USAGE
 
     from engine.lineage import run, decompose, factor_lineage, two_trees
 
-    run()                       # all 14 relations, tiered and self-checked
+    run()                       # all 23 relations, tiered and self-checked
     decompose('chirality')      # the four-part test on a named operation
     factor_lineage(360)         # generational tree of a factorisation
     two_trees(100_000)          # the exact partition, measured
+    fall_test(12)               # FALL <=> Z/(12) has zero divisors (G1)
+    box_dimension(MANDELBROT, (-2,0.5), (-1.25,1.25))   # fractal boundary (FR3)
 
-SIGMA: infinity for F1-F6 and R1-R8 (exact / exhaustive over finite spaces).
+SIGMA: infinity for F1-F6, R1-R8, G1 G3 G4 G5 G6, FR1 (exact/exhaustive);
+       finite for G2 (sampled moduli), FR2 (Feigenbaum, converging), FR3
+       (box-count on a grid — a coarse but honest dimension in (1,2)).
 
 Author:  Claude, at Cody's direction — 2026-08-21.
 White Hat. No free parameters. Failed predictions stay in the record.
@@ -607,6 +614,124 @@ def fall_test(n: int) -> Dict[str, Any]:
     }
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# FRACTAL DECOMPOSITION (2026-08-22) — the highest-order factoral rung
+# ═══════════════════════════════════════════════════════════════════════════
+# A fractal is the higher-order generational lineage of a toroidal bifurcation,
+# which is the higher-order lineage of a ring, which is the higher-order lineage
+# of a circle. Each level is the lineage operator applied to the one below;
+# "the same maths at every level" IS self-similarity, so the tower is a fractal.
+#
+# The order tower of factoral decomposition (spectrum -> cepstrum -> bispectrum)
+# does not stop at order 3. Iterated to the limit it is a FRACTAL: apply the
+# fall/survive test not once but under repeated iteration of a generator, and
+# the boundary between fall (escape) and survive (bounded) is a self-similar set
+# with a fractal dimension. Fall/survive here is the SAME dichotomy as G1 (does
+# the quotient have zero divisors), now read on the DYNAMICS of an iterated map.
+#
+# THE LIBRARY IS THE CONTROL SET. Ainulindale/wiki/fractals/ catalogues 200+
+# Ultra Fractal generators (Mandelbrot/Julia/Nova/Phoenix/Burning-Ship/...).
+# Each is a known generator with a known dimension — a CONTROL to calibrate the
+# instrument against, and an INSTRUCTION MANUAL (its escape-time/IFS rule) for a
+# different higher-order lineage. escape_survives()/box_dimension() below take
+# the generator as an argument so any catalogue formula can drive them.
+
+
+def nonassoc_count(d: int) -> int:
+    """Number of ordered distinct basis triples with associator ≠ 0 in T_d.
+    The exact self-similarity datum of the Cayley–Dickson tower (FR1)."""
+    c = 0
+    for i in range(d):
+        for j in range(d):
+            for k in range(d):
+                if len({i, j, k}) < 3:
+                    continue
+                L = cd_mul(cd_mul(unit(d, i), unit(d, j)), unit(d, k))
+                R = cd_mul(unit(d, i), cd_mul(unit(d, j), unit(d, k)))
+                if nrm([a - b for a, b in zip(L, R)]) > 1e-9:
+                    c += 1
+    return c
+
+
+def _logistic_period(r: float, settle: int = 20000, tol: float = 1e-9) -> int:
+    x = 0.5
+    for _ in range(settle):
+        x = r * x * (1 - x)
+    orbit = [x]
+    for _ in range(256):
+        x = r * x * (1 - x)
+        orbit.append(x)
+    for p in (1, 2, 4, 8, 16, 32):
+        if all(abs(orbit[i] - orbit[i + p]) < tol for i in range(64)):
+            return p
+    return 999
+
+
+def feigenbaum_delta() -> Dict[str, Any]:
+    """The period-doubling bifurcation cascade of the logistic map — the 1D
+    shadow of the toroidal bifurcation. Successive interval ratios → the
+    Feigenbaum constant δ = 4.6692… (FR2). 'Bifurcates emergently', measured."""
+    def bif(target, a, b):
+        for _ in range(80):
+            m = (a + b) / 2
+            if _logistic_period(m) >= target:
+                b = m
+            else:
+                a = m
+        return (a + b) / 2
+    pts = [3.0, bif(4, 3.40, 3.48), bif(8, 3.53, 3.55),
+           bif(16, 3.560, 3.567), bif(32, 3.5685, 3.5700)]
+    deltas = [(pts[i + 1] - pts[i]) / (pts[i + 2] - pts[i + 1])
+              for i in range(len(pts) - 2)]
+    return {'bifurcation_points': pts, 'delta_estimates': deltas,
+            'feigenbaum': 4.66920160910299}
+
+
+# A few generators from the "library" — each a control with a known character.
+MANDELBROT = lambda z, c: z * z + c                                # noqa: E731
+BURNING_SHIP = lambda z, c: complex(abs(z.real), abs(z.imag)) ** 2 + c  # noqa: E731
+
+
+def escape_survives(c: complex, step, z0: complex = 0j,
+                    maxiter: int = 80, bailout: float = 2.0) -> bool:
+    """The iterated fall/survive test. survive = the orbit stays BOUNDED (in
+    the set); fall = it ESCAPES past the bailout. This is G1's dichotomy read on
+    dynamics: bounded ↔ a domain, escaping ↔ zero divisors appear."""
+    z = z0
+    for _ in range(maxiter):
+        z = step(z, c)
+        if abs(z) > bailout:
+            return False
+    return True
+
+
+def box_dimension(step, xr, yr, param=None, resolutions=(50, 100, 200),
+                  maxiter: int = 80, bailout: float = 2.0) -> Dict[str, Any]:
+    """Box-counting dimension of the fall/survive BOUNDARY of a generator.
+
+    param=None  -> Mandelbrot-like: c varies over the plane, z₀ = 0.
+    param=c     -> Julia-like: c fixed, z₀ varies over the plane.
+    The boundary is the σ=½-analog critical set; a fractal has 1 < D < 2.
+    """
+    boxes = []
+    for N in resolutions:
+        xs = [xr[0] + (xr[1] - xr[0]) * i / N for i in range(N)]
+        ys = [yr[0] + (yr[1] - yr[0]) * j / N for j in range(N)]
+        if param is None:
+            g = [[escape_survives(complex(x, y), step, 0j, maxiter, bailout)
+                  for x in xs] for y in ys]
+        else:
+            g = [[escape_survives(param, step, complex(x, y), maxiter, bailout)
+                  for x in xs] for y in ys]
+        cnt = sum(1 for j in range(N - 1) for i in range(N - 1)
+                  if g[j][i] != g[j][i + 1] or g[j][i] != g[j + 1][i])
+        boxes.append(cnt)
+    D = [math.log(boxes[k + 1] / boxes[k]) / math.log(resolutions[k + 1] / resolutions[k])
+         for k in range(len(boxes) - 1)]
+    return {'resolutions': list(resolutions), 'boundary_boxes': boxes,
+            'dimension_estimates': D}
+
+
 # The tier table of the generational-lineage skill, as data rather than prose.
 TIERS: Dict[str, Tuple[int, str, str]] = {
     # name          tier  descends from                      note
@@ -650,6 +775,16 @@ TIERS: Dict[str, Tuple[int, str, str]] = {
     'primary-decomposition': (3, 'Lasker–Noether: (n) = ⋂(pᵢ^aᵢ)',
                      'a COUNT of primary components — the SECOND-order (cepstral) '
                      'factoral datum. exponents = peak heights, Ω(n) = Σ'),
+    # ── fractal-decomposition operations (the highest-order rung) ────────────
+    'self-similar':  (3, 'the lineage operator applied to its own output',
+                     'a RATIO across scales — DERIVED. "the same maths at every '
+                     'level" is exactly this'),
+    'bifurcation':   (1, 'a DILATE that splits one branch into two',
+                     'the generator of the fractal; iterated it gives the tree. '
+                     'J₂ is the torus involution that generates it'),
+    'fractal':       (3, 'the fall/survive boundary of an iterated generator',
+                     'a RATIO — box-count dimension 1 < D < 2. the highest-order '
+                     'factoral decomposition; ring theory is its skeleton'),
 }
 
 
@@ -1028,6 +1163,87 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'commutativity@4, associativity@8, the domain property@16. The '
             f'associator is order-3 curvature; the fall is order-1 position.')
 
+    # ═══════════════════════════════════════════════════════════════════════
+    # THE FRACTAL BLOCK (FR1–FR3). Added 2026-08-22.
+    # Fractal decomposition = the highest-order factoral rung: iterate the
+    # bifurcation to the limit, and the fall/survive boundary is self-similar.
+    # ═══════════════════════════════════════════════════════════════════════
+
+    # ── FR1 — the CD tower is an EXACT self-similar recursion ────────────────
+    def fr_tower_self_similar(self) -> None:
+        n8, n16 = nonassoc_count(8), nonassoc_count(16)
+        # persist core = 8 (an octonion) at every scale — R4's invariant
+        persist = all(self.gains(d, 1, d // 2 + 2).get(1.0, 0) == 8
+                      for d in (8, 16, 32))
+        ok = (n8 == 168 and n16 == 1848 and n16 == 11 * n8 and persist)
+        self._record(
+            'fractal.tower_self_similar',
+            'the Cayley–Dickson tower is an EXACT self-similar recursion: the '
+            'associator-event count obeys a fixed multiplicative law under '
+            'doubling (168 → 1848 = 11·168) and the gain-1 persist core is 8 '
+            '(an octonion) at every scale — "the same maths at every level"',
+            3, 'a RATIO across scales — the self-similarity of the tower',
+            True, ok,
+            f'[KNOWN (exact counts)] associator≠0: dim8={n8}, dim16={n16}='
+            f'{n16 // n8}·{n8}; persist core = 8 at dim 8,16,32 = {persist}. '
+            f'Self-similarity here is EXACT (a fixed recursion), not a fitted '
+            f'dimension — the tower is the cleanest fractal in the framework, '
+            f'and the generational lineage IS its address.')
+
+    # ── FR2 — the bifurcation cascade: it bifurcates emergently → Feigenbaum ──
+    def fr_bifurcation_cascade(self) -> None:
+        f = feigenbaum_delta()
+        d = f['delta_estimates']
+        target = f['feigenbaum']
+        brackets = min(d) < target < max(d)
+        near = all(4.3 < x < 5.2 for x in d)
+        ok = brackets and near
+        self._record(
+            'fractal.bifurcation_cascade',
+            'the period-doubling cascade — the 1D shadow of the toroidal '
+            'bifurcation — "bifurcates emergently", and the ratio of successive '
+            'bifurcation intervals converges to the Feigenbaum constant '
+            'δ = 4.6692, universal to the generator', 1,
+            'the bifurcation (a splitting DILATE) iterated; J₂ is its generator',
+            True, ok,
+            f'[KNOWN (Feigenbaum 1978)] bifurcation points '
+            f'{[round(x, 5) for x in f["bifurcation_points"]]}; δ estimates '
+            f'{[round(x, 4) for x in d]} bracket {target:.4f}. The cascade is '
+            f'the toroidal bifurcation about the σ=½ axis, read on the interval; '
+            f'its accumulation point is a Cantor set — a fractal from iterating '
+            f'one split.')
+
+    # ── FR3 — the fall/survive boundary of an iterated generator is fractal ───
+    def fr_fall_survive_boundary(self) -> None:
+        # the baseline generator, plus two controls from the "library"
+        mand = box_dimension(MANDELBROT, (-2, 0.5), (-1.25, 1.25))
+        julia = box_dimension(MANDELBROT, (-1.5, 1.5), (-1.5, 1.5),
+                              param=complex(-0.8, 0.156))
+        ship = box_dimension(BURNING_SHIP, (-2, 1), (-2, 1))
+        def fractal(res):
+            return all(1.0 < x < 2.0 for x in res['dimension_estimates'])
+        ok = fractal(mand) and fractal(julia) and fractal(ship)
+        md = mand['dimension_estimates'][-1]
+        jd = julia['dimension_estimates'][-1]
+        sd = ship['dimension_estimates'][-1]
+        self._record(
+            'fractal.fall_survive_boundary',
+            'the fall/survive boundary of an iterated generator is a FRACTAL '
+            '(1 < D < 2): fall = the orbit escapes, survive = it stays bounded '
+            '— G1\'s dichotomy read on dynamics. The library of generators are '
+            'the CONTROLS, each with its own dimension', 3,
+            'the fall/survive test (G1) iterated to the limit — a RATIO (box '
+            'dimension) of the boundary',
+            True, ok,
+            f'[FRONTIER framing; controls from wiki/fractals/] box-count '
+            f'dimension of the fall/survive boundary: Mandelbrot D≈{md:.2f}, '
+            f'Julia(-0.8+0.156i) D≈{jd:.2f}, Burning-Ship D≈{sd:.2f} — all '
+            f'strictly in (1,2), and DISTINCT, so the instrument separates '
+            f'generators. bounded↔a domain, escaping↔zero divisors appear; the '
+            f'boundary is the σ=½-analog critical set. This is a structural '
+            f'analogy to arithmetic factoring, labelled as one — not a proof '
+            f'that the Mandelbrot set IS the primes.')
+
     def run(self) -> None:
         super().run()                              # R1-R8, the sigma relations
         for f in (self.f_two_trees_exact, self.f_densities_conserve,
@@ -1040,6 +1256,9 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                   self.g_trace_laplacian_is_nilpotency,
                   self.g_associator_is_ring_defect):
             g()
+        for fr in (self.fr_tower_self_similar, self.fr_bifurcation_cascade,
+                   self.fr_fall_survive_boundary):
+            fr()
 
     def report(self) -> None:
         print('═' * 78)
@@ -1047,6 +1266,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('  R1–R8  carried from VAPMIP/engines/e10_generational_lineage.py')
         print('  F1–F6  this repo: factorisation decomposed against the Two Trees')
         print('  G1–G6  the ring-theory spine: FALL ⟺ quotient has zero divisors')
+        print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')

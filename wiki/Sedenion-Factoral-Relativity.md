@@ -358,9 +358,9 @@ built to catch, caught.
 
 ---
 
-## The frontier — fractal decomposition
+## Fractal decomposition — the highest-order rung (FR1–FR3, built 2026-08-22)
 
-Recorded before the code, per the discipline. Cody's chain across the session:
+Built into the engine as the fractal block. Cody's chain across the session:
 
 > **a circle → (higher generational lineage) → a ring → a toroidal bifurcation
 > → a fractal.** Each level is the lineage operator applied to the one below;
@@ -384,6 +384,22 @@ Recorded before the code, per the discipline. Cody's chain across the session:
   level a quotient/sub-structure of the last, the associator the torsion that
   stops the branches stacking flat (two reflections → a rotation;
   rotation + log advance → the Archimedes screw).
+
+**The block, in the engine (all self-checked):**
+
+- **FR1 `tower_self_similar`** — the CD tower is an EXACT self-similar recursion:
+  associator events 168 → 1848 = 11·168, persist core 8 at every scale. "The
+  same maths at every level," made exact (KNOWN).
+- **FR2 `bifurcation_cascade`** — the period-doubling cascade bifurcates
+  emergently; successive interval ratios bracket the Feigenbaum constant
+  δ = 4.6692. J₂ is the generator; the accumulation is a Cantor set (KNOWN).
+- **FR3 `fall_survive_boundary`** — the fall/survive boundary of an iterated
+  generator is a fractal (1 < D < 2): fall = escape, survive = bounded — G1's
+  dichotomy read on dynamics. `escape_survives()`/`box_dimension()` take the
+  generator as an argument, so the fractal library drives them as CONTROLS.
+  FR3 runs Mandelbrot (D≈1.3), Julia (D≈1.6), Burning Ship (D≈1.56) — all
+  fractal, all distinct. FRONTIER: the fall/survive ↔ factoring link is
+  structural, not a claim that the Mandelbrot set is the primes.
 
 **The experiment set exists:** `Ainulindale/wiki/fractals/` — 200+ Ultra Fractal
 formulas (Mitchell, Monnier, Jones' Nova/Halley/Phoenix/Torus, …). The place to

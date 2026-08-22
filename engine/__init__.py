@@ -17,6 +17,9 @@ from .lineage import (
     cd_mul_gf2, all_ones, trace_laplacian_gf2, is_nilpotent_gf2,
     primary_decomposition, von_mangoldt, euler_phi,
     quotient_zero_divisors, fall_test,
+    # fractal decomposition (2026-08-22)
+    nonassoc_count, feigenbaum_delta, escape_survives, box_dimension,
+    MANDELBROT, BURNING_SHIP,
 )
 
 IMPORT_ERROR = None
@@ -47,4 +50,6 @@ __all__ = [
     'cd_mul_gf2', 'all_ones', 'trace_laplacian_gf2', 'is_nilpotent_gf2',
     'primary_decomposition', 'von_mangoldt', 'euler_phi',
     'quotient_zero_divisors', 'fall_test',
+    'nonassoc_count', 'feigenbaum_delta', 'escape_survives', 'box_dimension',
+    'MANDELBROT', 'BURNING_SHIP',
 ]
