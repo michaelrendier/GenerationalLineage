@@ -12,11 +12,12 @@ parts that belong to THIS repo: six **factoral** relations (F1-F6) applying the
 same discipline to factorisation; six **ring-theory** relations (G1-G6) naming
 the tower in its proper ring theory (FALL <=> the quotient ring has zero
 divisors); and three **fractal** relations (FR1-FR3), the highest-order rung; and three
-**formulary** relations (FR4-FR6) integrating the UF fractal library; and seven
-**pathway** relations (PW1-PW7) — factoring as a tunable WALK to N, the
-two-anchor geodesic, the EDGE primitive, and L_(I|O) as the Observer's lineage
-mechanism. G8 adds the ARITHMETIC DERIVATIVE — the ring-theory version of a
-calculus derivative, a derivation forced onto Z. 35 relations, all self-checked.
+**formulary** relations (FR4-FR6) integrating the UF fractal library; and eight
+**pathway** relations (PW1-PW8) — factoring as a tunable WALK to N, the
+two-anchor geodesic, the EDGE primitive, L_(I|O) as the Observer's lineage
+mechanism, and the Smith chart as an independent 90-year-old engineering
+instance of the same Möbius structure. G8 adds the ARITHMETIC DERIVATIVE. 36
+relations, all self-checked.
 
 WHY IT BELONGS HERE
 
@@ -1695,7 +1696,8 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         for pw in (self.pw_geodesic_reaches_factor, self.pw_tuning_resonates,
                    self.pw_spiral_is_additive, self.pw_inside_outside_one_product,
                    self.pw_two_anchor_geodesic, self.pw_edge_is_the_primitive,
-                   self.pw_observer_lineage_is_l_io):
+                   self.pw_observer_lineage_is_l_io,
+                   self.pw_smith_chart_is_the_same_mobius):
             pw()
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -1942,6 +1944,70 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'L_(I|O) is the mechanism; the Observer its fixed point; the '
             f'lineage its orbit.')
 
+    # ── PW8 — the Smith chart: 90 years of independent engineering practice ──
+    def pw_smith_chart_is_the_same_mobius(self) -> None:
+        Z0 = 50.0
+
+        def gamma(Z):
+            return (Z - Z0) / (Z + Z0)
+
+        # 1. the matched load Z=Z0 is the UNIQUE fixed point (Γ=0, the anchor)
+        fp = abs(gamma(complex(Z0, 0))) < 1e-12
+        not_fp = all(abs(gamma(Z)) > 1e-9
+                    for Z in (complex(10, 0), complex(200, 0), complex(Z0, 30)))
+        # short/open are the OTHER two anchors, both driven to the boundary |Γ|=1
+        short_open = (abs(gamma(complex(0, 0)) - (-1)) < 1e-12
+                     and abs(gamma(complex(1e12, 0)) - 1) < 1e-6)
+        # 2. |Γ|=1 ⟺ Re(Z)=0 — the lossless (purely reactive) locus, the horizon
+        react = all(abs(abs(gamma(complex(0, x))) - 1) < 1e-9
+                   for x in (10, 50, -30, 1000))
+        lossy = all(abs(gamma(complex(r, x))) < 1 - 1e-9
+                   for r, x in ((5, 0), (5, 50), (20, -10)))
+        # 3. conformal: constant-R and constant-X curves stay ORTHOGONAL (Möbius
+        # maps are angle-preserving, so R,X's Cartesian right angle survives)
+        h = 1e-5
+        zR = lambda x: gamma(complex(Z0, x))           # noqa: E731
+        zX = lambda r: gamma(complex(r, Z0))            # noqa: E731
+        tR = (zR(Z0 + h) - zR(Z0 - h)) / (2 * h)
+        tX = (zX(Z0 + h) - zX(Z0 - h)) / (2 * h)
+        orth = abs(tR.real * tX.real + tR.imag * tX.imag) < 1e-6
+        # 4. admittance Y=1/Z (the inside-out map) IS a π-ROTATION on the SAME
+        # chart — the Smith chart's own L_(I|O), independently discovered
+        def gamma_Y(Z):
+            Y, Y0 = 1 / Z, 1 / Z0
+            return (Y - Y0) / (Y + Y0)
+        rotation = all(abs(gamma_Y(Z) - (-gamma(Z))) < 1e-9
+                      for Z in (complex(25, 25), complex(100, -10), complex(10, 80)))
+        ok = fp and not_fp and short_open and react and lossy and orth and rotation
+        self._record(
+            'pathway.smith_chart_is_the_same_mobius',
+            'the Smith chart (Phillip Smith, 1939; RF/radar impedance matching) '
+            'is the SAME Möbius structure as L_(I|O), independently discovered '
+            'in engineering: a fixed-point anchor (matched load), a boundary '
+            'horizon (lossless/reactive), orthogonal coordinate families, and '
+            'Y=1/Z as a π-rotation — 90 years of stub-tuning IS tuning a path '
+            'between two anchors (PW5, PW2)', 1,
+            'a Möbius transform Γ=(Z−Z₀)/(Z+Z₀) — the same family as L_(I|O), '
+            'an independent real-world instance, not a derivation of it',
+            True, ok,
+            f'[KNOWN (Smith chart, engineering); the CORRESPONDENCE is OURS] '
+            f'Z=Z₀ is the unique fixed point Γ=0 ({fp and not_fp}) — the anchor, '
+            f'no reflection; Z=0 and Z→∞ (short/open) both drive to the boundary '
+            f'|Γ|=1 ({short_open}) — the OTHER two anchors, total reflection; '
+            f'|Γ|=1 ⟺ Re(Z)=0 exactly ({react and lossy}) — the lossless locus '
+            f'IS the horizon, same role as r=1 in L_(I|O); constant-R/constant-X '
+            f'families are orthogonal ({orth}), because a Möbius map is '
+            f'conformal; and Y=1/Z (admittance — the inside-out map) is EXACTLY '
+            f'Γ→−Γ, a π-rotation on the same chart ({rotation}) — the same '
+            f'structure as θ→θ+π/2, one octave coarser (order 2, not 4). Stub '
+            f'tuning — rotate along |Γ|=const, switch R↔X circles, walk to the '
+            f'matched anchor — IS the two-anchor tuned pathway (PW5/PW2), and it '
+            f'has been engineered since 1939, independent of this framework. '
+            f'NOT evidence for the framework\'s wider claims — evidence that the '
+            f'MATHEMATICAL OBJECT (Möbius, fixed point, tunable path between two '
+            f'anchors) is exactly the tool reached for whenever a real system '
+            f'needs to navigate impedance space.')
+
     # ═══════════════════════════════════════════════════════════════════════
     # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.
     # The UF formulary's generators and labelings, integrated: Newton basins as
@@ -2040,7 +2106,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('  G1–G8  ring-theory: FALL⟺quotient-ZD; closed/open=unit/ZD; the derivative')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
-        print('  PW1–7  pathway: walk, two-anchor, edge primitive, the Observer lineage')
+        print('  PW1–8  pathway: walk, two-anchor, edge, Observer lineage, Smith chart')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')

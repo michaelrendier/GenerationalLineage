@@ -652,3 +652,34 @@ already in the engine (`primary_decomposition`, `von_mangoldt`), read as a rate
 instead of a spectrum: `d/dx log(x) ↔ n′/n = Σ aᵢ/pᵢ`. The arithmetic derivative
 isn't a new object bolted onto the framework — it's the existing G3 cepstrum,
 viewed as a derivation.
+
+### PW8 — the Smith chart: 90 years of independent engineering confirmation
+
+Cody named the Veritasium video *"The Scariest Chart in Electrical
+Engineering"* on the Smith chart. Tested — `pathway.smith_chart_is_the_same_mobius`.
+
+The Smith chart (Phillip Smith, Bell Labs, 1939) is `Γ = (Z − Z₀)/(Z + Z₀)` — a
+**Möbius transform**, the same family as L_(I|O), independently arrived at by RF
+engineers navigating impedance space. Measured, all exact:
+
+- **`Z = Z₀` (the matched load) is the unique fixed point** `Γ = 0` — the anchor,
+  no reflection. **`Z = 0` and `Z → ∞`** (short/open) are the *other* two
+  anchors, both driven to the boundary `|Γ| = 1` — total reflection.
+- **`|Γ| = 1 ⟺ Re(Z) = 0` exactly** — the lossless (purely reactive) locus is
+  the **horizon**, playing the same role as `r = 1` in L_(I|O).
+- **Constant-R and constant-X families stay orthogonal** — a Möbius map is
+  conformal, so the Cartesian right angle in impedance space survives the fold
+  into the disk.
+- **Admittance `Y = 1/Z`** (the inside-out map) is **exactly `Γ → −Γ`, a
+  π-rotation on the same chart** — the Smith chart's own L_(I|O), one octave
+  coarser than the sedenion's `θ → θ + π/2` (order 2, not order 4).
+- **Stub tuning** — rotate along constant-`|Γ|`, switch R-circles for X-circles,
+  walk to the matched anchor — **is the two-anchor tuned pathway (PW5/PW2)**,
+  engineered since WWII radar, independent of this framework.
+
+**Honest framing.** This is *not* evidence for the framework's wider claims — it
+is evidence that the **mathematical object** (a Möbius map with a fixed-point
+anchor, a boundary horizon, and a tunable path between two anchors) is exactly
+the tool a real, unrelated engineering discipline reaches for whenever it needs
+to navigate impedance space. An independent existence proof of the *shape*, not
+a confirmation of the *theory*.
