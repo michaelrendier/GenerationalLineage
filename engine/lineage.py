@@ -12,10 +12,11 @@ parts that belong to THIS repo: six **factoral** relations (F1-F6) applying the
 same discipline to factorisation; six **ring-theory** relations (G1-G6) naming
 the tower in its proper ring theory (FALL <=> the quotient ring has zero
 divisors); and three **fractal** relations (FR1-FR3), the highest-order rung; and three
-**formulary** relations (FR4-FR6) integrating the UF fractal library; and six
-**pathway** relations (PW1-PW6) — factoring as a tunable WALK to N, the
-two-anchor geodesic, and the EDGE as the primitive (node→edge→pathway). 32
-relations, all self-checked.
+**formulary** relations (FR4-FR6) integrating the UF fractal library; and seven
+**pathway** relations (PW1-PW7) — factoring as a tunable WALK to N, the
+two-anchor geodesic, the EDGE primitive, and L_(I|O) as the Observer's lineage
+mechanism. G8 adds the ARITHMETIC DERIVATIVE — the ring-theory version of a
+calculus derivative, a derivation forced onto Z. 35 relations, all self-checked.
 
 WHY IT BELONGS HERE
 
@@ -628,6 +629,34 @@ def fall_test(n: int) -> Dict[str, Any]:
     }
 
 
+def arith_deriv(n: int) -> int:
+    """THE RING-THEORY DERIVATIVE — the arithmetic derivative on (ℤ, +, ×).
+
+    Defined by exactly the two axioms of a ring DERIVATION, applied to the
+    integers directly (not by analogy):
+
+        p' = 1                      for every prime p      (the base case)
+        (mn)' = m'·n + m·n'         the LEIBNIZ / product rule
+
+    This is the ring-theoretic answer to "what is the derivative in calculus":
+    a derivation is ANY additive map satisfying Leibniz, and this is the one
+    forced on ℤ by declaring primes to have derivative 1 (the atoms — constant
+    rate, exactly d/dx(x) = 1). It needs no limit, no topology, only the ring
+    structure and the primary decomposition already computed by this module.
+
+    Closed form (the log-derivative rule, exact — see G8): for
+    n = ∏ pᵢ^aᵢ,  n' = n · Σ(aᵢ/pᵢ), the integer analogue of
+    d/dx log n = Σ aᵢ · d/dx log(pᵢ), i.e. n'/n plays the role of a
+    LOGARITHMIC derivative — the cepstral (order-2) datum read as a rate.
+    """
+    if n in (0, 1):
+        return 0
+    pd = primary_decomposition(n)
+    from fractions import Fraction
+    total = sum(Fraction(a, p) for p, a in pd.items())
+    return int(n * total)
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # FRACTAL DECOMPOSITION (2026-08-22) — the highest-order factoral rung
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1052,6 +1081,9 @@ TIERS: Dict[str, Tuple[int, str, str]] = {
     'primary-decomposition': (3, 'Lasker–Noether: (n) = ⋂(pᵢ^aᵢ)',
                      'a COUNT of primary components — the SECOND-order (cepstral) '
                      'factoral datum. exponents = peak heights, Ω(n) = Σ'),
+    'derivative':    (1, 'a DERIVATION: p′=1, Leibniz (mn)′=m′n+mn′',
+                     'a linear map obeying ONE algebraic law — the ring-theory '
+                     'floor calculus sits on. no limit, no topology needed'),
     # ── fractal-decomposition operations (the highest-order rung) ────────────
     'self-similar':  (3, 'the lineage operator applied to its own output',
                      'a RATIO across scales — DERIVED. "the same maths at every '
@@ -1502,6 +1534,64 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'commutativity@4, associativity@8, the domain property@16. The '
             f'associator is order-3 curvature; the fall is order-1 position.')
 
+    # ── G8 — the RING-THEORY DERIVATIVE: a derivation forced onto ℤ ──────────
+    def g_arithmetic_derivative(self) -> None:
+        import random
+        rng = random.Random(20260822)
+        # Leibniz rule, from the closed form, over random pairs
+        leibniz_bad = 0
+        for _ in range(500):
+            a, b = rng.randint(2, 800), rng.randint(2, 800)
+            if arith_deriv(a * b) != arith_deriv(a) * b + a * arith_deriv(b):
+                leibniz_bad += 1
+        # built from the TWO AXIOMS ALONE (p'=1, Leibniz), bottom-up — not the
+        # closed form — must agree with the closed form (both derive the same
+        # unique derivation on a UFD)
+        def from_axioms(n):
+            if n <= 1:
+                return 0
+            pd = primary_decomposition(n)
+            factors = [p for p, a in pd.items() for _ in range(a)]
+            val, deriv = 1, 0
+            for p in factors:
+                deriv = deriv * p + val * 1
+                val *= p
+            return deriv
+        axiom_bad = sum(1 for n in range(2, 2000)
+                        if arith_deriv(n) != from_axioms(n))
+        # power rule, exact: D(p^k) = k p^(k-1)
+        power_ok = all(arith_deriv(p ** k) == k * p ** (k - 1)
+                      for p in (2, 3, 5, 7) for k in (1, 2, 3, 4))
+        # D(0)=D(1)=0 — the Mingling is killed, and D(prime)=1 — an atom, a
+        # constant rate (the integer d/dx(x)=1)
+        mingling_ok = arith_deriv(0) == 0 and arith_deriv(1) == 0
+        atoms_ok = all(arith_deriv(p) == 1 for p in (2, 3, 5, 7, 97))
+        # fixed points D(n)=n: forced to n=p^p by the power rule (k p^{k-1}=p^k ⟺ k=p)
+        fixed = [n for n in range(2, 4000) if arith_deriv(n) == n]
+        fixed_ok = fixed == [4, 27, 3125]   # 2^2, 3^3, 5^5 — all under 4000
+        ok = (leibniz_bad == 0 and axiom_bad == 0 and power_ok
+              and mingling_ok and atoms_ok and fixed_ok)
+        self._record(
+            'ring.arithmetic_derivative',
+            'the RING-THEORY VERSION OF A DERIVATIVE is a DERIVATION — any '
+            'additive map satisfying Leibniz — and forcing p\'=1 on the primes '
+            'of ℤ (the atoms, a constant rate) determines ONE such map on all '
+            'of ℤ by the product rule alone. No limit, no topology needed', 1,
+            'REFLECT-free: a linear map obeying one algebraic law (Leibniz), '
+            'not a geometric primitive — the ring-theory floor below calculus',
+            True, ok,
+            f'[KNOWN (arithmetic derivative, Barbeau 1961)] Leibniz D(ab)='
+            f'D(a)b+aD(b): {500 - leibniz_bad}/500 hold; built from the two '
+            f'AXIOMS alone (p\'=1, Leibniz) matches the closed form n·Σ(aᵢ/pᵢ) '
+            f'for every n<2000 ({2000 - 2 - axiom_bad} agree); the POWER RULE '
+            f'D(pᵏ)=kp^(k-1) is exact; D(0)=D(1)=0 (the Mingling is killed); '
+            f'D(prime)=1 (an atom, constant rate — the integer d/dx(x)=1); and '
+            f'the power rule FORCES the fixed points D(n)=n to n=pᵖ exactly — '
+            f'measured {fixed}: 4=2², 27=3³, 3125=5⁵, the "arithmetic '
+            f'eˣ", numbers that are their own derivative. n\'/n is the '
+            f'LOGARITHMIC derivative — the SAME cepstral (order-2, G3) datum '
+            f'read as a rate: d/dx log(x) ↔ n\'/n = Σ aᵢ/pᵢ.')
+
     # ═══════════════════════════════════════════════════════════════════════
     # THE FRACTAL BLOCK (FR1–FR3). Added 2026-08-22.
     # Fractal decomposition = the highest-order factoral rung: iterate the
@@ -1594,7 +1684,8 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                   self.g_radical_units_split_gf2,
                   self.g_trace_laplacian_is_nilpotency,
                   self.g_associator_is_ring_defect,
-                  self.g_open_and_closed_pathways):
+                  self.g_open_and_closed_pathways,
+                  self.g_arithmetic_derivative):
             g()
         for fr in (self.fr_tower_self_similar, self.fr_bifurcation_cascade,
                    self.fr_fall_survive_boundary, self.fr_newton_basins_are_splitting,
@@ -1946,7 +2037,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('FACTORAL LINEAGE ENGINE — the decomposition tool')
         print('  R1–R8  carried from VAPMIP/engines/e10_generational_lineage.py')
         print('  F1–F6  this repo: factorisation decomposed against the Two Trees')
-        print('  G1–G7  ring-theory spine: FALL⟺quotient-ZD; closed/open = unit/ZD')
+        print('  G1–G8  ring-theory: FALL⟺quotient-ZD; closed/open=unit/ZD; the derivative')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
         print('  PW1–7  pathway: walk, two-anchor, edge primitive, the Observer lineage')

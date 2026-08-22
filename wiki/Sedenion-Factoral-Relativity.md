@@ -616,3 +616,39 @@ interpretation — consistent with the maths, not proven by it (SIGMA finite).
 orbit.** This is why having both anchors gives the inside-out of the piece (the
 view from inside the wave and the outside of the ripple), and why one anchor
 still progresses — the reverse pathway is inherent in every pathway result.
+
+### G8 — the arithmetic derivative: ring theory's version of calculus
+
+Cody: *"what is the ring theory version of a derivative in calculus?"* Answer,
+tested — `ring.arithmetic_derivative`.
+
+The ring-theoretic definition of "derivative" is a **derivation**: any additive
+map `D` on a ring satisfying the **Leibniz rule** `D(ab) = D(a)b + aD(b)`. No
+limit, no topology — it is purely the product rule, taken as the axiom rather
+than derived from one. Two concrete instances:
+
+- **The formal derivative on R[x]**: `D(Σaᵢxⁱ) = Σ i·aᵢxⁱ⁻¹`, works over *any*
+  commutative ring (even 𝔽_p). Its classical use: `gcd(f, D(f)) ≠ 1` detects a
+  **repeated root** — this is the discriminant, and it is exactly what decides
+  **ramification** when a prime splits in a ring extension (the cyclotomic
+  frontier of `Ainulindale/wiki/92`'s "circle → ring" continuation). Verified:
+  `f=(x−2)²(x−3)` has `gcd(f,f')` nontrivial; `f=(x−2)(x−3)(x−5)` (distinct
+  roots) has `gcd(f,f')=1`.
+- **The arithmetic derivative on ℤ** (Barbeau 1961) — declare `p′ = 1` for
+  every prime (an atom, a constant rate — the integer `d/dx(x) = 1`) and let
+  Leibniz determine the rest. This **is** a derivation on `(ℤ, +, ×)`, not an
+  analogy of one.
+
+Measured: the closed form `n′ = n·Σ(aᵢ/pᵢ)` agrees exactly with the value built
+from the two axioms alone (0 mismatches, n<2000); Leibniz holds over 500 random
+products (0 mismatches); the power rule `D(pᵏ) = k·p^(k−1)` is exact; `D(0) =
+D(1) = 0` (the **Mingling is killed** by the derivative); `D(prime) = 1`. The
+power rule **forces** the fixed points `D(n) = n` to `n = pᵖ` exactly —
+measured `[4, 27, 3125] = [2², 3³, 5⁵]`, the **arithmetic eˣ**: numbers that are
+their own derivative.
+
+**`n′/n` is the logarithmic derivative — the SAME order-2 cepstral datum**
+already in the engine (`primary_decomposition`, `von_mangoldt`), read as a rate
+instead of a spectrum: `d/dx log(x) ↔ n′/n = Σ aᵢ/pᵢ`. The arithmetic derivative
+isn't a new object bolted onto the framework — it's the existing G3 cepstrum,
+viewed as a derivation.

@@ -16,7 +16,7 @@ from .lineage import (
     # ring-theory machinery (2026-08-22)
     cd_mul_gf2, all_ones, trace_laplacian_gf2, is_nilpotent_gf2,
     primary_decomposition, von_mangoldt, euler_phi,
-    quotient_zero_divisors, fall_test,
+    quotient_zero_divisors, fall_test, arith_deriv,
     # fractal decomposition (2026-08-22)
     nonassoc_count, feigenbaum_delta, escape_survives, box_dimension,
     MANDELBROT, BURNING_SHIP,
@@ -54,7 +54,7 @@ __all__ = [
     'cd_mul', 'unit', 'sigma_self', 'sigma_rb', 'sigma_rb_independent',
     'cd_mul_gf2', 'all_ones', 'trace_laplacian_gf2', 'is_nilpotent_gf2',
     'primary_decomposition', 'von_mangoldt', 'euler_phi',
-    'quotient_zero_divisors', 'fall_test',
+    'quotient_zero_divisors', 'fall_test', 'arith_deriv',
     'nonassoc_count', 'feigenbaum_delta', 'escape_survives', 'box_dimension',
     'MANDELBROT', 'BURNING_SHIP',
     'smooth_escape', 'orbit_trap', 'orbit_curvature', 'lyapunov_exponent',
