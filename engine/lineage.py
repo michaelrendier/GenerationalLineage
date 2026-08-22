@@ -482,6 +482,131 @@ def factor_lineage(n: int) -> Dict[str, Any]:
     }
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# RING-THEORY MACHINERY (2026-08-22)
+# ═══════════════════════════════════════════════════════════════════════════
+# The factoral tower, named in its proper ring theory. The unifying statement,
+# measured by G1 below:
+#
+#     an element FALLS  iff  its quotient ring has zero divisors.
+#
+# Integer side (ℤ, an associative UFD — classical ring theory is complete):
+#     N composite  ⟺  ℤ/(N) has a zero divisor  ⟺  (N) is not a prime ideal.
+# Algebra side (𝕊₁₆ / T₃₂ over GF(2) — a NON-associative algebra, where the
+# ring axioms break rung by rung): a constant w falls ⟺ w is nilpotent ⟺ w
+# lies in the zero-divisor set = ∪ of the associated primes.
+#
+# The detector is the same KIND of object on both sides: one operation.
+#   ℤ side  : gcd(a, N) > 1                     (the integer trace-Laplacian)
+#   GF(2)   : the trace-Laplacian Δ(w) = w·𝟏    (w·𝟏 = 0 ⟺ w² = 0)
+
+
+def cd_mul_gf2(a: int, b: int, dim: int) -> int:
+    """Cayley–Dickson product in T_dim over GF(2), on integer bitmasks.
+
+    Bit k of the integer is the coefficient of basis element e_k. Over GF(2)
+    conjugation is the identity (−x = x) and the base product is AND. Non-
+    commutative and non-associative above dim 2 — ORDER matters, and is kept.
+    """
+    if dim == 1:
+        return a & b
+    h = dim // 2
+    mask = (1 << h) - 1
+    a1, a2 = a & mask, a >> h
+    b1, b2 = b & mask, b >> h
+    lo = cd_mul_gf2(a1, b1, h) ^ cd_mul_gf2(b2, a2, h)   # a1b1 − b̄2a2  (GF2)
+    hi = cd_mul_gf2(b2, a1, h) ^ cd_mul_gf2(a2, b1, h)   # b2a1 + a2b̄1
+    return lo | (hi << h)
+
+
+def all_ones(dim: int) -> int:
+    """𝟏_dim = Σ e_k = the all-ones vector (0xFF…F at dim 32)."""
+    return (1 << dim) - 1
+
+
+def trace_laplacian_gf2(w: int, dim: int = 32) -> int:
+    """Δ(w) = w · 𝟏_dim. Its popcount is the spectral distance from the
+    zero-divisor nodal line; Δ(w) = 0 exactly when w is nilpotent (G5)."""
+    return cd_mul_gf2(w, all_ones(dim), dim)
+
+
+def is_nilpotent_gf2(w: int, dim: int = 32) -> bool:
+    """w² = 0 in T_dim/GF(2)."""
+    return cd_mul_gf2(w, w, dim) == 0
+
+
+def euler_phi(n: int) -> int:
+    """|units of ℤ/(n)| — the count of residues coprime to n."""
+    result, m, p = n, n, 2
+    while p * p <= m:
+        if m % p == 0:
+            while m % p == 0:
+                m //= p
+            result -= result // p
+        p += 1
+    if m > 1:
+        result -= result // m
+    return result
+
+
+def primary_decomposition(n: int) -> Dict[int, int]:
+    """(n) = ⋂ (pᵢ^aᵢ) as {prime: exponent} — the Lasker–Noether primary
+    decomposition of the ideal, which is the SECOND-order (cepstral) factoral
+    datum: the peaks are at the primes, the heights are the exponents."""
+    out: Dict[int, int] = {}
+    m, p = n, 2
+    while p * p <= m:
+        while m % p == 0:
+            out[p] = out.get(p, 0) + 1
+            m //= p
+        p += 1
+    if m > 1:
+        out[m] = out.get(m, 0) + 1
+    return out
+
+
+def von_mangoldt(n: int) -> float:
+    """Λ(n) = log p if n = pᵏ (a prime power), else 0. The cepstral weight —
+    Λ is supported exactly on the primary components of the integers, and the
+    explicit formula ψ(x) = x − Σ_ρ xᵖ/ρ is the transform back to the zeros."""
+    pd = primary_decomposition(n)
+    if len(pd) == 1:
+        return math.log(next(iter(pd)))
+    return 0.0
+
+
+def quotient_zero_divisors(n: int) -> List[int]:
+    """The zero divisors of ℤ/(n): the nonzero residues a with gcd(a,n) > 1.
+    Empty exactly when n is prime (or 1) — then ℤ/(n) is a field (or the zero
+    ring). This is the FALL test, done in the quotient ring itself."""
+    from math import gcd
+    return [a for a in range(2, n) if gcd(a, n) > 1]
+
+
+def fall_test(n: int) -> Dict[str, Any]:
+    """The unifying fall/survive test, read through the quotient ring.
+
+    survive  ⟺  ℤ/(n) is a field (n prime)          → Telperion, a leaf
+    fall     ⟺  ℤ/(n) has zero divisors (n composite) → Laurelin, an internal node
+    mingling ⟺  n ∈ {0, 1}                            → the identities, neither tree
+    """
+    if n < 2:
+        return {'n': n, 'verdict': 'MINGLING', 'tree': None,
+                'quotient': 'ℤ/(0)=ℤ (a domain)' if n == 0 else 'ℤ/(1)=0 (zero ring)',
+                'has_zero_divisors': False}
+    zds = quotient_zero_divisors(n)
+    fell = len(zds) > 0
+    return {
+        'n': n,
+        'verdict': 'FALL' if fell else 'SURVIVE',
+        'tree': 'LAURELIN' if fell else 'TELPERION',
+        'quotient': f'ℤ/({n}) ' + ('has zero divisors' if fell else 'is a field'),
+        'has_zero_divisors': fell,
+        'n_zero_divisors': len(zds),
+        'primary_decomposition': primary_decomposition(n),
+    }
+
+
 # The tier table of the generational-lineage skill, as data rather than prose.
 TIERS: Dict[str, Tuple[int, str, str]] = {
     # name          tier  descends from                      note
@@ -508,6 +633,23 @@ TIERS: Dict[str, Tuple[int, str, str]] = {
                      'remove rigidity and the fulcrum survives, leverage does not'),
     'gcd':          (0, 'SCALE (division)', 'the lowest common ancestor of two '
                      'lineages, reached in one division — see R8'),
+    # ── ring-theory operations ──────────────────────────────────────────────
+    'ideal':        (2, 'a fixed set closed under absorption R·I ⊆ I',
+                     'a FIXED SET — DERIVED. the kernel of a quotient map'),
+    'quotient':     (1, 'SCALE — the collapse R → R/I',
+                     'a DILATE with gain 0 on I; the ring-theoretic FALL'),
+    'radical':      (2, 'the nilpotents — √(0) — a fixed set/ideal',
+                     'a FIXED SET — DERIVED. where the trace-Laplacian vanishes'),
+    'unit':         (3, 'a COUNT: the invertibles, |units| = φ(n)',
+                     'DERIVED. the SURVIVORS; complement of the zero divisors'),
+    'zero-divisor': (2, 'the ZD set = ∪ associated primes — a fixed set',
+                     'a FIXED SET — DERIVED. the FALL locus, one operation to test'),
+    'associator':   (3, '[a,b,c] = (ab)c − a(bc)',
+                     'a TRIPLE PRODUCT — DERIVED, and it is the OBSTRUCTION to '
+                     'being a ring: ≡ 0 for a genuine ring, ≠ 0 from 𝕆 upward'),
+    'primary-decomposition': (3, 'Lasker–Noether: (n) = ⋂(pᵢ^aᵢ)',
+                     'a COUNT of primary components — the SECOND-order (cepstral) '
+                     'factoral datum. exponents = peak heights, Ω(n) = Σ'),
 }
 
 
@@ -721,18 +863,190 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'whole structure is factorisation ON THE EDGES. Decompose the '
             f'RELATION an operator expresses, never the objects it connects.')
 
+    # ═══════════════════════════════════════════════════════════════════════
+    # THE RING-THEORY BLOCK (G1–G6). Added 2026-08-22.
+    # The factoral tower named in its proper ring theory. Every number COMPUTED.
+    # ═══════════════════════════════════════════════════════════════════════
+
+    # ── G1 — the unifying theorem: FALL ⟺ the quotient ring has zero divisors ─
+    def g_fall_is_quotient_zd(self, N: int = 2000) -> None:
+        from math import gcd
+        flags = _sieve(N)
+        bad = 0
+        for n in range(2, N + 1):
+            has_zd = any(gcd(a, n) > 1 for a in range(2, n))   # ℤ/(n) zero divisor
+            is_composite = not flags[n]
+            if has_zd != is_composite:
+                bad += 1
+        self._record(
+            'ring.fall_is_quotient_zd',
+            'an element FALLS iff its quotient ring has zero divisors: n is '
+            'composite ⟺ ℤ/(n) has a zero divisor ⟺ (n) is not a prime ideal. '
+            'The Two Trees ARE this dichotomy — domain vs. not-a-domain',
+            2, 'the zero-divisor set of ℤ/(n) — a fixed set (∪ associated primes)',
+            True, bad == 0,
+            f'[KNOWN (elementary ring theory)] checked every n in [2,{N}]: {bad} disagreements between "ℤ/(n) '
+            f'has a zero divisor" and "n is composite". Telperion (prime) = '
+            f'ℤ/(n) is a FIELD, survives; Laurelin (composite) = ℤ/(n) has '
+            f'zero divisors, falls. Same statement as the T₃₂ fall test: a '
+            f'constant falls ⟺ it is nilpotent ⟺ it is a zero divisor.')
+
+    # ── G2 — gcd IS the integer trace-Laplacian; the census closes ───────────
+    def g_gcd_is_the_detector(self, samples=(97, 360, 1024, 2310, 65537)) -> None:
+        from math import gcd
+        rows, ok = {}, True
+        for n in samples:
+            units = sum(1 for a in range(1, n) if gcd(a, n) == 1)
+            zds = sum(1 for a in range(1, n) if gcd(a, n) > 1)
+            census = units + zds + 1 == n and units == euler_phi(n)
+            rows[n] = (units, zds, census)
+            if not census:
+                ok = False
+        self._record(
+            'ring.gcd_is_the_detector',
+            'the zero-divisor detector of ℤ/(n) is gcd(a,n) > 1 — ONE division, '
+            'the integer trace-Laplacian; and the census closes exactly: '
+            'units φ(n) + zero-divisors + {0} = n', 0,
+            'SCALE (division) — Axis 2 of the tier-0 floor',
+            True, ok,
+            '[KNOWN (elementary)] ' + '  '.join(f'n={n}: units={u}=φ, zd={z}, +{{0}}={u+z+1}=n:{c}'
+                      for n, (u, z, c) in rows.items()) +
+            '  — gcd is to ℤ/(n) what Δ(w)=w·𝟏 is to T₃₂/GF(2): the single '
+            'operation that decides fall vs. survive.')
+
+    # ── G3 — primary decomposition IS the cepstrum ───────────────────────────
+    def g_primary_decomposition_is_cepstrum(self, N: int = 3000) -> None:
+        bad, worst = 0, None
+        for n in range(2, N):
+            pd = primary_decomposition(n)
+            recon = 1
+            for p, a in pd.items():
+                recon *= p ** a
+            omega = sum(pd.values())               # Ω(n), with multiplicity
+            small_omega = len(pd)                   # ω(n), distinct primes
+            lin = factor_lineage(n)
+            lam = von_mangoldt(n)
+            is_prime_power = len(pd) == 1
+            lam_ok = (lam > 0) == is_prime_power
+            if not (recon == n and omega == lin['omega']
+                    and small_omega == len(set(lin['leaves_telperion']))
+                    and lam_ok):
+                bad += 1
+                worst = worst or n
+        self._record(
+            'ring.primary_decomposition_is_cepstrum',
+            'the Lasker–Noether primary decomposition (n) = ⋂(pᵢ^aᵢ) IS the '
+            'second-order (cepstral) factoral datum: exponents = peak heights, '
+            'Ω(n) = Σ = lineage length, ω(n) = support; von Mangoldt Λ is '
+            'supported exactly on the primary components (prime powers)', 3,
+            'a COUNT of primary components — a ratio of the primes of G1',
+            True, bad == 0,
+            f'[KNOWN (Lasker–Noether)] n in [2,{N}): {bad} disagreements. ∏pᵢ^aᵢ reconstructs n; Ω '
+            f'matches the lineage length (F5); Λ(n)>0 iff n is a prime power. '
+            f'Λ is the cepstral domain of the integers, and ψ(x)=x−Σ_ρ xᵖ/ρ '
+            f'is the transform back to the Riemann zeros — the spectrum.')
+
+    # ── G4 — over GF(2), x² ∈ {0, e₀}: the radical / units split ──────────────
+    def g_radical_units_split_gf2(self, dim: int = 8) -> None:
+        squares = [cd_mul_gf2(x, x, dim) for x in range(1 << dim)]
+        in_split = all(s in (0, 1) for s in squares)
+        nil = sum(1 for s in squares if s == 0)      # includes x=0
+        unit = sum(1 for s in squares if s == 1)
+        half = (1 << dim) // 2
+        self._record(
+            'ring.radical_units_split_gf2',
+            'over GF(2) every element squares to 0 or e₀: the NILPOTENTS (the '
+            'radical √0 — a fixed set/ideal) and the INVOLUTORY units split the '
+            f'algebra in half — {nil}/{unit} at dim {dim}', 2,
+            'the radical of T_dim/GF(2) — a fixed set, and the trace-Laplacian '
+            'projects onto it',
+            True, in_split and nil == unit == half,
+            f'[KNOWN framing] dim {dim}, all {1 << dim} elements: squares ⊆ {{0, e₀}} = '
+            f'{in_split}; nilpotent {nil} = involutory {unit} = {half} = 2^dim/2. '
+            f'The fallen live in the radical; the survivors are the units. This '
+            f'is the algebra-side of G1: fall = enter the radical.')
+
+    # ── G5 — the trace-Laplacian, and the corrected annihilator fact ─────────
+    def g_trace_laplacian_is_nilpotency(self, dim: int = 8, n_rand: int = 20000) -> None:
+        import random
+        # (a) exhaustive at `dim`: Δ(w)=0 ⟺ w²=0
+        exh = all((trace_laplacian_gf2(w, dim) == 0) == is_nilpotent_gf2(w, dim)
+                  for w in range(1 << dim))
+        # (b) 𝟏 is NOT a global annihilator: e₀ is a witness (e₀·𝟏 = 𝟏 ≠ 0)
+        one = all_ones(dim)
+        not_global = cd_mul_gf2(1, one, dim) != 0
+        # (c) sampled at dim 32: same equivalence, plus the SHA-1 name collision
+        rng = random.Random(20260822)
+        eq32 = all((trace_laplacian_gf2(w, 32) == 0) == is_nilpotent_gf2(w, 32)
+                   for w in (rng.getrandbits(32) for _ in range(n_rand)))
+        IV = (0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0)
+        Kc = (0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6)
+        iv_null = all(cd_mul_gf2(a, b, 32) == 0 for a in IV for b in IV)
+        iv_dist0 = all(trace_laplacian_gf2(w, 32) == 0 for w in IV)
+        k_distmax = all(bin(trace_laplacian_gf2(w, 32)).count('1') == 32 for w in Kc)
+        self._record(
+            'ring.trace_laplacian_is_nilpotency',
+            'the trace-Laplacian Δ(w)=w·𝟏 vanishes IFF w is nilpotent (w²=0); '
+            '𝟏 is NOT a global annihilator (e₀·𝟏 = 𝟏 ≠ 0). SHA-1\'s five IV '
+            'constants are a NULL SUBALGEBRA on the nodal line (dist 0); its '
+            'four round constants sit at maximum distance (32)', 2,
+            'the radical of G4 read as the kernel of the linear map w ↦ w·𝟏',
+            True, exh and not_global and eq32 and iv_null and iv_dist0 and k_distmax,
+            f'[OURS — corrects a false lemma] dim {dim} exhaustive: Δ(w)=0 ⟺ w²=0 holds for all {1 << dim} '
+            f'elements = {exh}; 𝟏 global annihilator? {not not_global} '
+            f'(e₀·𝟏 = 𝟏, so NO). dim 32: equivalence over {n_rand} random = '
+            f'{eq32}; the 5 SHA-1 IVs are a null subalgebra ({iv_null}) all at '
+            f'distance 0 ({iv_dist0}); the 4 round constants all at distance 32 '
+            f'({k_distmax}). The lemma "x·𝟏=0 for all x" contradicts its own '
+            f'distance table and is retracted; the THEOREM stands, machine-verified.')
+
+    # ── G6 — the associator is the OBSTRUCTION to being a ring ────────────────
+    def g_associator_is_ring_defect(self) -> None:
+        def associates(d):
+            for i in range(d):
+                for j in range(d):
+                    for k in range(d):
+                        L = cd_mul(cd_mul(unit(d, i), unit(d, j)), unit(d, k))
+                        R = cd_mul(unit(d, i), cd_mul(unit(d, j), unit(d, k)))
+                        if L != R:
+                            return False
+            return True
+        assoc = {d: associates(d) for d in (1, 2, 4, 8)}
+        # a genuine ring has associator ≡ 0; ℝ,ℂ,ℍ do, 𝕆 does not
+        ok = assoc[1] and assoc[2] and assoc[4] and not assoc[8]
+        self._record(
+            'ring.associator_is_ring_defect',
+            'a genuine ring has associator [a,b,c] ≡ 0. ℝ,ℂ,ℍ are rings '
+            '(associator vanishes); 𝕆 and up are NOT — the associator IS the '
+            'obstruction, and its 168-quantisation (R5) measures the defect', 3,
+            'the associator — the third-order (bispectral) factoral datum',
+            True, ok,
+            f'[KNOWN (CD property cascade)] associativity holds at dim 1,2,4 = {assoc[1],assoc[2],assoc[4]} '
+            f'(ℝ,ℂ,ℍ are associative rings) and FAILS at dim 8 = {not assoc[8]} '
+            f'(𝕆 is not a ring). Ring theory is COMPLETE on the ℤ side and is '
+            f'exactly what breaks, rung by rung, on the algebra side: '
+            f'commutativity@4, associativity@8, the domain property@16. The '
+            f'associator is order-3 curvature; the fall is order-1 position.')
+
     def run(self) -> None:
         super().run()                              # R1-R8, the sigma relations
         for f in (self.f_two_trees_exact, self.f_densities_conserve,
                   self.f_mingling_point, self.f_gcd_is_lca,
                   self.f_omega_is_lineage_length, self.f_pg32_is_edges):
             f()
+        for g in (self.g_fall_is_quotient_zd, self.g_gcd_is_the_detector,
+                  self.g_primary_decomposition_is_cepstrum,
+                  self.g_radical_units_split_gf2,
+                  self.g_trace_laplacian_is_nilpotency,
+                  self.g_associator_is_ring_defect):
+            g()
 
     def report(self) -> None:
         print('═' * 78)
         print('FACTORAL LINEAGE ENGINE — the decomposition tool')
         print('  R1–R8  carried from VAPMIP/engines/e10_generational_lineage.py')
         print('  F1–F6  this repo: factorisation decomposed against the Two Trees')
+        print('  G1–G6  the ring-theory spine: FALL ⟺ quotient has zero divisors')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')
@@ -781,10 +1095,16 @@ def main() -> None:
               f'leaves={fl["leaves_telperion"]}')
     print('\nThe four-part test, worked examples:')
     for op in ('chirality', 'fulcrum', 'dilate', 'add', 'factoral', 'leverage',
-               'gnarl'):
+               'associator', 'ideal', 'quotient', 'gnarl'):
         d = decompose(op)
         print(f'  {op:<12} tier={str(d["tier"]):<5} {d["status"]:<10} '
               f'{d["note"][:60]}')
+
+    print('\nThe fall/survive test, read through the quotient ring:')
+    for n in (7, 12, 97, 1):
+        ft = fall_test(n)
+        print(f'  n={n:<4} {ft["verdict"]:<8} {ft["quotient"]:<24} '
+              f'primary={ft.get("primary_decomposition", {})}')
 
 
 if __name__ == '__main__':

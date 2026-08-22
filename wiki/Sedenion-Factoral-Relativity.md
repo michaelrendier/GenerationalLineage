@@ -293,3 +293,106 @@ package down.
   *derive* a tier for a new operation from its behaviour — it can only
   tell you that the domain does not contain it. That is honest, and it is
   also the obvious next piece of work.
+
+---
+
+## The ring-theory spine (relations G1–G6, added 2026-08-22)
+
+Cody, 2026-08-22: *"where is ring theory in all this."* The answer: it was here
+the whole time, named in signal-processing and geometry. Put it back on top and
+the tower collapses to one statement.
+
+### The unifying theorem — an element falls iff its quotient ring has zero divisors
+
+    ℤ side (associative UFD — classical ring theory is COMPLETE):
+        N composite  ⟺  ℤ/(N) has a zero divisor  ⟺  (N) not a prime ideal   → FALL
+        N prime      ⟺  ℤ/(N) is a field                                     → SURVIVE
+        N ∈ {0,1}    ⟺  the degenerate quotients ℤ/(0)=ℤ, ℤ/(1)=0            → MINGLING
+
+    algebra side (T₃₂/GF(2) — NON-associative, ring axioms break rung by rung):
+        w falls  ⟺  w is nilpotent  ⟺  w ∈ the zero-divisor set (∪ associated primes)
+
+**The Two Trees ARE this dichotomy** — a domain vs. not-a-domain. And the
+*detector* is the same kind of object on both sides, one operation:
+
+    ℤ    :  gcd(a, N) > 1          — the integer trace-Laplacian
+    GF(2):  Δ(w) = w · 𝟏           — Δ(w)=0 ⟺ w²=0
+
+That is why R8/F4 already said "gcd is the lowest common ancestor, in one
+division": gcd is to ℤ/(N) exactly what Δ is to T₃₂/GF(2).
+
+### The three orders, in their proper names
+
+| order | DSP name | ring theory | what it reads |
+|---|---|---|---|
+| 1 | spectrum / cymatic | zero-divisor set = ∪ associated primes | which primes are present — the SUPPORT (ω); where SHA-1 fell |
+| 2 | cepstrum | **primary decomposition** (Lasker–Noether), von Mangoldt Λ | the EXPONENTS — multiplicity (Ω), the lineage length |
+| 3 | bispectrum | the **associator** — failure of the ring axiom | the ORDERING / coupling; ≡0 for a ring, ≠0 from 𝕆 up |
+
+The cepstrum rung is not an analogy: `log n = Σ aᵢ log pᵢ` turns the product into
+a sum, and the von Mangoldt function Λ(n) — supported exactly on prime powers,
+weight log p — is the cepstral domain of the integers. The explicit formula
+`ψ(x) = x − Σ_ρ xᵖ/ρ` is the transform back to the Riemann zeros ρ, which are the
+first-order **spectrum** (Berry–Keating). Value → curvature → torsion.
+
+### The two rings are different in kind
+
+Ring theory is **complete** on the ℤ side and is **exactly what breaks**, rung by
+rung, on the algebra side: commutativity dies at ℍ, associativity at 𝕆, the
+domain property at 𝕊. Factoral decomposition is the *projection* of the first
+into the second; the zero-divisor locus is where "factorisation is non-trivial"
+lands under that projection; and the **associator is the precise obstruction to
+𝕊 being a ring at all** (G6). The white paper's own §2.5 already calls it
+curvature — the associator is the torsion a genuine ring does not have.
+
+### A find, kept on the record (G5, OURS)
+
+Building G5 surfaced that the UDEO white paper's *"𝟏₃₂ is a global annihilator
+(x·𝟏 = 0 for every x)"* lemma is **false** and contradicts its own distance
+table — the round constants have `Δ(K) = 𝟏 ≠ 0` (distance 32). The correct,
+machine-verified statement is `Δ(w) = 0 ⟺ w² = 0` (nilpotency), exhaustive at
+dim 8 and over 20 000 random at dim 32. The theorem stands (IV nilpotency, null
+subalgebra — not "ideal", since the algebra is non-associative); the shortcut
+proof was retracted in `TuringStack` the same day. A MATHS-FAULT the harness was
+built to catch, caught.
+
+---
+
+## The frontier — fractal decomposition
+
+Recorded before the code, per the discipline. Cody's chain across the session:
+
+> **a circle → (higher generational lineage) → a ring → a toroidal bifurcation
+> → a fractal.** Each level is the lineage operator applied to the one below;
+> "the same maths at every level" is self-similarity, so the tower is itself a
+> fractal.
+
+- **Circle → ring.** Partition the circle into `n` points → the `n`-th roots of
+  unity → the **cyclotomic ring ℤ[ζₙ]**. The circle's lineage *is* a ring. How a
+  prime `p` splits / ramifies / stays inert in ℤ[ζₙ], decided by `p mod n`
+  (Dedekind–Kummer), is the fall/survive test one level up — G1 for prime
+  *ideals*. This is the exact, KNOWN reason "the partitions of the circle" and
+  "the ways of factorising them" are ring theory.
+- **Ring → toroidal bifurcation.** A torus is `S¹ × S¹`, a product of circles —
+  the intersection of ring theory and geometry. The **Riemann toroidal energy**
+  (Cody's model, new 2026-08-21) sits on that torus around the involution axis
+  `R − B` (σ = ½) and **bifurcates emergently** into the two trees. **J₂ is the
+  torus involution** (`wiki/90`) swapping R ↔ B — the generator of the
+  bifurcation. FRONTIER, labelled provisional.
+- **Toroidal bifurcation → fractal.** Iterating the bifurcation gives a
+  self-similar decomposition tree. Ring theory is its algebraic skeleton: every
+  level a quotient/sub-structure of the last, the associator the torsion that
+  stops the branches stacking flat (two reflections → a rotation;
+  rotation + log advance → the Archimedes screw).
+
+**The experiment set exists:** `Ainulindale/wiki/fractals/` — 200+ Ultra Fractal
+formulas (Mitchell, Monnier, Jones' Nova/Halley/Phoenix/Torus, …). The place to
+run the ring-theoretic decomposition, and where ring theory is expected to shine.
+
+**Why emergence is load-bearing.** Fix a value anywhere and you have *chosen* a
+scale. Let the operations emerge from the geometry — the torus ∩ its axis, with
+∅_RB as the inductive geometric coupling used as a Hamiltonian supplying the
+equations — and each picks its own scale and path. That is what makes it a
+complete self-diagnostic tool, inside and outside at once: nothing imposed, so
+no imposed scale can hide. Noether again — a conserved current, not a fitted
+parameter.

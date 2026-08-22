@@ -13,6 +13,10 @@ from .lineage import (
     FactoralLineageEngine, GenerationalLineageEngine, Relation, Status,
     run as run_lineage, decompose, factor_lineage, two_trees, TIERS,
     cd_mul, unit, sigma_self, sigma_rb, sigma_rb_independent,
+    # ring-theory machinery (2026-08-22)
+    cd_mul_gf2, all_ones, trace_laplacian_gf2, is_nilpotent_gf2,
+    primary_decomposition, von_mangoldt, euler_phi,
+    quotient_zero_divisors, fall_test,
 )
 
 IMPORT_ERROR = None
@@ -40,4 +44,7 @@ __all__ = [
     'FactoralLineageEngine', 'GenerationalLineageEngine', 'Relation', 'Status',
     'run_lineage', 'decompose', 'factor_lineage', 'two_trees', 'TIERS',
     'cd_mul', 'unit', 'sigma_self', 'sigma_rb', 'sigma_rb_independent',
+    'cd_mul_gf2', 'all_ones', 'trace_laplacian_gf2', 'is_nilpotent_gf2',
+    'primary_decomposition', 'von_mangoldt', 'euler_phi',
+    'quotient_zero_divisors', 'fall_test',
 ]

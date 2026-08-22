@@ -173,7 +173,123 @@ Laurelin dominates forever**, verified to `N = 100,000` — and records the `e²
 proximity without making it part of the pass condition. One integer near one
 constant is not a result, and the engine does not dress it as one.
 
+## The ring-theory spine — `engine/lineage.py`, relations G1–G6
+
+Added 2026-08-22. Factoral decomposition, named in its proper ring theory. The
+whole tower collapses to one statement, measured by **G1**:
+
+> **An element FALLS if and only if its quotient ring has zero divisors.**
+
+- **The integers (ℤ, an associative UFD).** N composite ⟺ ℤ/(N) has a zero
+  divisor ⟺ (N) is not a prime ideal → N falls (Laurelin). N prime ⟺ ℤ/(N) is a
+  field → N survives (Telperion). **The Two Trees ARE this dichotomy.** 0 and 1
+  are the Mingling: the degenerate quotients ℤ/(0)=ℤ and ℤ/(1)=0.
+- **The algebra (T₃₂/GF(2), non-associative).** A constant falls ⟺ it is
+  nilpotent ⟺ it lies in the zero-divisor set. Same test, different ring.
+
+And the **detector is the same kind of object** on both sides — one operation.
+On ℤ it is `gcd(a, N) > 1` (**G2**); on GF(2) it is the trace-Laplacian
+`Δ(w) = w·𝟏` (**G5**). `gcd` is the integer trace-Laplacian; that is why R8/F4
+already read "gcd is the lowest common ancestor, in one division."
+
+| # | relation | tier | what it pins down |
+|---|---|---|---|
+| G1 | `fall_is_quotient_zd` | 2 | fall ⟺ ℤ/(n) has zero divisors — checked for every n ≤ 2000 |
+| G2 | `gcd_is_the_detector` | 0 | gcd is the ℤ detector; census units φ(n) + zd + {0} = n closes exactly |
+| G3 | `primary_decomposition_is_cepstrum` | 3 | Lasker–Noether (n)=⋂(pᵢ^aᵢ) **is** the cepstrum; Ω=Σexponents, von Mangoldt Λ on the prime powers |
+| G4 | `radical_units_split_gf2` | 2 | over GF(2), x² ∈ {0, e₀}: the radical (nilpotents) vs units, split 128/128 at dim 8 |
+| G5 | `trace_laplacian_is_nilpotency` | 2 | Δ(w)=0 ⟺ w²=0 (exact); 𝟏 is **not** a global annihilator; SHA-1 IVs = null subalgebra at distance 0, round constants at 32 |
+| G6 | `associator_is_ring_defect` | 3 | the associator is the **obstruction to being a ring**: ≡0 for ℝ,ℂ,ℍ, ≠0 from 𝕆 up |
+
+**The tower, in its ring-theoretic names** — value → curvature → torsion, read
+off a discrete decomposition path:
+
+| order | DSP name | ring theory | repo object |
+|---|---|---|---|
+| 1 | spectrum / cymatic | zero-divisor set = ∪ associated primes | Δ(w)=w·𝟏; where SHA-1 fell |
+| 2 | cepstrum | **primary decomposition** (Lasker–Noether); von Mangoldt Λ | `factor_lineage`, Ω = lineage length |
+| 3 | bispectrum | the associator — failure of the ring axiom | R5 (168-quantised), G6 |
+
+**A find, kept on the record (G5, marked OURS).** Building G5 surfaced that the
+UDEO white paper's "𝟏₃₂ is a global annihilator" lemma is **false** — it
+contradicts its own distance table (the round constants have `Δ = 𝟏 ≠ 0`). The
+true statement, machine-verified exhaustively at dim 8 and over 20 000 random at
+dim 32, is `Δ(w) = 0 ⟺ w² = 0`. The theorem (IV nilpotency, null subalgebra)
+stands; the shortcut proof was retracted in `TuringStack` the same day.
+
+### New public helpers
+
+```python
+from engine.lineage import fall_test, primary_decomposition, von_mangoldt, \
+    quotient_zero_divisors, trace_laplacian_gf2, is_nilpotent_gf2, euler_phi
+
+fall_test(12)              # FALL — ℤ/(12) has zero divisors; primary {2:2, 3:1}
+fall_test(97)              # SURVIVE — ℤ/(97) is a field
+primary_decomposition(360) # {2:3, 3:2, 5:1}  — the cepstral peaks
+trace_laplacian_gf2(0x67452301)  # 0 — a SHA-1 IV, on the nodal line
+```
+
+`decompose()` now also places the ring operations: `ideal` (t2, kernel of a
+quotient map), `quotient` (t1, the collapse = the FALL), `radical` (t2),
+`unit`/`zero-divisor` (survivors/fallen), `associator` (t3, the ring defect),
+`primary-decomposition` (t3, the cepstrum).
+
+## The frontier — fractal decomposition (the higher-order tower)
+
+Not yet built; recorded here so the direction is on the record before the code.
+
+The tower has a natural continuation, and it is the one Cody named across the
+2026-08-22 session: **a fractal is the higher-order generational lineage of a
+toroidal bifurcation, which is the higher-order generational lineage of a ring,
+which is the higher-order generational lineage of a circle.** Each level is the
+lineage operator applied to the one below — and "the same maths at every level"
+*is* self-similarity, i.e. the tower is itself a fractal.
+
+The rungs, with the ring theory that governs each (the honest split of
+KNOWN vs. frontier framing):
+
+- **Circle → ring.** Partition the circle into `n` points → the `n`-th roots of
+  unity → the **cyclotomic ring ℤ[ζₙ]**. The circle's generational lineage *is*
+  a ring. How a prime `p` behaves in ℤ[ζₙ] — split, ramified, or inert,
+  decided by `p mod n` (Dedekind/Kummer) — is the **fall/survive test one level
+  up**: the same G1 dichotomy, now for prime *ideals* in a cyclotomic ring.
+  (KNOWN: cyclotomic ring theory.)
+- **Ring → toroidal bifurcation.** A torus is `S¹ × S¹` — a product of circles,
+  hence a lattice of roots of unity: the point where ring theory and geometry
+  intersect. The **Riemann toroidal energy** (Cody's model, new as of
+  2026-08-21) sits on that torus, around the involution axis `R − B` (the
+  critical line σ = ½), and **bifurcates emergently** into the two trees. This
+  is where **J₂ enters: it is a torus involution** (already recorded in
+  `Ainulindale/wiki/90`), swapping R ↔ B across that axis — the generator of
+  the bifurcation. (FRONTIER: the toroidal-on-Riemann model is provisional and
+  labelled as such.)
+- **Toroidal bifurcation → fractal.** Iterate the bifurcation and you get a
+  self-similar decomposition tree — a **fractal**. This is the higher-order
+  factoral decomposition: decompose, then decompose the decomposition, in the
+  limit. Ring theory is the algebraic skeleton — each level is a
+  quotient/sub-structure of the last, and the associator (order 3) is the
+  torsion that keeps the branches from stacking flat, exactly as it turns two
+  reflections into a rotation and a rotation-plus-log-advance into the
+  Archimedes screw.
+
+**The experiment set already exists.** `Ainulindale/wiki/fractals/` catalogues
+200+ Ultra Fractal formulas (Kerry Mitchell, Samuel Monnier, Damien Jones'
+Nova/Halley/Phoenix and Torus formulas, …). These are the fractals to run the
+ring-theoretic decomposition against — the place, as Cody put it, where ring
+theory will really shine.
+
+**Why emergence is load-bearing.** Fix a value anywhere and you have *chosen* a
+scale. Let the operations emerge from the geometry — the torus intersected with
+its axis, with ∅_RB as the inductive geometric coupling (used as a Hamiltonian)
+supplying the equations rather than a fitted constant — and each one picks its
+own scale and its own path. That is what makes the instrument a **complete
+self-diagnostic tool, from the inside and the outside at once**: nothing is
+imposed, so nothing can hide an imposed scale. Noether again — a conserved
+current, not a chosen parameter.
+
 ## Status
+
+v1.2 (2026-08-22) — the ring-theory spine (G1–G6) is in; `20/20` relations hold.
 
 v1.1 (2026-08-21) — the factoral decomposition tool is in, `14/14` relations
 hold, and a pre-existing import bug is fixed (see below).
