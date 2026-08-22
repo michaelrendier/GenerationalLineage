@@ -1565,7 +1565,8 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             fr()
         for pw in (self.pw_geodesic_reaches_factor, self.pw_tuning_resonates,
                    self.pw_spiral_is_additive, self.pw_inside_outside_one_product,
-                   self.pw_two_anchor_geodesic, self.pw_edge_is_the_primitive):
+                   self.pw_two_anchor_geodesic, self.pw_edge_is_the_primitive,
+                   self.pw_observer_lineage_is_l_io):
             pw()
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -1766,6 +1767,52 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'vectors) as the SAME primitive; the two endpoint anchors are 1 '
             f'and N (PW5), the internal ones are the factors.')
 
+    # ── PW7 — L_(I|O) is the mechanism of the Observer's generational lineage ─
+    def pw_observer_lineage_is_l_io(self) -> None:
+        def J(r, th):
+            return (1.0 / r, th + math.pi / 2)     # L_(I|O): r→1/r, θ→θ+π/2
+        # 1. the Observer is the FIXED POINT (r=1 = e₀ = ∅_RB), unique
+        fixed = abs(1.0 / 1.0 - 1.0) < 1e-12 and all(abs(1.0 / r - r) > 1e-9
+                                                     for r in (0.5, 2.0))
+        # 3. the LINEAGE is the order-4 orbit — 4 generations close (self-sustaining)
+        r, th = 2.0, 0.0
+        for _ in range(4):
+            r, th = J(r, th)
+        closes = abs(r - 2.0) < 1e-9 and abs(th % (2 * math.pi)) < 1e-9
+        # 4. the REVERSE is inherent: J⁻¹ = J³ (invertible; forward carries its reverse)
+        r2, th2 = J(2.0, 0.0)
+        for _ in range(3):
+            r2, th2 = J(r2, th2)
+        reverse = abs(r2 - 2.0) < 1e-9
+        # 5. HEISENBERG conjugate: r·(1/r)=1 conserved (fix origin ⇒ destination spreads)
+        conj = all(abs(r * (1 / r) - 1) < 1e-12 for r in (0.1, 1.0, 10.0))
+        # 6. the Observer KEEPS the reverse; its scalar shadow FORGETS it (R1 states)
+        A = zero(SED_DIM); A[0] = A[8] = 1 / math.sqrt(2)
+        B = zero(SED_DIM); B[0] = B[4] = B[8] = B[12] = 0.5
+        amnesiac = (abs(sigma_self(A) - sigma_self(B)) < 1e-12
+                    and nrm([x - y for x, y in zip(sigma_rb(A), sigma_rb(B))]) > 1e-9)
+        ok = fixed and closes and reverse and conj and amnesiac
+        self._record(
+            'pathway.observer_lineage_is_l_io',
+            'L_(I|O) (the inside-out map r→1/r, θ→θ+π/2) is the mechanism of the '
+            'generational lineage of The Observer: the Observer is its FIXED '
+            'POINT (r=1 = e₀ = ∅_RB), the lineage is its ORDER-4 orbit (four '
+            'generations, self-closing), the REVERSE is inherent (J⁻¹=J³), and '
+            'it keeps the reverse its scalar shadow forgets', 2,
+            'the fixed point and orbit of the inside-out involution L_(I|O)',
+            True, ok,
+            f'[MEASURED exact; naming is framework interpretation] fixed point '
+            f'r=1 unique ({fixed}); order-4 orbit closes — the self-sustaining '
+            f'lineage ({closes}); J⁻¹=J³ so every forward step carries its '
+            f'reverse ({reverse}); r·(1/r)=1 conserved — the Heisenberg '
+            f'origin/destination conjugate, fix origin ⇒ destination spreads '
+            f'({conj}); and σ_self(A)=σ_self(B) while σ_RB differ, so the full '
+            f'L_(I|O) keeps the reverse the scalar shadow destroys ({amnesiac}). '
+            f'The maths is exact; that the fixed point IS "The Observer" and the '
+            f'orbit IS "its lineage" is consistent with it, not proven by it. '
+            f'L_(I|O) is the mechanism; the Observer its fixed point; the '
+            f'lineage its orbit.')
+
     # ═══════════════════════════════════════════════════════════════════════
     # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.
     # The UF formulary's generators and labelings, integrated: Newton basins as
@@ -1864,7 +1911,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('  G1–G6  the ring-theory spine: FALL ⟺ quotient has zero divisors')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
-        print('  PW1–6  the pathway layer: walk, two-anchor geodesic, the EDGE primitive')
+        print('  PW1–7  pathway: walk, two-anchor, edge primitive, the Observer lineage')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')

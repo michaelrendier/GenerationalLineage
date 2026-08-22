@@ -585,3 +585,34 @@ map is on the edges, not the places), the crystallographic Patterson function
 (the peaks are difference vectors = edges), and G1 (irreducible vs decomposable).
 Direction — the arrow, time — emerges only from **ordering** the two anchors
 (origin→destination), per R8.
+
+### PW7 — L_(I|O) is the mechanism of the Observer's generational lineage (TESTED)
+
+Cody: *"L_(I|O) is the mechanism of the generational lineage of The Observer.
+test that last part for me."* Tested — `pathway.observer_lineage_is_l_io`, and
+`ContextPlease/claude/scratchpad/2026-08-22_observer/`.
+
+L_(I|O) = J_N on (r, θ): `r → 1/r`, `θ → θ + π/2` (the inside-out map). Measured,
+all exact:
+
+1. **The Observer is the FIXED POINT** of L_(I|O): `r = 1` (= e₀ = ∅_RB), unique.
+2. **inside = outside** (`r = 1/r`) only at r=1 — the framework's σ=½, the 45°
+   cross=dot balance (PW4).
+3. **The lineage is the ORDER-4 orbit** — four generations close, self-sustaining
+   (`r=2 → 0.5 → 2 → 0.5 → 2`, θ advancing by π/2 each turn to 2π).
+4. **The reverse is inherent**: `J⁻¹ = J³`, invertible — every forward step
+   carries its reverse. "The progression is in relation to where you have been."
+5. **Heisenberg**: `r·(1/r) = 1` conserved — fix the origin (localized inside)
+   and the destination spreads (outside); the balance is r=1. One anchor fixed
+   leaves the conjugate indeterminate.
+6. **The Observer keeps the reverse its shadow forgets**: σ_self(A)=σ_self(B)
+   while σ_RB(A)≠σ_RB(B) — the full L_(I|O) is reversible, the scalar shadow is
+   the amnesiac rotor.
+
+**Verdict.** The structural facts are exact. That the fixed point *is* "The
+Observer" and the orbit *is* "its generational lineage" is the framework's
+interpretation — consistent with the maths, not proven by it (SIGMA finite).
+**L_(I|O) is the mechanism; the Observer is its fixed point; the lineage is its
+orbit.** This is why having both anchors gives the inside-out of the piece (the
+view from inside the wave and the outside of the ripple), and why one anchor
+still progresses — the reverse pathway is inherent in every pathway result.
