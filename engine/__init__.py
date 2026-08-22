@@ -22,6 +22,8 @@ from .lineage import (
     MANDELBROT, BURNING_SHIP,
     smooth_escape, orbit_trap, orbit_curvature, lyapunov_exponent,
     basin_of, newton_basins, label_orbit,
+    # the pathway layer (2026-08-22)
+    spiral_address, pathway_residues, tune_pathway, decompose_number,
 )
 
 IMPORT_ERROR = None
@@ -56,4 +58,5 @@ __all__ = [
     'MANDELBROT', 'BURNING_SHIP',
     'smooth_escape', 'orbit_trap', 'orbit_curvature', 'lyapunov_exponent',
     'basin_of', 'newton_basins', 'label_orbit',
+    'spiral_address', 'pathway_residues', 'tune_pathway', 'decompose_number',
 ]

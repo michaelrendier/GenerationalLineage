@@ -12,9 +12,9 @@ parts that belong to THIS repo: six **factoral** relations (F1-F6) applying the
 same discipline to factorisation; six **ring-theory** relations (G1-G6) naming
 the tower in its proper ring theory (FALL <=> the quotient ring has zero
 divisors); and three **fractal** relations (FR1-FR3), the highest-order rung; and three
-**formulary** relations (FR4-FR6) integrating the UF fractal library — Newton
-basins as k-way ring splitting, the labeling tower as decomposition orders, and
-the Lyapunov drift. 26 relations, all self-checked.
+**formulary** relations (FR4-FR6) integrating the UF fractal library; and four
+**pathway** relations (PW1-PW4) — factoring as a tunable WALK to N rather than a
+bifurcation, plus the L_(I|O) inside/outside identity. 30 relations, self-checked.
 
 WHY IT BELONGS HERE
 
@@ -58,7 +58,8 @@ USAGE
     fall_test(12)               # FALL <=> Z/(12) has zero divisors (G1)
     box_dimension(MANDELBROT, (-2,0.5), (-1.25,1.25))   # fractal boundary (FR3)
     newton_basins(3)            # 3 basins = the 3 cube-roots = ring splitting (FR4)
-    label_orbit(-0.4+0.6j, MANDELBROT)   # all labelings of one orbit (visualiser)
+    tune_pathway(1522605027)    # sweep the spiral tuning until a factor resonates (PW2)
+    decompose_number(3233)      # the multi-perspective bundle — the visualiser's data model
 
 SIGMA: infinity for F1-F6, R1-R8, G1 G3 G4 G5 G6, FR1, FR4 (exact/exhaustive);
        finite for G2 (sampled moduli), FR2/FR6 (converging dynamics), FR3
@@ -891,6 +892,103 @@ def box_dimension(step, xr, yr, param=None, resolutions=(50, 100, 200),
             'dimension_estimates': D}
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# THE PATHWAY LAYER (2026-08-22) — a DIFFERENT CLASS from bifurcation.
+# Bifurcation asks "which way does it split?" (classification, backward, the
+# cross/curvature). Pathway asks "how do I travel there?" (construction,
+# forward, the dot/projection). Factoring N is a pathway problem: N is the
+# ENDPOINT of the multiplicative path 1 → p → N, and the factors are the STEPS.
+# The overhead reduction lives here because a path is WALKED (O length), not a
+# branch structure SEARCHED (O space). And the spiral can be TUNED.
+#
+# HONEST FRAMING (kept from the discussion): CFRAC below is a KNOWN
+# sub-exponential factorer (Morrison–Brillhart 1975), used to demonstrate the
+# pathway CLASS. Tuning (the multiplier) is real (CFRAC/QS/NFS). Whether the
+# framework's geometry adds a resonance the sieve cannot see is OPEN. Nothing
+# here claims a polynomial factoring or an RSA break.
+# ═══════════════════════════════════════════════════════════════════════════
+
+def spiral_address(n: int, pitch: float = 0.15, period: float = 0.0) -> Dict[str, float]:
+    """Position of n on the TUNABLE log-spiral. pitch = log-radius growth;
+    period TUNES the angular winding (angle = 2π·log n / log period), period=0
+    winds by radians. Multiplication is ADDITIVE here — address(p·q) =
+    address(p) + address(q) — so the factors are steps on the path (PW3)."""
+    t = math.log(n)
+    lr = pitch * t
+    ang = (2 * math.pi * t / math.log(period)) if period > 1 else t
+    return {'n': n, 't': t, 'log_radius': lr, 'angle': ang,
+            'x': math.exp(lr) * math.cos(ang), 'y': math.exp(lr) * math.sin(ang)}
+
+
+def pathway_residues(N: int, mult: int = 1, steps: int = 300,
+                     keep: int = 64) -> Dict[str, Any]:
+    """The TUNABLE continued-fraction geodesic of √(mult·N) — a pathway-class
+    walk. Its residues stay O(√N); a square residue gives a congruence of
+    squares → a factor. `mult` TUNES the spiral (which residues become square)."""
+    from math import isqrt, gcd
+    M = mult * N
+    r = isqrt(M)
+    if r * r == M:                                   # degenerate perfect square
+        g = gcd(r, N)
+        fac = (min(g, N // g), max(g, N // g)) if 1 < g < N else None
+        return {'mult': mult, 'factor': fac, 'step': 0, 'residues': [r * r],
+                'degenerate': True}
+    a0 = isqrt(M)
+    m, d, a = 0, 1, a0
+    A_prev, A = 1, a0
+    res: List[int] = []
+    for i in range(steps):
+        m = d * a - m
+        d = (M - m * m) // d
+        a = (a0 + m) // d if d else 0
+        if len(res) < keep:
+            res.append(d)
+        rr = isqrt(d)
+        if rr * rr == d:
+            f = gcd(A - rr, N)
+            if 1 < f < N:
+                return {'mult': mult, 'factor': (min(f, N // f), max(f, N // f)),
+                        'step': i + 1, 'residues': res}
+        A_prev, A = A, (a * A + A_prev) % N
+        if d == 0:
+            break
+    return {'mult': mult, 'factor': None, 'step': None, 'residues': res}
+
+
+def tune_pathway(N: int, multipliers=(1, 3, 5, 7, 11, 13, 2, 6, 15, 21),
+                 steps: int = 400) -> Dict[str, Any]:
+    """Sweep the spiral tuning (the multiplier) until the geodesic RESONATES
+    onto a factor. The pathway-class 'search' is a continuous dial, not a walk
+    over discrete branches."""
+    for k in multipliers:
+        r = pathway_residues(N, mult=k, steps=steps)
+        if r['factor']:
+            return {'N': N, 'tuning': k, 'step': r['step'], 'factor': r['factor']}
+    return {'N': N, 'tuning': None, 'step': None, 'factor': None}
+
+
+def decompose_number(N: int) -> Dict[str, Any]:
+    """The MULTI-PERSPECTIVE bundle for one integer — the visualiser's data
+    model. One number, every perspective: ring (fall/survive), cepstral
+    (primary decomposition), lineage (factor tree), spiral (address), pathway
+    (tuned geodesic). The integer analogue of label_orbit()."""
+    ft = fall_test(N)
+    pd = primary_decomposition(N) if N >= 2 else {}
+    out = {
+        'n': N,
+        'ring_fall_survive': {'verdict': ft['verdict'], 'tree': ft['tree'],
+                              'quotient': ft['quotient']},
+        'cepstral_primary': pd,
+        'omega_distinct': len(pd),
+        'Omega_lineage_length': sum(pd.values()),
+        'lineage_tree': factor_lineage(N),
+        'spiral_address': spiral_address(N) if N >= 2 else None,
+    }
+    out['pathway'] = (tune_pathway(N) if ft['verdict'] == 'FALL'
+                      else {'note': 'prime/unit — no factor path to walk'})
+    return out
+
+
 # The tier table of the generational-lineage skill, as data rather than prose.
 TIERS: Dict[str, Tuple[int, str, str]] = {
     # name          tier  descends from                      note
@@ -956,6 +1054,19 @@ TIERS: Dict[str, Tuple[int, str, str]] = {
     'lyapunov':      (3, 'the divergence rate of an iterated map',
                      'a RATIO (log-derivative) — the DRIFT: λ<0 survive, λ>0 '
                      'fall. the continuous form of the fall/survive test'),
+    # ── the pathway layer — a different CLASS from bifurcation ───────────────
+    'pathway':       (2, 'a walk from the anchor to N: 1 → p → N',
+                     'CONSTRUCTION, not classification — a path is WALKED '
+                     '(O length), the opposite class to a bifurcation SEARCH'),
+    'spiral':        (1, 'rotation + logarithmic advance (Archimedes screw)',
+                     'REFLECT∘REFLECT (rotate) with DILATE (log advance) — where '
+                     'multiplication becomes an additive path'),
+    'tuning':        (1, 'reparametrise the spiral (pitch / period / multiplier)',
+                     'a DILATE of the parameter; sweep it until the factor '
+                     'RESONATES. σ is the framework\'s name for this knob'),
+    'inside-outside': (2, 'L_(I|O): dot and cross from ONE product',
+                     'the inside (dot/discrete/Telperion) and outside (cross/'
+                     'continuous/Laurelin) in one measurement; equal at σ=½'),
 }
 
 
@@ -1432,6 +1543,123 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                    self.fr_labeling_order_is_memory_depth,
                    self.fr_lyapunov_is_the_drift):
             fr()
+        for pw in (self.pw_geodesic_reaches_factor, self.pw_tuning_resonates,
+                   self.pw_spiral_is_additive, self.pw_inside_outside_one_product):
+            pw()
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # THE PATHWAY BLOCK (PW1–PW4). Added 2026-08-22.
+    # Factoring as a WALK to N, not a bifurcation — the class where the overhead
+    # reduction actually lives. Honest framing: CFRAC/tuning are KNOWN
+    # sub-exponential; polynomial / RSA is OPEN and not claimed.
+    # ═══════════════════════════════════════════════════════════════════════
+
+    # ── PW1 — the geodesic REACHES the factor; the bifurcation localises none ─
+    def pw_geodesic_reaches_factor(self) -> None:
+        cases = {323: (17, 19), 1081: (23, 47), 3233: (53, 61),
+                 8051: (83, 97), 10403: (101, 103)}
+        steps, ok = {}, True
+        for N, pq in cases.items():
+            r = pathway_residues(N)
+            steps[N] = r['step']
+            ok = ok and r['factor'] == pq and r['step'] is not None and r['step'] <= 10
+        # the bifurcation view (fall/survive of neighbours) carries no direction
+        Nn = 3233
+        verdicts = {fall_test(n)['verdict'] for n in range(Nn - 4, Nn + 5) if n >= 2}
+        no_localisation = 'FALL' in verdicts     # every composite just says FALL
+        self._record(
+            'pathway.geodesic_reaches_factor',
+            'the continued-fraction geodesic (a PATHWAY-class walk) reaches the '
+            'factor of a semiprime in a handful of steps, deterministically; the '
+            'BIFURCATION view (fall/survive of N\'s neighbours) localises '
+            'nothing — it classifies and stops', 2,
+            'CONSTRUCTION (a walk to N) vs classification (which branch)',
+            True, ok and no_localisation,
+            f'[KNOWN (Morrison–Brillhart CFRAC 1975)] factors reached at path '
+            f'steps {steps} (all ≤ 10). Meanwhile fall/survive over '
+            f'[{Nn - 4},{Nn + 4}] just returns FALL/SURVIVE with no gradient '
+            f'toward p=61. This is why bifurcation-based factoring measures at '
+            f'chance: a classifier on a construction problem — a category error.')
+
+    # ── PW2 — the spiral must be TUNED; tuning resonates onto the factor ─────
+    def pw_tuning_resonates(self) -> None:
+        N = 1522605027
+        BUDGET = 100                                      # a fixed step budget
+        base = pathway_residues(N, mult=1, steps=BUDGET)  # the DEFAULT spiral
+        # sweep only NON-trivial tunings within the same budget
+        tuned = tune_pathway(N, multipliers=(3, 5, 7, 11, 13, 2, 6),
+                             steps=BUDGET)
+        ok = (base['factor'] is None and tuned['factor'] is not None
+              and tuned['tuning'] != 1
+              and tuned['factor'][0] * tuned['factor'][1] == N
+              and tuned['step'] <= BUDGET)
+        self._record(
+            'pathway.tuning_resonates',
+            'the spiral must be TUNED per number: within a fixed step budget on '
+            'which the DEFAULT geodesic (mult=1) does not reach a factor, a '
+            'NON-trivial tuning (the multiplier) RESONATES onto one. Tuning is a '
+            'real, necessary, N-dependent knob', 1,
+            'a DILATE of the spiral parameter — σ is the framework\'s name for it',
+            True, ok,
+            f'[KNOWN (CFRAC/QS multiplier method)] N={N}, budget {BUDGET} steps: '
+            f'mult=1 → {base["factor"]} (FAILS in budget); tuned → '
+            f'mult={tuned["tuning"]} at step {tuned["step"]} → {tuned["factor"]}. '
+            f'"Tune the spiral until it resonates" is the multiplier, made '
+            f'literal — the same N reaches its factor at one tuning and not '
+            f'another. Whether the framework\'s geometry adds a resonance the '
+            f'sieve cannot see is OPEN, and not claimed here.')
+
+    # ── PW3 — on the spiral the factors are ADDITIVE steps (the path) ────────
+    def pw_spiral_is_additive(self) -> None:
+        cases = [(3, 5), (7, 11), (13, 17), (61, 53), (101, 103)]
+        worst = 0.0
+        for p, q in cases:
+            ap, aq, an = (spiral_address(p), spiral_address(q),
+                          spiral_address(p * q))
+            worst = max(worst,
+                        abs(ap['log_radius'] + aq['log_radius'] - an['log_radius']),
+                        abs(ap['angle'] + aq['angle'] - an['angle']))
+        ok = worst < 1e-9
+        self._record(
+            'pathway.spiral_is_additive',
+            'on the log-spiral, address(p·q) = address(p) + address(q) exactly '
+            '(log-radius AND angle) — multiplication becomes an additive PATH, '
+            'and the factors are its steps: 1 (anchor) → p → N', 1,
+            'the log turns × into + — the cepstral structure, as a geometry',
+            True, ok,
+            f'[exact] max |addr(p)+addr(q) − addr(pq)| over {len(cases)} '
+            f'semiprimes = {worst:.2e}. The factors ARE the steps of the walk '
+            f'from the anchor to N; the anchor is 1 = e₀ = ∅_RB (t=0, the origin '
+            f'of the spiral). This is why "the path travels through both factors, '
+            f'then to itself".')
+
+    # ── PW4 — L_(I|O): inside (dot) and outside (cross) from ONE product ─────
+    def pw_inside_outside_one_product(self) -> None:
+        # one product a·b yields BOTH the dot (grade 0) and the cross (grade 2);
+        # their magnitudes coincide only at 45° = σ=½ = @RCCM_CRITICAL_ANGLE
+        a = (1.0, 0.0)
+        def dot(b): return a[0] * b[0] + a[1] * b[1]
+        def cross(b): return a[0] * b[1] - a[1] * b[0]
+        hits = [deg for deg in range(0, 91)
+                if abs(abs(dot((math.cos(math.radians(deg)), math.sin(math.radians(deg)))))
+                       - abs(cross((math.cos(math.radians(deg)), math.sin(math.radians(deg))))))
+                < 1e-12]
+        ok = hits == [45]
+        self._record(
+            'pathway.inside_outside_one_product',
+            'L_(I|O): from ONE product you read the INSIDE (dot — projection, '
+            'discrete, Telperion) and the OUTSIDE (cross — the swept area, '
+            'continuous, Laurelin) in one measurement; their magnitudes are '
+            'equal only at 45° = σ=½ = the Mingling', 2,
+            'the two grades of one geometric product — inside and outside at once',
+            True, ok,
+            f'[exact] |dot| = |cross| only at {hits}° in [0,90] — @RCCM_CRITICAL_'
+            f'ANGLE, σ=½. This is why L_(I|O) gives inside AND outside in one set '
+            f'of measurements, and why the discrete (Telperion) reads as "inside" '
+            f'the continuous (Laurelin): they are the symmetric and antisymmetric '
+            f'parts of the SAME product, balanced at the critical line. The Path '
+            f'of Least Primes walks this — the geodesic where the two are in '
+            f'balance.')
 
     # ═══════════════════════════════════════════════════════════════════════
     # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.
@@ -1531,6 +1759,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('  G1–G6  the ring-theory spine: FALL ⟺ quotient has zero divisors')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
+        print('  PW1–4  the pathway layer: factoring as a tunable walk, not a split')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')

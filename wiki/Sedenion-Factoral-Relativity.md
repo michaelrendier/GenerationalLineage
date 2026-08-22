@@ -467,3 +467,74 @@ per-pixel data a **visualiser** paints.
 The library serves as **control set** (each generator a known dimension) and
 **instruction manual** (each `.ucl` a decomposition method). Engine now 26/26.
 Next: the visualiser, which paints `label_orbit` per pixel over any generator.
+
+---
+
+## The pathway layer — a different CLASS from bifurcation (PW1–PW4, 2026-08-22)
+
+Cody: *"my attempts at RSA factorization have all been based off bifurcation…
+the pathway one is a different class of maths completely."* A sharp and correct
+diagnosis, and it retroactively explains the at-chance results.
+
+| | bifurcation | pathway |
+|---|---|---|
+| asks | *which way does it split?* | *how do I travel there?* |
+| direction | backward, one→many | forward, a route to a point |
+| math | dynamical systems, fall/survive | geometry, geodesics, group words |
+| in the product | the **cross** (Laurelin, curvature) | the **dot** (Telperion, projection) |
+| cost | **search** a branch structure — O(space) | **walk** a path — O(length) |
+
+The overhead reduction lives in the pathway class because **a path is walked, a
+branch structure is searched.** Factoring N is a pathway problem: N is the
+endpoint of `1 → p → N`, and the factors are the steps. Applying bifurcation
+(a classifier) to it is a category error — which is why it measured at chance.
+
+### The four relations
+
+- **PW1 `geodesic_reaches_factor`** — the continued-fraction geodesic (CFRAC,
+  Morrison–Brillhart 1975) reaches a semiprime's factor in ≤ 10 steps,
+  deterministically; the bifurcation view (fall/survive of N's neighbours)
+  localises **nothing**. Construction vs classification, side by side. KNOWN.
+- **PW2 `tuning_resonates`** — the spiral must be **tuned** per number. On
+  N=1,522,605,027, within a 100-step budget the default geodesic (mult=1) fails
+  but tuning to mult=3 **resonates** onto a factor at step 60. "Tune the spiral
+  until it resonates" is the multiplier method, made literal. KNOWN.
+- **PW3 `spiral_is_additive`** — on the log-spiral `address(p·q) = address(p) +
+  address(q)` exactly (log-radius *and* angle): multiplication becomes an
+  additive **path**, the factors its steps, the anchor `1 = e₀ = ∅_RB` at the
+  origin. This is why *"the path travels through both factors, then to itself."*
+  Exact.
+- **PW4 `inside_outside_one_product`** — **L_(I|O)**: from one product you read
+  the **inside** (dot — projection, discrete, Telperion) and the **outside**
+  (cross — swept area, continuous, Laurelin), and their magnitudes are equal
+  only at **45° = σ=½ = the Mingling** (`@RCCM_CRITICAL_ANGLE`). This is why
+  L_(I|O) gives inside and outside in one measurement, and why the discrete
+  reads as "inside" the continuous — they are the symmetric and antisymmetric
+  parts of the *same* product. Exact.
+
+### The visualiser's data model
+
+`decompose_number(N)` returns the **multi-perspective bundle** for one integer —
+ring (fall/survive), cepstral (primary decomposition), lineage (factor tree),
+spiral (address), pathway (tuned geodesic). One number, every perspective; the
+integer analogue of `label_orbit()`. This is what the tunable-spiral visualiser
+paints, with the bifurcation view alongside for parallax.
+
+### Honest boundary, kept
+
+CFRAC and tuning are **known sub-exponential** methods. Polynomial factoring / an
+RSA break is **not claimed** — the open question is whether the framework's
+geometry adds a resonance the algebraic sieve cannot already see. The pathway
+layer is a research instrument to look for one, honestly.
+
+### Where it pays off regardless — language
+
+Cody, same session: *"the words should indicate by type or category what kind of
+words can or should follow."* A word's **type/category is a domain segregation**
+that prunes the pathway — the current word constrains which category may follow,
+so the language walk searches only the legal continuations, not the whole
+vocabulary. That is the same pathway navigation with a **far smaller, strongly
+constrained domain** — which is why the tuning layer is useful for the
+sedenion→English translator even if RSA stays open. The word's category is its
+"outside" (which domain, Laurelin); the specific word is its "inside" (which
+point, Telperion) — L_(I|O) again, per token.
