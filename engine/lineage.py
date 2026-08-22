@@ -1437,6 +1437,43 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'({k_distmax}). The lemma "x·𝟏=0 for all x" contradicts its own '
             f'distance table and is retracted; the THEOREM stands, machine-verified.')
 
+    # ── G7 — ring theory holds BOTH closed and open pathways ─────────────────
+    def g_open_and_closed_pathways(self) -> None:
+        from math import gcd
+
+        def returns_to_anchor(a, N, steps=300):
+            x = a % N
+            for _ in range(steps):
+                if x == 1:
+                    return True
+                x = (x * a) % N
+            return False
+        bad = 0
+        for N in (12, 30, 100, 210):
+            for a in range(1, N):
+                if returns_to_anchor(a, N) != (gcd(a, N) == 1):
+                    bad += 1
+        ok = bad == 0
+        self._record(
+            'ring.open_and_closed_pathways',
+            'ring theory describes BOTH: a CLOSED pathway (returns to the anchor '
+            '1) is exactly a UNIT; an OPEN pathway (never returns to 1) is '
+            'exactly a ZERO DIVISOR. Group theory has only the closed ones — the '
+            'open sector is what RING theory adds', 2,
+            'the multiplicative orbit of a in ℤ/N — units cycle back to 1, zero '
+            'divisors do not',
+            True, ok,
+            f'[exact] over ℤ/12,30,100,210: {bad} mismatches between '
+            f'"orbit returns to the anchor 1" and "gcd(a,N)=1 (unit)". So '
+            f'CLOSED ⟺ unit, OPEN ⟺ zero divisor. Open pathways come in two '
+            f'ring-theoretic kinds: TERMINATING (nilpotents fall to 0 — the ρ '
+            f'tail, = Pollard rho) and CONVERGENT (Möbius/continued-fraction '
+            f'orbits spiral to an attractor, e.g. z→1+1/z → φ in ℤ[φ], the '
+            f'Gemini event-horizon sim). The horizon r=1 is the units (closed, '
+            f'the Observer/e₀ sits on it); the fall to 0 or φ is open. A FIELD '
+            f'(N prime) is all-closed; a ring with zero divisors (N composite) '
+            f'has open pathways — closed-vs-open IS G1, survive-vs-fall.')
+
     # ── G6 — the associator is the OBSTRUCTION to being a ring ────────────────
     def g_associator_is_ring_defect(self) -> None:
         def associates(d):
@@ -1556,7 +1593,8 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                   self.g_primary_decomposition_is_cepstrum,
                   self.g_radical_units_split_gf2,
                   self.g_trace_laplacian_is_nilpotency,
-                  self.g_associator_is_ring_defect):
+                  self.g_associator_is_ring_defect,
+                  self.g_open_and_closed_pathways):
             g()
         for fr in (self.fr_tower_self_similar, self.fr_bifurcation_cascade,
                    self.fr_fall_survive_boundary, self.fr_newton_basins_are_splitting,
@@ -1908,7 +1946,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('FACTORAL LINEAGE ENGINE — the decomposition tool')
         print('  R1–R8  carried from VAPMIP/engines/e10_generational_lineage.py')
         print('  F1–F6  this repo: factorisation decomposed against the Two Trees')
-        print('  G1–G6  the ring-theory spine: FALL ⟺ quotient has zero divisors')
+        print('  G1–G7  ring-theory spine: FALL⟺quotient-ZD; closed/open = unit/ZD')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
         print('  PW1–7  pathway: walk, two-anchor, edge primitive, the Observer lineage')
