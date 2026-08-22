@@ -538,3 +538,26 @@ constrained domain** — which is why the tuning layer is useful for the
 sedenion→English translator even if RSA stays open. The word's category is its
 "outside" (which domain, Laurelin); the specific word is its "inside" (which
 point, Telperion) — L_(I|O) again, per token.
+
+### PW5 — two anchors, and mathematical X-ray crystallography
+
+Cody: *"there are two anchors — the origin, and the reference point destination.
+Now you can tune the path between the two."* Pinning **both** ends (1 and N)
+turns factoring from an outward walk into a **boundary-value problem**: the
+factor is a node on the geodesic between them, symmetric about the midpoint √N.
+
+**PW5 `two_anchor_geodesic`** (KNOWN, Fermat) — balanced semiprimes are
+log-symmetric about √N (exact) and found at excursion 0 from that midpoint;
+unbalanced 3·10007 sits at excursion 4831. Two anchors turn factoring into "how
+far is the node from √N?" — and **RSA hides the factor by tuning that distance
+large.**
+
+Cody named the whole instrument: **mathematical X-ray crystallography.** N is the
+crystal; the labelings are the structure factors; the two anchors are the Ewald
+sphere; tuning is rotating the crystal; a square residue is a Bragg reflection;
+the XOR-difference structure (F6) is the Patterson function; and the **phase
+problem** — you measure intensities (order 1) but lose phases (order 2) — is
+exactly why factoring is hard and why bifurcation (a classifier) measured at
+chance. Full synthesis: `Ainulindale/wiki/94_mathematical_xray_crystallography.md`.
+The visualiser is therefore a **number diffractometer**: mount N, rotate (tune),
+collect reflections, reconstruct the factor density from `decompose_number(N)`.

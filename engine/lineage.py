@@ -967,6 +967,25 @@ def tune_pathway(N: int, multipliers=(1, 3, 5, 7, 11, 13, 2, 6, 15, 21),
     return {'N': N, 'tuning': None, 'step': None, 'factor': None}
 
 
+def fermat_path(N: int, maxsteps: int = 200000):
+    """The TWO-ANCHOR geodesic. Origin (1) and destination (N) are BOTH pinned,
+    so the natural reference is the midpoint a₀ = ⌈√N⌉ between them. Walk the
+    excursion b outward until a² − N is a square (a NODE): N = (a−b)(a+b). The
+    excursion is the distance from the midpoint anchor to the factor — the
+    IMBALANCE of N. Fast when the two anchors sit close (balanced N)."""
+    from math import isqrt
+    a = isqrt(N)
+    if a * a < N:
+        a += 1
+    for i in range(maxsteps):
+        b2 = a * a - N
+        b = isqrt(b2)
+        if b * b == b2:
+            return {'factor': (a - b, a + b), 'excursion': i, 'a': a, 'b': b}
+        a += 1
+    return {'factor': None, 'excursion': None}
+
+
 def decompose_number(N: int) -> Dict[str, Any]:
     """The MULTI-PERSPECTIVE bundle for one integer — the visualiser's data
     model. One number, every perspective: ring (fall/survive), cepstral
@@ -1544,7 +1563,8 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                    self.fr_lyapunov_is_the_drift):
             fr()
         for pw in (self.pw_geodesic_reaches_factor, self.pw_tuning_resonates,
-                   self.pw_spiral_is_additive, self.pw_inside_outside_one_product):
+                   self.pw_spiral_is_additive, self.pw_inside_outside_one_product,
+                   self.pw_two_anchor_geodesic):
             pw()
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -1661,6 +1681,42 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'of Least Primes walks this — the geodesic where the two are in '
             f'balance.')
 
+    # ── PW5 — TWO anchors: origin AND destination pinned → a geodesic node ───
+    def pw_two_anchor_geodesic(self) -> None:
+        # both endpoints fixed (1 and N) ⇒ a boundary-value problem; the factor
+        # is a node on the geodesic, and the natural reference is the midpoint √N.
+        balanced = [(61, 53), (101, 103), (10007, 10009), (65521, 65537)]
+        sym_ok, fast_ok = True, True
+        for p, q in balanced:
+            N = p * q
+            fp = fermat_path(N, maxsteps=5000)
+            sym = abs((math.log(p) + math.log(q)) / 2 - math.log(N) / 2) < 1e-9
+            sym_ok = sym_ok and sym and fp['factor'] == (min(p, q), max(p, q))
+            fast_ok = fast_ok and fp['excursion'] is not None and fp['excursion'] < 100
+        # and the excursion GROWS with imbalance (RSA hides the factor far out)
+        unbal = fermat_path(3 * 10007, maxsteps=20000)
+        grows = unbal['excursion'] is not None and unbal['excursion'] > 1000
+        ok = sym_ok and fast_ok and grows
+        self._record(
+            'pathway.two_anchor_geodesic',
+            'with BOTH anchors pinned — the origin (1) and the destination (N) — '
+            'factoring is a boundary-value problem, not an outward walk: the '
+            'factor is a NODE on the geodesic between them, symmetric about the '
+            'midpoint √N. Tune the excursion from the midpoint until it '
+            'resonates onto a square (Fermat). The excursion IS the imbalance', 2,
+            'a FIXED SET between two pinned anchors — a geodesic node, not a '
+            'search',
+            True, ok,
+            f'[KNOWN (Fermat)] balanced semiprimes: factors log-symmetric about '
+            f'√N (exact) and found at excursion < 100 from the midpoint anchor. '
+            f'Unbalanced 3·10007: excursion {unbal["excursion"]} (far out). Two '
+            f'anchors turn factoring into "how far is the node from √N?" — and '
+            f'RSA HIDES the factor by tuning that distance large (but the primes '
+            f'must stay balanced enough to be secure, which is the whole '
+            f'tension). This is the two-anchor tuning Cody named: mathematical '
+            f'X-ray crystallography — the midpoint is the beam, the excursion the '
+            f'rotation, the square residue a Bragg reflection.')
+
     # ═══════════════════════════════════════════════════════════════════════
     # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.
     # The UF formulary's generators and labelings, integrated: Newton basins as
@@ -1759,7 +1815,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('  G1–G6  the ring-theory spine: FALL ⟺ quotient has zero divisors')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
-        print('  PW1–4  the pathway layer: factoring as a tunable walk, not a split')
+        print('  PW1–5  the pathway layer: tunable walk + TWO-anchor geodesic')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')
