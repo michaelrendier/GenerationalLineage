@@ -83,7 +83,7 @@ engine/
                  (real π(x;16,k) vs Dirichlet equidistribution). Imports
                  telperion_engine.py and h_rb_hat/maths.py directly — no
                  reimplementation of either.
-  lineage.py   — THE FACTORAL DECOMPOSITION TOOL. 31 self-checked relations:
+  lineage.py   — THE FACTORAL DECOMPOSITION TOOL. 32 self-checked relations:
                  R1–R8 VAPMIP; F1–F6 factoral; G1–G6 ring theory;
                  FR1–FR6 fractal + formulary; PW1–PW4 pathway. stdlib+numpy;
                  nothing outside this repo, and is imported first and
@@ -107,7 +107,7 @@ you need is a way to tell a **primitive** operation from a **derived** one, and
 to say what any named "geometry" descends from.
 
 ```
-python3 engine/lineage.py          # 31/31, ~23s
+python3 engine/lineage.py          # 32/32, ~23s
 ```
 
 **What it gives this repo that it did not have:**
@@ -335,6 +335,8 @@ imposed, so nothing can hide an imposed scale. Noether again — a conserved
 current, not a chosen parameter.
 
 ## Status
+
+v1.7 (2026-08-22) — the edge primitive (PW6): node→edge→pathway; `32/32`.
 
 v1.6 (2026-08-22) — two-anchor geodesic (PW5), mathematical X-ray crystallography; `31/31`.
 

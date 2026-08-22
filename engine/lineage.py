@@ -12,9 +12,10 @@ parts that belong to THIS repo: six **factoral** relations (F1-F6) applying the
 same discipline to factorisation; six **ring-theory** relations (G1-G6) naming
 the tower in its proper ring theory (FALL <=> the quotient ring has zero
 divisors); and three **fractal** relations (FR1-FR3), the highest-order rung; and three
-**formulary** relations (FR4-FR6) integrating the UF fractal library; and four
-**pathway** relations (PW1-PW4) — factoring as a tunable WALK to N rather than a
-bifurcation, plus the L_(I|O) inside/outside identity. 30 relations, self-checked.
+**formulary** relations (FR4-FR6) integrating the UF fractal library; and six
+**pathway** relations (PW1-PW6) — factoring as a tunable WALK to N, the
+two-anchor geodesic, and the EDGE as the primitive (node→edge→pathway). 32
+relations, all self-checked.
 
 WHY IT BELONGS HERE
 
@@ -1564,7 +1565,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             fr()
         for pw in (self.pw_geodesic_reaches_factor, self.pw_tuning_resonates,
                    self.pw_spiral_is_additive, self.pw_inside_outside_one_product,
-                   self.pw_two_anchor_geodesic):
+                   self.pw_two_anchor_geodesic, self.pw_edge_is_the_primitive):
             pw()
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -1717,6 +1718,54 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'X-ray crystallography — the midpoint is the beam, the excursion the '
             f'rotation, the square residue a Bragg reflection.')
 
+    # ── PW6 — the EDGE is the primitive: node → edge → pathway ───────────────
+    def pw_edge_is_the_primitive(self) -> None:
+        # two ordered anchors + a line = a directed EDGE (the minimal pathway
+        # piece). A pathway is edges SHARING anchors; the shared (internal)
+        # anchor is the FACTOR. A prime is an irreducible edge (0 internal
+        # anchors); a composite is a path of Ω edges with Ω−1 internal anchors.
+        ok = True
+        example = None
+        for n in range(2, 2000):
+            pd = primary_decomposition(n)
+            omega = sum(pd.values())
+            steps = []
+            for p, a in sorted(pd.items()):
+                steps += [p] * a
+            anchors, acc = [1], 1
+            for p in steps:
+                acc *= p
+                anchors.append(acc)
+            edges = len(anchors) - 1
+            internal = len(anchors) - 2       # exclude the two endpoints 1 and n
+            is_prime = (omega == 1)
+            good = (edges == omega and internal == omega - 1 and anchors[-1] == n
+                    and (internal == 0) == is_prime)
+            if not good:
+                ok = False
+                break
+            if n == 30 and example is None:   # 30 = 2·3·5, a three-edge path
+                example = anchors
+        self._record(
+            'pathway.edge_is_the_primitive',
+            'the primitive is the EDGE — two ordered anchors and the line between '
+            'them. A pathway is edges SHARING anchors, and the shared (internal) '
+            'anchor is the FACTOR. A prime is an IRREDUCIBLE edge (1→p, no '
+            'internal anchor); a composite is a PATH of Ω edges with Ω−1 internal '
+            'anchors = the partial products. Direction is from ORDER (R8)', 2,
+            'two anchors + a line — the edge, the minimal relationship (cf. F6, '
+            'the 15 XOR-difference edges)',
+            True, ok,
+            f'[exact] n in [2,2000): edges = Ω, internal anchors = Ω−1, and '
+            f'prime ⟺ 0 internal anchors, for every n. Example n=30=2·3·5: path '
+            f'{example} — 3 edges, internal anchors {example[1:-1]} = the '
+            f'partial products, where the factors LIVE. node (1 anchor) → edge '
+            f'(2 anchors+line) → pathway (edges sharing anchors). Factoring = '
+            f'finding the shared anchor where two edges meet. This is F6 (edges '
+            f'not places) and the crystallographic Patterson (difference '
+            f'vectors) as the SAME primitive; the two endpoint anchors are 1 '
+            f'and N (PW5), the internal ones are the factors.')
+
     # ═══════════════════════════════════════════════════════════════════════
     # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.
     # The UF formulary's generators and labelings, integrated: Newton basins as
@@ -1815,7 +1864,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('  G1–G6  the ring-theory spine: FALL ⟺ quotient has zero divisors')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
-        print('  PW1–5  the pathway layer: tunable walk + TWO-anchor geodesic')
+        print('  PW1–6  the pathway layer: walk, two-anchor geodesic, the EDGE primitive')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')

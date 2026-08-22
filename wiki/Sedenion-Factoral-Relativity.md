@@ -561,3 +561,27 @@ exactly why factoring is hard and why bifurcation (a classifier) measured at
 chance. Full synthesis: `Ainulindale/wiki/94_mathematical_xray_crystallography.md`.
 The visualiser is therefore a **number diffractometer**: mount N, rotate (tune),
 collect reflections, reconstruct the factor density from `decompose_number(N)`.
+
+### PW6 — the EDGE is the primitive: node → edge → pathway
+
+Cody: *"this is how anchors emerge pathways — two points and a line is an edge;
+two anchors and a line is a piece of a pathway."* The primitive is the **edge**:
+two ordered anchors and the line between them. A pathway is edges **sharing
+anchors**, and the shared (internal) anchor is the **factor**.
+
+**PW6 `edge_is_the_primitive`** (exact) — for every n in [2,2000): the
+multiplicative path `1 → … → N` has `Ω(N)` edges and `Ω(N)−1` internal anchors
+(the partial products), and **prime ⟺ 0 internal anchors** (an irreducible
+edge). Example `n=30=2·3·5`: path `[1, 2, 6, 30]` — three edges, internal
+anchors `[2, 6]`, where the factors live.
+
+    node (1 anchor)  →  edge (2 anchors + line)  →  pathway (edges sharing anchors)
+
+So **factoring is finding the shared anchor where two edges meet.** The two
+endpoint anchors are 1 and N (PW5); the internal ones are the factors. A prime is
+an atom (an irreducible edge); a composite is a molecule (a path). This unifies
+three things already in the engine as the **same primitive**: F6 (the factoring
+map is on the edges, not the places), the crystallographic Patterson function
+(the peaks are difference vectors = edges), and G1 (irreducible vs decomposable).
+Direction — the arrow, time — emerges only from **ordering** the two anchors
+(origin→destination), per R8.
