@@ -412,3 +412,58 @@ equations — and each picks its own scale and path. That is what makes it a
 complete self-diagnostic tool, inside and outside at once: nothing imposed, so
 no imposed scale can hide. Noether again — a conserved current, not a fitted
 parameter.
+
+---
+
+## The UF formulary, integrated (FR4–FR6, 2026-08-22)
+
+Cody: *"integrate everything into the generational lineage engine."* The fractal
+library at `PtolemyDesktop/Archimedes/Maths/Formula/UFformulary/` — ~3,800
+generators (`.ufm`), ~480 labelings (`.ucl`), ~210 transforms (`.uxf`), 507
+files — is integrated on **both axes**. The generator is the fractal; the
+labeling is the decomposition.
+
+### The generators (the fractals) — FR3's control set
+
+171 of the 213 generator files are escape-time and drive `escape_survives` /
+`box_dimension` directly (now guarded against Magnet-type divide-by-zero). 49
+are Newton/Nova (root-finding) — these are FR4. 21 are IFS/Barnsley (attractor
+paradigm — a future measurement).
+
+### The labelings (the decompositions) — lifted from the `.ucl` methods
+
+Each coloring method is one rung of the order tower, and its `.ucl` source is
+its instruction manual:
+
+| helper | UF `.ucl` source | rung |
+|---|---|---|
+| `smooth_escape` | smooth iteration | order 1 — escape rate |
+| `orbit_trap` | orbit traps | order 1 — the support |
+| `orbit_curvature` | `dmj-Curvature` = `avg\|arg((z−z′)/(z′−z″))\|` (Kerry Mitchell) | **order 3 — the associator on dynamics** |
+| `lyapunov_exponent` | `dmj-Lyapunov` | the drift |
+| `basin_of` / `newton_basins` | Newton/Nova basins | k-way fall/survive = **ring splitting** |
+
+`label_orbit(c, step)` returns all labelings of one orbit at once — the
+per-pixel data a **visualiser** paints.
+
+### The three relations
+
+- **FR4 `newton_basins_are_splitting`** — Newton's method on `zᵏ − 1` has
+  **exactly k basins**: the k roots of unity, i.e. the linear factorisation
+  `zᵏ − 1 = ∏(z − ζⱼ)`. Which basin you fall into is which factor. This is G1's
+  fall/survive taken **k-way**, and it is ring splitting — the bridge from the
+  fractal block back to the ring-theory spine. Verified k = 2,3,4,5. KNOWN.
+- **FR5 `labeling_order_is_memory_depth`** — a labeling's **order = how many
+  consecutive orbit points it needs**. Escape rate = 1 (order 1); curvature is
+  undefined below 3 points and defined from 3 (order 3). On bounded orbits the
+  escape rate **saturates** while curvature still varies — order 3 resolves what
+  order 1 is blind to, exactly as the associator sees what the support cannot.
+  OURS (framing).
+- **FR6 `lyapunov_is_the_drift`** — the Lyapunov exponent **is** the continuous
+  fall/survive drift: λ(3.2) = −0.92 (survive), λ(3.9) = +0.50 (fall),
+  λ(3.5699) ≈ 0 (the Feigenbaum edge — the σ=½ of the interval map). Same sign
+  law as the Collatz per-step drift `log(√3/2) < 0`. KNOWN.
+
+The library serves as **control set** (each generator a known dimension) and
+**instruction manual** (each `.ucl` a decomposition method). Engine now 26/26.
+Next: the visualiser, which paints `label_orbit` per pixel over any generator.

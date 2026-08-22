@@ -11,8 +11,10 @@ and re-measured here — not paraphrased, not re-derived. On top of them sit the
 parts that belong to THIS repo: six **factoral** relations (F1-F6) applying the
 same discipline to factorisation; six **ring-theory** relations (G1-G6) naming
 the tower in its proper ring theory (FALL <=> the quotient ring has zero
-divisors); and three **fractal** relations (FR1-FR3), the highest-order rung.
-23 relations, all self-checked.
+divisors); and three **fractal** relations (FR1-FR3), the highest-order rung; and three
+**formulary** relations (FR4-FR6) integrating the UF fractal library — Newton
+basins as k-way ring splitting, the labeling tower as decomposition orders, and
+the Lyapunov drift. 26 relations, all self-checked.
 
 WHY IT BELONGS HERE
 
@@ -55,10 +57,19 @@ USAGE
     two_trees(100_000)          # the exact partition, measured
     fall_test(12)               # FALL <=> Z/(12) has zero divisors (G1)
     box_dimension(MANDELBROT, (-2,0.5), (-1.25,1.25))   # fractal boundary (FR3)
+    newton_basins(3)            # 3 basins = the 3 cube-roots = ring splitting (FR4)
+    label_orbit(-0.4+0.6j, MANDELBROT)   # all labelings of one orbit (visualiser)
 
-SIGMA: infinity for F1-F6, R1-R8, G1 G3 G4 G5 G6, FR1 (exact/exhaustive);
-       finite for G2 (sampled moduli), FR2 (Feigenbaum, converging), FR3
-       (box-count on a grid — a coarse but honest dimension in (1,2)).
+SIGMA: infinity for F1-F6, R1-R8, G1 G3 G4 G5 G6, FR1, FR4 (exact/exhaustive);
+       finite for G2 (sampled moduli), FR2/FR6 (converging dynamics), FR3
+       (box-count on a grid — a coarse but honest dimension in (1,2)), FR5
+       (framing over sampled orbits).
+
+THE LABELINGS (lifted from the UF formulary's .ucl coloring methods): the
+GENERATOR is the fractal, the LABELING is the decomposition. escape/smooth =
+order 1, orbit_trap = order-1 support, orbit_curvature = order 3 (the associator
+on dynamics), lyapunov = the drift, basin = k-way fall/survive = ring splitting.
+label_orbit() returns them all for one orbit — the per-pixel data of a visualiser.
 
 Author:  Claude, at Cody's direction — 2026-08-21.
 White Hat. No free parameters. Failed predictions stay in the record.
@@ -66,6 +77,7 @@ White Hat. No free parameters. Failed predictions stay in the record.
 
 from __future__ import annotations
 
+import cmath
 import math
 from dataclasses import dataclass
 from enum import Enum
@@ -696,13 +708,160 @@ def escape_survives(c: complex, step, z0: complex = 0j,
                     maxiter: int = 80, bailout: float = 2.0) -> bool:
     """The iterated fall/survive test. survive = the orbit stays BOUNDED (in
     the set); fall = it ESCAPES past the bailout. This is G1's dichotomy read on
-    dynamics: bounded ↔ a domain, escaping ↔ zero divisors appear."""
+    dynamics: bounded ↔ a domain, escaping ↔ zero divisors appear.
+
+    Guarded (2026-08-22): Magnet-type generators (z→((z²+c−1)/(2z+c−2))²) can
+    divide by zero or overflow — a blow-up IS an escape, so it counts as a fall.
+    """
     z = z0
     for _ in range(maxiter):
-        z = step(z, c)
+        try:
+            z = step(z, c)
+        except (ZeroDivisionError, OverflowError, ValueError):
+            return False
+        if not (math.isfinite(z.real) and math.isfinite(z.imag)):
+            return False
         if abs(z) > bailout:
             return False
     return True
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# THE LABELINGS — decomposition readouts lifted from the UF formulary's .ucl
+# coloring methods (PtolemyDesktop/Archimedes/Maths/Formula/UFformulary/).
+# "Multiple types of fractals, multiple types of labeling": the GENERATOR is
+# the fractal, the LABELING is the decomposition. Each labeling below is one
+# rung of the order tower, and its .ucl source is its instruction manual.
+# ═══════════════════════════════════════════════════════════════════════════
+
+def smooth_escape(c: complex, step, z0: complex = 0j,
+                  maxiter: int = 80, bailout: float = 2.0) -> float:
+    """ORDER 1 — the continuous escape rate (smooth iteration count). The
+    fall/survive test with a real-valued readout: how fast the orbit falls.
+    maxiter (= did not fall) for survivors."""
+    z = z0
+    for n in range(maxiter):
+        try:
+            z = step(z, c)
+        except (ZeroDivisionError, OverflowError, ValueError):
+            return float(n)
+        az = abs(z)
+        if az > bailout:
+            return n + 1 - math.log(math.log(max(az, 1.0000001))) / math.log(2)
+    return float(maxiter)
+
+
+def orbit_trap(c: complex, step, z0: complex = 0j, trap: complex = 0j,
+               maxiter: int = 80, bailout: float = 1e6) -> float:
+    """ORDER 1 (support) — closest approach of the orbit to a trap point. Which
+    structures the orbit visits; the spectral 'support' of the orbit."""
+    z = z0
+    best = float('inf')
+    for _ in range(maxiter):
+        try:
+            z = step(z, c)
+        except (ZeroDivisionError, OverflowError, ValueError):
+            break
+        best = min(best, abs(z - trap))
+        if abs(z) > bailout:
+            break
+    return best
+
+
+def orbit_curvature(c: complex, step, z0: complex = 0j,
+                    maxiter: int = 60, bailout: float = 1e6) -> float:
+    """ORDER 3 — Kerry Mitchell / dmj-Curvature: the average |arg((z−z')/(z'−z''))|
+    over the orbit, i.e. the discrete curvature of the orbit PATH. Needs THREE
+    consecutive points, exactly as the associator needs three elements. Returns
+    -1.0 when fewer than three points exist (undefined → the order-3 signature)."""
+    zold2 = zold = None
+    a = 0.0
+    i = 0
+    z = z0
+    for _ in range(maxiter):
+        try:
+            z = step(z, c)
+        except (ZeroDivisionError, OverflowError, ValueError):
+            break
+        if abs(z) > bailout:
+            break
+        if i >= 2 and abs(zold - zold2) > 1e-18:
+            a += abs(cmath.phase((z - zold) / (zold - zold2)))
+        zold2, zold = zold, z
+        i += 1
+    return a / (i - 1) if i >= 3 else -1.0
+
+
+def lyapunov_exponent(r: float, settle: int = 1000, n: int = 4000) -> float:
+    """THE DRIFT — the Lyapunov exponent of the logistic map. λ < 0 in stable
+    (survive) windows, λ > 0 in chaos (fall), λ ≈ 0 at the accumulation. The
+    continuous, dynamical form of the fall/survive test — the same object as the
+    Collatz per-step drift log(√3/2) < 0 (contracts, so it survives to 1)."""
+    x = 0.5
+    for _ in range(settle):
+        x = r * x * (1 - x)
+    s = 0.0
+    for _ in range(n):
+        x = r * x * (1 - x)
+        d = abs(r * (1 - 2 * x))
+        s += math.log(d) if d > 1e-12 else -30.0
+    return s / n
+
+
+# ── Newton / Nova basins: k-way fall/survive = polynomial splitting = ring ───
+def basin_of(z0: complex, step, roots, maxiter: int = 60, tol: float = 1e-6) -> int:
+    """Which root the orbit converges to — the k-WAY generalisation of
+    fall/survive. Returns the root index, or -1 if it does not converge. Which
+    root you fall into is which linear factor: this is ring splitting."""
+    z = z0
+    for _ in range(maxiter):
+        try:
+            z = step(z, 0j)
+        except (ZeroDivisionError, OverflowError, ValueError):
+            return -1
+        for k, r in enumerate(roots):
+            if abs(z - r) < tol:
+                return k
+        if not (math.isfinite(z.real) and math.isfinite(z.imag)):
+            return -1
+    return -1
+
+
+def newton_basins(k: int, N: int = 60, R: float = 1.6,
+                  maxiter: int = 60) -> Dict[str, Any]:
+    """Newton's method on p(z) = zᵏ − 1. Its k roots are the k-th roots of unity
+    — the linear factorisation zᵏ − 1 = ∏(z − ζⱼ). The plane partitions into k
+    basins; which basin = which factor. The basin boundary is the (fractal)
+    Julia set. This is G1's fall/survive taken k-way — prime splitting made
+    visible."""
+    roots = [cmath.exp(2j * math.pi * j / k) for j in range(k)]
+    p = lambda z: z ** k - 1                        # noqa: E731
+    dp = lambda z: k * z ** (k - 1)                 # noqa: E731
+    step = lambda z, c: z - p(z) / dp(z)            # noqa: E731
+    labels = []
+    for jy in range(N):
+        for ix in range(N):
+            z0 = complex(-R + 2 * R * ix / N, -R + 2 * R * jy / N)
+            labels.append(basin_of(z0, step, roots, maxiter))
+    grid = [labels[i * N:(i + 1) * N] for i in range(N)]
+    basins = sorted(set(l for l in labels if l >= 0))
+    boundary = sum(1 for j in range(N - 1) for i in range(N - 1)
+                   if grid[j][i] != grid[j][i + 1] or grid[j][i] != grid[j + 1][i])
+    return {'k': k, 'n_basins': len(basins), 'basins': basins, 'roots': roots,
+            'boundary_boxes': boundary, 'step': step}
+
+
+def label_orbit(c: complex, step, z0: complex = 0j) -> Dict[str, float]:
+    """All labelings of one orbit at once — the decomposition tower on a single
+    point. This is what a visualiser paints per pixel: one generator, many
+    labelings. order 1 (escape rate), order 1-support (trap), order 3
+    (curvature). survive is the boolean underneath them all."""
+    return {
+        'survive': escape_survives(c, step, z0),
+        'escape_rate': smooth_escape(c, step, z0),       # order 1
+        'orbit_trap': orbit_trap(c, step, z0),           # order 1 — support
+        'curvature': orbit_curvature(c, step, z0),       # order 3
+    }
 
 
 def box_dimension(step, xr, yr, param=None, resolutions=(50, 100, 200),
@@ -785,6 +944,18 @@ TIERS: Dict[str, Tuple[int, str, str]] = {
     'fractal':       (3, 'the fall/survive boundary of an iterated generator',
                      'a RATIO — box-count dimension 1 < D < 2. the highest-order '
                      'factoral decomposition; ring theory is its skeleton'),
+    # ── labelings, lifted from the UF formulary's .ucl coloring methods ──────
+    'basin':         (2, 'which root a Newton orbit converges to',
+                     'a FIXED SET (k-way) — DERIVED. the k-way fall/survive; '
+                     'which basin = which linear factor = ring splitting'),
+    'orbit-trap':    (3, 'closest approach of the orbit to a shape',
+                     'a COUNT/min over the orbit — the order-1 SUPPORT labeling'),
+    'orbit-curvature': (3, 'avg |arg((z−z′)/(z′−z″))| over the orbit',
+                     'a RATIO needing THREE orbit points — the ORDER-3 labeling, '
+                     'the associator read on dynamics (Kerry Mitchell / dmj)'),
+    'lyapunov':      (3, 'the divergence rate of an iterated map',
+                     'a RATIO (log-derivative) — the DRIFT: λ<0 survive, λ>0 '
+                     'fall. the continuous form of the fall/survive test'),
 }
 
 
@@ -1257,8 +1428,100 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                   self.g_associator_is_ring_defect):
             g()
         for fr in (self.fr_tower_self_similar, self.fr_bifurcation_cascade,
-                   self.fr_fall_survive_boundary):
+                   self.fr_fall_survive_boundary, self.fr_newton_basins_are_splitting,
+                   self.fr_labeling_order_is_memory_depth,
+                   self.fr_lyapunov_is_the_drift):
             fr()
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.
+    # The UF formulary's generators and labelings, integrated: Newton basins as
+    # k-way ring splitting, the labeling tower as decomposition orders, and the
+    # Lyapunov drift as the continuous fall/survive test.
+    # ═══════════════════════════════════════════════════════════════════════
+
+    # ── FR4 — Newton basins ARE polynomial splitting = ring theory, k-way ────
+    def fr_newton_basins_are_splitting(self) -> None:
+        rows, ok = {}, True
+        for k in (2, 3, 4, 5):
+            nb = newton_basins(k, N=48)
+            on_circle = all(abs(abs(r) - 1) < 1e-9 for r in nb['roots'])
+            good = (nb['n_basins'] == k and on_circle and nb['boundary_boxes'] > 0)
+            rows[k] = (nb['n_basins'], nb['boundary_boxes'])
+            ok = ok and good
+        self._record(
+            'fractal.newton_basins_are_splitting',
+            'Newton\'s method on zᵏ−1 has exactly k basins — the k roots of '
+            'unity, i.e. the linear factorisation zᵏ−1 = ∏(z−ζⱼ). Which basin '
+            'you fall into is which factor: the k-WAY generalisation of G1\'s '
+            'fall/survive, and it is ring splitting', 2,
+            'a FIXED SET (k-way) — G1 taken k-way, over the splitting field',
+            True, ok,
+            f'[KNOWN (Cayley 1879; Newton fractals)] '
+            + '  '.join(f'z^{k}−1→{n} basins, ∂={b}' for k, (n, b) in rows.items())
+            + '. Exactly k basins at each k, roots on the unit circle, boundary '
+            'nonempty (the fractal Julia set). This is the bridge from the '
+            'fractal block to the ring-theory spine: Newton basins over ℂ are '
+            'the fall/survive of a prime SPLITTING, one level up.')
+
+    # ── FR5 — a labeling's ORDER is its memory depth (the decomposition tower) ─
+    def fr_labeling_order_is_memory_depth(self) -> None:
+        mand = MANDELBROT
+        c_in = complex(-0.4, 0.6)          # an orbit that stays bounded
+        # order 1: escape rate is defined from ONE step (large c falls at n=1)
+        order1_len1 = smooth_escape(complex(5, 0), mand, maxiter=8) < 2.0
+        # order 3: curvature is UNDEFINED below three points, defined from three
+        curv_short = orbit_curvature(c_in, mand, maxiter=2)
+        curv_full = orbit_curvature(c_in, mand, maxiter=40)
+        order3 = (curv_short == -1.0 and curv_full > 0.0)
+        # and the two labelings are DISTINCT instruments: on 8 in-set orbits the
+        # escape rate SATURATES (order 1 is blind to bounded orbits) while the
+        # curvature still varies — order 3 resolves what order 1 cannot.
+        pts = [complex(-0.5 + 0.1 * i, 0.55) for i in range(8)]
+        er = [smooth_escape(c, mand) for c in pts]
+        cv = [orbit_curvature(c, mand, maxiter=40) for c in pts]
+        escape_blind = all(abs(er[i] - er[0]) < 1e-9 for i in range(len(er)))
+        curv_informative = (max(cv) - min(cv)) > 0.1
+        distinct = curv_informative and escape_blind      # blind vs sighted
+        ok = order1_len1 and order3 and distinct
+        self._record(
+            'fractal.labeling_order_is_memory_depth',
+            'a labeling\'s ORDER is the number of consecutive orbit points it '
+            'needs: escape rate = 1 (order 1), curvature = 3 (order 3) — the '
+            'same memory depths as the decomposition tower (support needs 1, '
+            'the associator needs 3). The labelings ARE the orders, and a higher '
+            'order resolves structure a lower one is blind to', 3,
+            'the memory depth of a labeling = its decomposition order',
+            True, ok,
+            f'[OURS (framing; labelings from the UF formulary)] escape rate '
+            f'defined from 1 point ({order1_len1}); curvature undefined below 3 '
+            f'points (short={curv_short}) and defined from 3 (full='
+            f'{curv_full:.3f}). On 8 bounded orbits the escape rate saturates '
+            f'(all {er[0]:.0f} — order 1 is BLIND to which survivor) while '
+            f'curvature varies {min(cv):.2f}…{max(cv):.2f} — order 3 sees what '
+            f'order 1 cannot. Exactly the ring-theory tower: support (order 1) '
+            f'vs the associator (order 3).')
+
+    # ── FR6 — the Lyapunov exponent IS the continuous fall/survive drift ─────
+    def fr_lyapunov_is_the_drift(self) -> None:
+        stable = lyapunov_exponent(3.2)          # period-2 window — survive
+        accum = lyapunov_exponent(3.5699)        # Feigenbaum point — the edge
+        chaos = lyapunov_exponent(3.9)           # chaotic — fall
+        full = lyapunov_exponent(4.0)            # fully chaotic — λ = ln 2 ·?
+        ok = (stable < -0.1 and chaos > 0.1 and abs(accum) < 0.05 and full > 0.1)
+        self._record(
+            'fractal.lyapunov_is_the_drift',
+            'the Lyapunov exponent is the continuous fall/survive test: λ < 0 in '
+            'stable (survive) windows, λ > 0 in chaos (fall), λ ≈ 0 at the '
+            'accumulation — the same sign law as the Collatz per-step drift '
+            'log(√3/2) < 0 (contracts, so it survives to 1)', 3,
+            'a RATIO (log-derivative) — the drift, weighting the two branches',
+            True, ok,
+            f'[KNOWN (Lyapunov; Feigenbaum)] λ(3.2)={stable:+.3f} (survive), '
+            f'λ(3.5699)={accum:+.3f} (edge ≈ 0), λ(3.9)={chaos:+.3f} (fall), '
+            f'λ(4.0)={full:+.3f}. The sign IS the fall/survive verdict, and the '
+            f'zero-crossing is the Feigenbaum edge — the σ=½ of the interval map. '
+            f'Same object as the drift measured in the Collatz paper.')
 
     def report(self) -> None:
         print('═' * 78)
@@ -1267,6 +1530,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('  F1–F6  this repo: factorisation decomposed against the Two Trees')
         print('  G1–G6  the ring-theory spine: FALL ⟺ quotient has zero divisors')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
+        print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')

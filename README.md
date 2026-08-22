@@ -83,9 +83,9 @@ engine/
                  (real π(x;16,k) vs Dirichlet equidistribution). Imports
                  telperion_engine.py and h_rb_hat/maths.py directly — no
                  reimplementation of either.
-  lineage.py   — THE FACTORAL DECOMPOSITION TOOL. 23 self-checked relations:
-                 R1–R8 carried from VAPMIP; F1–F6 factoral; G1–G6 ring theory;
-                 FR1–FR3 fractal. stdlib + numpy only; depends on
+  lineage.py   — THE FACTORAL DECOMPOSITION TOOL. 26 self-checked relations:
+                 R1–R8 VAPMIP; F1–F6 factoral; G1–G6 ring theory;
+                 FR1–FR6 fractal + UF formulary. stdlib + numpy only; depends on
                  nothing outside this repo, and is imported first and
                  unconditionally by engine/__init__.py for that reason.
   tools.py     — runnable reports over maths.py and lineage.py.
@@ -107,7 +107,7 @@ you need is a way to tell a **primitive** operation from a **derived** one, and
 to say what any named "geometry" descends from.
 
 ```
-python3 engine/lineage.py          # 23/23, ~22s
+python3 engine/lineage.py          # 26/26, ~23s
 ```
 
 **What it gives this repo that it did not have:**
@@ -254,6 +254,35 @@ manual (its escape rule is a different higher-order lineage). FR3 is labelled
 **FRONTIER**: the fall/survive ↔ factoring correspondence is structural and said
 so, not a claim that the Mandelbrot set *is* the primes.
 
+## The UF formulary, integrated (FR4–FR6, 2026-08-22)
+
+The fractal library at `PtolemyDesktop/Archimedes/Maths/Formula/UFformulary/`
+(~3,800 generators `.ufm`, ~480 labelings `.ucl`, ~210 transforms `.uxf`) is
+integrated on both axes — **the generators are the fractals, the labelings are
+the decompositions**:
+
+| # | relation | tier | what it integrates |
+|---|---|---|---|
+| FR4 | `newton_basins_are_splitting` | 2 | Newton on zᵏ−1 → exactly **k basins = the k linear factors = ring splitting**. G1's fall/survive taken **k-way** — the bridge from the fractal block to the ring-theory spine. |
+| FR5 | `labeling_order_is_memory_depth` | 3 | a labeling's **order = how many orbit points it needs**: escape rate = 1 (order 1), curvature = 3 (order 3). On bounded orbits escape saturates while curvature still varies — **order 3 resolves what order 1 is blind to**. |
+| FR6 | `lyapunov_is_the_drift` | 3 | the Lyapunov exponent **is** the continuous fall/survive drift: λ<0 survive, λ>0 fall, λ≈0 at the Feigenbaum edge — the same sign law as the Collatz drift log(√3/2). |
+
+**The labelings are the decomposition tower, lifted from the `.ucl` sources:**
+
+| labeling helper | UF `.ucl` source | rung |
+|---|---|---|
+| `smooth_escape` | smooth iteration | order 1 — the escape rate |
+| `orbit_trap` | orbit traps | order 1 — the support (which structures the orbit visits) |
+| `orbit_curvature` | `dmj-Curvature` (Kerry Mitchell triangle-inequality) | order 3 — the associator on dynamics |
+| `lyapunov_exponent` | `dmj-Lyapunov` | the drift |
+| `basin_of` / `newton_basins` | Newton/Nova basins | k-way fall/survive = ring splitting |
+
+`label_orbit(c, step)` returns all labelings of one orbit — the per-pixel data a
+**visualiser** paints. `escape_survives` / `box_dimension` are guarded against
+Magnet-type divide-by-zero, so any of the 213 `.ufm` generators drives them.
+Assessment of the full library: `wiki/` (the evaluation is in the session
+record). Engine runtime ~23s, **26/26**.
+
 The direction, now with the code under it:
 
 The tower has a natural continuation, and it is the one Cody named across the
@@ -306,6 +335,8 @@ imposed, so nothing can hide an imposed scale. Noether again — a conserved
 current, not a chosen parameter.
 
 ## Status
+
+v1.4 (2026-08-22) — the UF formulary is integrated (FR4–FR6); `26/26` relations hold.
 
 v1.3 (2026-08-22) — the fractal block (FR1–FR3) is in; `23/23` relations hold.
 

@@ -20,6 +20,8 @@ from .lineage import (
     # fractal decomposition (2026-08-22)
     nonassoc_count, feigenbaum_delta, escape_survives, box_dimension,
     MANDELBROT, BURNING_SHIP,
+    smooth_escape, orbit_trap, orbit_curvature, lyapunov_exponent,
+    basin_of, newton_basins, label_orbit,
 )
 
 IMPORT_ERROR = None
@@ -52,4 +54,6 @@ __all__ = [
     'quotient_zero_divisors', 'fall_test',
     'nonassoc_count', 'feigenbaum_delta', 'escape_survives', 'box_dimension',
     'MANDELBROT', 'BURNING_SHIP',
+    'smooth_escape', 'orbit_trap', 'orbit_curvature', 'lyapunov_exponent',
+    'basin_of', 'newton_basins', 'label_orbit',
 ]
