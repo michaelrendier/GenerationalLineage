@@ -683,3 +683,33 @@ anchor, a boundary horizon, and a tunable path between two anchors) is exactly
 the tool a real, unrelated engineering discipline reaches for whenever it needs
 to navigate impedance space. An independent existence proof of the *shape*, not
 a confirmation of the *theory*.
+
+### PW9 — the NUMBER CHART: the Smith chart's methodology, applied directly
+
+Cody: *"this is the methodology of visualizing factoral decomposition."* The
+Smith chart isn't an analogy for the visualiser — it's the design template.
+Tested — `pathway.number_chart_is_the_methodology`.
+
+**Γ_N(a) = excursion/(excursion + 2a₀)** — the Fermat search radius (PW5),
+folded into a bounded `[0, 1)` chart exactly the way the Smith chart folds the
+impedance half-plane into the unit disk. `a₀ = ⌈√N⌉` (the two-anchor midpoint)
+maps to `Γ_N = 0`, the fixed-point anchor — a Smith-chart "matched load".
+
+Measured: the midpoint anchor maps to `Γ_N = 0` exactly, for every N tested;
+`Γ_N` is bounded and **monotone** as the excursion grows — the chart is
+tuning-legible, exactly like rotating a Smith chart. And the payoff: **where
+the factor node lands is a difficulty gauge, read at a glance** — balanced
+semiprimes (3233, 10403, 65521×65537) put their node at `Γ_N < 0.01`, right at
+the anchor; the unbalanced `3 × 10007` puts its node at `Γ_N > 0.9`, near the
+horizon. Radial position on the chart *is* how hard N was to crack.
+
+**What this resolves.** Every open visualiser design question from earlier —
+side-by-side panels vs. overlay, which perspective encodes what — is answered
+by the Smith chart's own design: **one bounded chart, fixed-anchor landmarks,
+tuning as a legible motion.** Not five linked panes; one chart with orthogonal
+coordinate families overlaid (constant-excursion vs. constant-multiplier, the
+Smith chart's constant-R vs. constant-X), anchors drawn as fixed landmarks (1,
+N, √N — not data points among many), and a tuning **dial** (the multiplier k,
+PW2) as the second control, exactly mirroring the Smith chart's rotate + add-a-
+stub two-control interface. `decompose_number(N)['number_chart']` is now the
+visualiser's chart datum, alongside its other perspectives.

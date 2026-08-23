@@ -12,12 +12,13 @@ parts that belong to THIS repo: six **factoral** relations (F1-F6) applying the
 same discipline to factorisation; six **ring-theory** relations (G1-G6) naming
 the tower in its proper ring theory (FALL <=> the quotient ring has zero
 divisors); and three **fractal** relations (FR1-FR3), the highest-order rung; and three
-**formulary** relations (FR4-FR6) integrating the UF fractal library; and eight
-**pathway** relations (PW1-PW8) — factoring as a tunable WALK to N, the
+**formulary** relations (FR4-FR6) integrating the UF fractal library; and nine
+**pathway** relations (PW1-PW9) — factoring as a tunable WALK to N, the
 two-anchor geodesic, the EDGE primitive, L_(I|O) as the Observer's lineage
-mechanism, and the Smith chart as an independent 90-year-old engineering
-instance of the same Möbius structure. G8 adds the ARITHMETIC DERIVATIVE. 36
-relations, all self-checked.
+mechanism, the Smith chart as an independent Mobius confirmation, and the
+NUMBER CHART (PW9) — the Smith-chart METHODOLOGY applied directly: a bounded,
+anchored, tuning-legible chart that is decompose_number()'s visualiser data.
+G8 adds the ARITHMETIC DERIVATIVE. 37 relations, all self-checked.
 
 WHY IT BELONGS HERE
 
@@ -1017,6 +1018,28 @@ def fermat_path(N: int, maxsteps: int = 200000):
     return {'factor': None, 'excursion': None}
 
 
+def number_chart_point(N: int, a: int, a0: int = None) -> float:
+    """THE VISUALISER'S METHODOLOGY — the Smith chart, applied. Γ_N(a) folds
+    the (unbounded) Fermat search radius into a BOUNDED coordinate in [0, 1),
+    exactly as the Smith chart folds the impedance half-plane into the unit
+    disk: Γ_N = excursion / (excursion + 2·a₀), a₀ = the midpoint anchor
+    ⌈√N⌉ (PW5). a₀ ↦ Γ_N = 0 (the fixed point — a Smith-chart "matched load");
+    the horizon Γ_N → 1 is unbounded excursion — no factor found within reach.
+
+    Where the factor NODE lands on this chart is a difficulty gauge, read at a
+    glance: balanced N sits at the anchor (Γ_N ≈ 0); unbalanced/hard N sits
+    near the horizon (Γ_N ≈ 1) — the same landmark reading a Smith chart gives
+    for how far a load is from being matched.
+    """
+    from math import isqrt
+    if a0 is None:
+        a0 = isqrt(N)
+        if a0 * a0 < N:
+            a0 += 1
+    excursion = a - a0
+    return excursion / (excursion + 2 * a0)
+
+
 def decompose_number(N: int) -> Dict[str, Any]:
     """The MULTI-PERSPECTIVE bundle for one integer — the visualiser's data
     model. One number, every perspective: ring (fall/survive), cepstral
@@ -1036,6 +1059,13 @@ def decompose_number(N: int) -> Dict[str, Any]:
     }
     out['pathway'] = (tune_pathway(N) if ft['verdict'] == 'FALL'
                       else {'note': 'prime/unit — no factor path to walk'})
+    if ft['verdict'] == 'FALL':
+        fp = fermat_path(N, maxsteps=20000)
+        out['number_chart'] = ({'gamma': number_chart_point(N, fp['a']),
+                                'excursion': fp['excursion'], 'a': fp['a']}
+                               if fp['factor'] else None)
+    else:
+        out['number_chart'] = None
     return out
 
 
@@ -1697,7 +1727,8 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                    self.pw_spiral_is_additive, self.pw_inside_outside_one_product,
                    self.pw_two_anchor_geodesic, self.pw_edge_is_the_primitive,
                    self.pw_observer_lineage_is_l_io,
-                   self.pw_smith_chart_is_the_same_mobius):
+                   self.pw_smith_chart_is_the_same_mobius,
+                   self.pw_number_chart_is_the_methodology):
             pw()
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -2008,6 +2039,47 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'anchors) is exactly the tool reached for whenever a real system '
             f'needs to navigate impedance space.')
 
+    # ── PW9 — the NUMBER CHART: the Smith chart methodology, applied ─────────
+    def pw_number_chart_is_the_methodology(self) -> None:
+        from math import isqrt
+        cases_balanced = [3233, 10403, 4294049777]
+        cases_hard = [30021]                              # 3 × 10007, unbalanced
+        anchor_ok = all(abs(number_chart_point(N, isqrt(N) if isqrt(N)**2 == N
+                                               else isqrt(N) + 1)) < 1e-12
+                        for N in cases_balanced + cases_hard)
+        # monotone / bounded as excursion grows — the chart is tuning-legible
+        N = 3233
+        a0 = isqrt(N) + (0 if isqrt(N) ** 2 == N else 1)
+        vals = [number_chart_point(N, a0 + e) for e in (0, 10, 100, 1000, 10000)]
+        monotone = vals == sorted(vals) and all(0 <= v < 1 for v in vals)
+        # the factor NODE reads as a difficulty gauge: balanced → near the
+        # anchor (Γ≈0), unbalanced → near the horizon (Γ≈1)
+        near_anchor = all(number_chart_point(N, fermat_path(N, 20000)['a']) < 0.01
+                          for N in cases_balanced)
+        near_horizon = number_chart_point(30021, fermat_path(30021, 20000)['a']) > 0.9
+        ok = anchor_ok and monotone and near_anchor and near_horizon
+        self._record(
+            'pathway.number_chart_is_the_methodology',
+            'the Smith-chart METHODOLOGY, applied directly: Γ_N(a) = '
+            'excursion/(excursion+2a₀) folds the unbounded Fermat search into a '
+            'bounded [0,1) chart with the midpoint a₀=⌈√N⌉ (PW5) as the fixed-'
+            'point anchor — and where the factor NODE lands is a difficulty '
+            'gauge, read at a glance', 1,
+            'the Smith chart\'s bounded conformal fold (PW8), applied to the '
+            'two-anchor geodesic (PW5) instead of impedance',
+            True, ok,
+            f'[OURS] the midpoint anchor maps to Γ_N=0 exactly for every N '
+            f'tested ({anchor_ok}); Γ_N is bounded in [0,1) and MONOTONE as '
+            f'excursion grows ({monotone}) — the chart is tuning-legible, '
+            f'exactly like rotating a Smith chart; balanced semiprimes '
+            f'{cases_balanced} put their factor node at Γ_N<0.01, at the anchor '
+            f'({near_anchor}); the unbalanced 3×10007 puts its node at '
+            f'Γ_N>0.9, near the horizon ({near_horizon}) — RADIAL POSITION ON '
+            f'THE CHART IS HOW HARD N WAS TO CRACK, visible without reading a '
+            f'number. This is the visualiser\'s methodology: one bounded chart, '
+            f'fixed-anchor landmarks, tuning as a legible motion — not five '
+            f'side-by-side panels.')
+
     # ═══════════════════════════════════════════════════════════════════════
     # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.
     # The UF formulary's generators and labelings, integrated: Newton basins as
@@ -2106,7 +2178,7 @@ class FactoralLineageEngine(GenerationalLineageEngine):
         print('  G1–G8  ring-theory: FALL⟺quotient-ZD; closed/open=unit/ZD; the derivative')
         print('  FR1–3  fractal decomposition: the highest-order factoral rung')
         print('  FR4–6  the UF formulary: Newton basins, labeling orders, the drift')
-        print('  PW1–8  pathway: walk, two-anchor, edge, Observer lineage, Smith chart')
+        print('  PW1–9  pathway: walk..Smith chart..the NUMBER CHART (the methodology)')
         print('═' * 78)
         held = sum(1 for r in self.log if r.status is Status.HOLDS)
         print(f'{held}/{len(self.log)} relations hold\n')
