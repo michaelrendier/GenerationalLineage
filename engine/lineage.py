@@ -1040,6 +1040,297 @@ def number_chart_point(N: int, a: int, a0: int = None) -> float:
     return excursion / (excursion + 2 * a0)
 
 
+# ── the TWO-RING CHART — PW8's Möbius fold, factored out and generalised ────
+# PW8 checked the fold against ONE pair of rings (resistance, reactance) at
+# ONE anchor (Z0=50, real). PW10 (below) checks the same fold against
+# ARBITRARY ring pairs and ARBITRARY (including complex) anchors — the fold's
+# four invariants are properties of the MAP, not of impedance. That is what
+# licenses picking new ring definitions per use (Cody, 2026-08-23): a
+# box-kite strut pair, or any other two-quantity relationship, rides the same
+# instrument, no re-derivation required.
+
+def ring_chart_gamma(Z: complex, Z0: complex) -> complex:
+    """THE FOLD ITSELF. Γ = (Z − Z0) / (Z + Z0) — the Smith chart's Möbius
+    map, pulled out of PW8 as a standalone primitive so any pair of ring
+    definitions can drive it, not only impedance. Z0 is the chart's own
+    fixed-point anchor: Γ(Z0) = 0 by construction, for ANY Z0 ≠ 0."""
+    return (Z - Z0) / (Z + Z0)
+
+
+def two_ring_chart(obj: Any, ring1, ring2, Z0: complex,
+                    ring1_name: str = 'ring1',
+                    ring2_name: str = 'ring2') -> Dict[str, Any]:
+    """THE TWO-RING CHART. ring1, ring2: obj -> float are the caller's own
+    choice of what the chart's two ring-families MEAN — resistance/reactance
+    is one choice among many, not a constraint of the fold. Builds
+    Z = ring1(obj) + i·ring2(obj) and folds it through ring_chart_gamma().
+
+    This is the general instrument PW9's number_chart_point() is one
+    specialisation of (real-valued, ring2 fixed at the excursion axis); PW10
+    checks that the fold's invariants — fixed point, boundary, conformal
+    orthogonality, the inversion π-rotation — survive the generalisation for
+    ARBITRARY ring1/ring2, not just excursion/anchor or resistance/reactance.
+    """
+    Z = complex(ring1(obj), ring2(obj))
+    G = ring_chart_gamma(Z, Z0)
+    return {'Z': Z, 'Z0': Z0, 'gamma': G, 'abs_gamma': abs(G),
+            'ring1': ring1_name, 'ring2': ring2_name}
+
+
+@dataclass
+class ProcessOperator:
+    """One named operator in a pathway decomposition: a function of ANY
+    number of OTHER named operators' outputs (by name, referenced in
+    `depends_on`) — not assumed to be "the previous one" in a chain.
+    This is the general shape a process's own minimum necessary tool-set
+    actually takes; a chain is just the degenerate case where every
+    operator depends on exactly one predecessor, not the rule."""
+    name: str
+    fn: Any                          # Callable[..., Any] — takes depends_on's outputs, in order
+    depends_on: Tuple[str, ...] = ()  # names of other operators, or 'input'
+
+
+def pathway_decomposition(input_value: Any, operators: Sequence[ProcessOperator],
+                          output_name: str) -> Dict[str, Any]:
+    """THE PATHWAY DECOMPOSITION — the primary forensic tool: run a DAG of
+    named PROCESS OPERATORS, resolve dependencies in whatever order makes
+    them satisfiable (not assumed left-to-right), and report every
+    operator's own output as an "imaginary" component alongside the one
+    designated REAL output.
+
+    Cody, 2026-08-25, the corrected framing this replaces a chain-only
+    first attempt with: "the point here is...building a mathematical
+    'pathway decomposition' using 'process operators'...regardless of
+    actual mathematical equations or operations associated with an
+    Octonion or a Quaternion...regardless of the fact that those
+    additional i's are rotations in the maths, they can be composite
+    constructions for any process from imaginary to real meaning." So —
+    deliberately, NOT here: no cd_level, no rounding a stage count up to
+    the nearest power-of-2 division-algebra name. "Imaginary" names a
+    ROLE (hidden, generative, composite) here, not an algebra with
+    rotation rules; the count is whatever the process's own minimum tool-
+    set turns out to need, discovered by running it, never chosen to hit
+    a target dimension. How the components combine into the real slot is
+    a property of the PROCESS — often literally a sum (Hamiltonian-
+    shaped: this project's own kinetic+inertia split, Phase 30 sec.4, is
+    the same pattern — several distinct terms adding to one observable),
+    but that is what `operators` says it is, never imposed by this
+    function.
+
+    RSA's CRT-decrypt is the control case this was built to get right:
+    `m1` and `m2` each depend only on the input (independent, not
+    chained); `h` depends on BOTH `m1` and `m2`; the final `m` depends on
+    `h` AND `m2` again — a real dependency graph, not a fiction of one
+    forced into a linear pipeline with closures reaching around it.
+    """
+    results: Dict[str, Any] = {'input': input_value}
+    resolved = {'input'}
+    order: List[str] = []
+    remaining = list(operators)
+    while remaining:
+        progressed = False
+        still = []
+        for op in remaining:
+            if all(dep in resolved for dep in op.depends_on):
+                args = [results[dep] for dep in op.depends_on]
+                results[op.name] = op.fn(*args)
+                resolved.add(op.name)
+                order.append(op.name)
+                progressed = True
+            else:
+                still.append(op)
+        if not progressed:
+            missing = [op.name for op in still]
+            raise ValueError(f'unresolved dependency (cycle, or missing name) '
+                             f'among: {missing}')
+        remaining = still
+
+    imaginary = tuple((name, results[name]) for name in order if name != output_name)
+    return {'real': results[output_name], 'imaginary': imaginary,
+            'dim': 1 + len(imaginary), 'order': order, 'all': results}
+
+
+def cross_ratio(z1: complex, z2: complex, z3: complex, z4: complex) -> complex:
+    """THE SCALE INVARIANT — the classical Mobius invariant, exact under
+    EVERY choice of anchor Z0. Cody, 2026-08-25: "what is the invariant
+    when scale is removed...i want to see that object." The first
+    candidate tried and REJECTED, kept in the record rather than erased:
+    arg(Z) (the raw angle) is scale-blind for a bare complex number, but
+    does NOT survive ring_chart_gamma() — the fold has its own fixed
+    point at Z0, not at the origin, so rescaling Z around 0 is not a
+    symmetry of the fold, and arg(Gamma) changes with scale (checked
+    directly: from 1.054 rad down to 0.007 rad across four anchors on one
+    fixed point). The cross-ratio of any FOUR points, by contrast, is
+    EXACTLY unchanged by ring_chart_gamma() regardless of which anchor Z0
+    folds them — checked across four wildly different anchors, matching
+    to full numerical precision every time. This is the scale-blind
+    object underneath the fold: not a property of any one point, a
+    property of a RELATIONSHIP among four."""
+    return ((z1 - z3) * (z2 - z4)) / ((z1 - z4) * (z2 - z3))
+
+
+def chart_scale_factor(Z: complex, Z0: complex) -> float:
+    """|dΓ/dZ| = |2·Z0 / (Z+Z0)²| — the fold's own derivative, exact, not a
+    numerical approximation. This is the "flattening artifact" (Cody,
+    2026-08-25): a Möbius map is conformal, so it preserves ANGLES but not
+    AREA — a patch near Z gets stretched or compressed by exactly this
+    factor when it lands in Γ-space, and that distortion is real, computed
+    information a bare (Re Γ, Im Γ) reading doesn't carry on its own.
+    Checked against central-difference numerical differentiation in PW13,
+    not just asserted from the algebra."""
+    return abs(2 * Z0) / abs(Z + Z0) ** 2
+
+
+def factoral_spiral(objs: Sequence[Any], ring1, ring2, Z0: complex,
+                    ring1_name: str = 'ring1',
+                    ring2_name: str = 'ring2') -> Dict[str, Any]:
+    """THE FACTORAL SPIRAL — two_ring_chart run over a whole collection at
+    once, each object's own Γ AND scale factor returned together, plus a
+    per-integer-cell bucketing of ring1/ring2 (round()ed) so a caller can
+    see where objects cluster without re-deriving it.
+
+    Cody, 2026-08-25: spectral analysis IS factoral decomposition, using a
+    different notion of "factor" — an eigendecomposition factors an
+    operator into (eigenvalue, eigenvector) pairs the SAME WAY integer
+    factorization decomposes N into primes: both are "write this thing as
+    a product/sum of irreducible pieces." This function is the generic
+    instrument for that: point it at ANY collection with two chosen
+    numeric readings (ring1, ring2 — could be relation counts, could be
+    eigenvalue components, could be anything a caller defines) and see
+    the collection's own factoral/spectral structure as chart geometry —
+    the "crystallography" reading (PW11's repeat-structure recovery) and
+    this reading are the same move at two different scales: infer an
+    unseen generating structure from a collection's own shape, not from
+    inspecting any one member.
+
+    Returns per-object readings (list) AND a `cells` dict — key =
+    (round(ring1), round(ring2)), value = list of indices landing there —
+    the discrete "windows of order" a caller can render as bubbles instead
+    of raw scatter.
+    """
+    readings = []
+    cells: Dict[tuple, List[int]] = {}
+    for idx, obj in enumerate(objs):
+        r1, r2 = ring1(obj), ring2(obj)
+        Z = complex(r1, r2)
+        G = ring_chart_gamma(Z, Z0)
+        sf = chart_scale_factor(Z, Z0)
+        readings.append({'Z': Z, 'gamma': G, 'abs_gamma': abs(G), 'scale_factor': sf})
+        key = (round(r1), round(r2))
+        cells.setdefault(key, []).append(idx)
+    return {'Z0': Z0, 'ring1': ring1_name, 'ring2': ring2_name,
+            'readings': readings, 'cells': cells}
+
+
+# ── the CRYSTAL — recovering an unseen generator from repeat-structure ──────
+# 2026-08-23, Cody: crystallography as "measurement of invisible
+# relationships" -- can the SAME move (autocorrelate differences, never look
+# at positions/plaintext directly) infer a hidden generating parameter of a
+# permutation/sequence from its own repeat-structure alone? Yes, and it is
+# not new territory: this IS Kasiski examination / the Friedman test,
+# generalised past text ciphers to any repeating sequence. PW11 below is the
+# self-tested control (KNOWN key length, recovered blind).
+
+def repeat_distances(seq: Sequence, n: int = 3) -> List[int]:
+    """All pairwise distances between repeated n-grams in seq — THE CRYSTAL.
+    A Patterson-style autocorrelation built from repeats alone, positions
+    never compared to any external reference — the same object Kasiski
+    examination reads a cipher's key length off of, generalised to any
+    sequence over any alphabet."""
+    positions: Dict[Tuple, List[int]] = {}
+    for i in range(len(seq) - n + 1):
+        gram = tuple(seq[i:i + n])
+        positions.setdefault(gram, []).append(i)
+    dists: List[int] = []
+    for pos in positions.values():
+        for a in range(len(pos)):
+            for b in range(a + 1, len(pos)):
+                dists.append(pos[b] - pos[a])
+    return dists
+
+
+def infer_period_by_stem_vote(distances: Sequence[int],
+                              max_period: int = 20) -> Dict[str, Any]:
+    """Recover an unseen generating PERIOD from nothing but the crystal's
+    distances — "the order of the character set", read off the
+    relationship structure, never observed directly.
+
+    NOT a blind gcd of every distance — that is fragile, because ONE
+    spurious repeat (a coincidence unrelated to the true period) collapses
+    a running gcd to 1. Instead this VOTES: for each candidate period k,
+    count how many distances k divides, and take the best-supported k. This
+    IS the Friedman/Kasiski method, stated generally — R8's gcd/meet
+    applied by counting support across many candidates instead of reducing
+    them all at once.
+    """
+    votes = {k: sum(1 for d in distances if d % k == 0)
+             for k in range(2, max_period + 1)}
+    best = max(votes, key=lambda k: votes[k]) if votes else None
+    return {'votes': votes, 'best_period': best, 'n_distances': len(distances)}
+
+
+def vigenere_cipher(plaintext: Sequence[int], key: Sequence[int],
+                    alphabet: int = 26) -> List[int]:
+    """A minimal polyalphabetic shift cipher over integers 0..alphabet−1 —
+    the SYNTHETIC control for infer_period_by_stem_vote(): the key length
+    is KNOWN here by construction, so recovery can be checked exactly
+    (recovered == true), not just judged plausible."""
+    return [(c + key[i % len(key)]) % alphabet for i, c in enumerate(plaintext)]
+
+
+# ── the JOIN — a permutation's order from its cycle-length stems ────────────
+def permutation_cycles(perm: Sequence[int]) -> List[List[int]]:
+    """The cycle decomposition of a permutation given as perm[i] = where i
+    maps to. Each cycle is the ORBIT of one starting point under repeated
+    application — the permutation analogue of factor_lineage's leaves."""
+    n = len(perm)
+    seen = [False] * n
+    cycles: List[List[int]] = []
+    for i in range(n):
+        if seen[i]:
+            continue
+        cycle, j = [], i
+        while not seen[j]:
+            seen[j] = True
+            cycle.append(j)
+            j = perm[j]
+        cycles.append(cycle)
+    return cycles
+
+
+def permutation_order_direct(perm: Sequence[int]) -> int:
+    """The permutation's order, computed the definitional way: apply it
+    repeatedly until it returns to identity. The control permutation_order_
+    via_stems() below is checked against."""
+    n = len(perm)
+    identity = list(range(n))
+    cur = list(perm)
+    order = 1
+    while cur != identity:
+        cur = [perm[x] for x in cur]
+        order += 1
+    return order
+
+
+def permutation_order_via_stems(perm: Sequence[int]) -> int:
+    """The permutation's order as the JOIN of its cycle-length stems — the
+    dual of R8's gcd/MEET. order(π) = lcm(cycle lengths); each length is
+    primary-decomposed (G3's cepstral machinery, already built) and the
+    lcm takes the MAX exponent per prime across cycles, where a gcd/meet
+    would take the MIN. Same stems, opposite lattice operation."""
+    combined: Dict[int, int] = {}
+    for cycle in permutation_cycles(perm):
+        L = len(cycle)
+        if L <= 1:
+            continue
+        for p, e in primary_decomposition(L).items():
+            combined[p] = max(combined.get(p, 0), e)
+    order = 1
+    for p, e in combined.items():
+        order *= p ** e
+    return order
+
+
 def decompose_number(N: int) -> Dict[str, Any]:
     """The MULTI-PERSPECTIVE bundle for one integer — the visualiser's data
     model. One number, every perspective: ring (fall/survive), cepstral
@@ -1728,7 +2019,13 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                    self.pw_two_anchor_geodesic, self.pw_edge_is_the_primitive,
                    self.pw_observer_lineage_is_l_io,
                    self.pw_smith_chart_is_the_same_mobius,
-                   self.pw_number_chart_is_the_methodology):
+                   self.pw_number_chart_is_the_methodology,
+                   self.pw_two_ring_chart_is_general,
+                   self.pw_key_length_is_a_stem_vote,
+                   self.pw_permutation_order_is_the_join,
+                   self.pw_scale_factor_is_the_conformal_derivative,
+                   self.pw_process_trace_matches_the_cipher,
+                   self.pw_cross_ratio_is_scale_blind):
             pw()
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -2079,6 +2376,341 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'number. This is the visualiser\'s methodology: one bounded chart, '
             f'fixed-anchor landmarks, tuning as a legible motion — not five '
             f'side-by-side panels.')
+
+    # ── PW10 — the TWO-RING CHART generalises: any ring pair, any anchor ─────
+    def pw_two_ring_chart_is_general(self) -> None:
+        # 1. fixed point — Γ(Z0)=0 for arbitrary Z0, including COMPLEX anchors
+        # (PW8 only ever tested a real Z0=50; impedance never needed a
+        # complex one, but the algebra never required realness either)
+        anchors = [complex(50, 0), complex(3, 4), complex(-2, 7), complex(0.5, -1.5)]
+        fp = all(abs(ring_chart_gamma(Z0, Z0)) < 1e-12 for Z0 in anchors)
+
+        # 2. boundary — Re(Z·conj(Z0))=0 ⟺ |Γ|=1, derived (not assumed) from
+        # |Z−Z0|²=|Z+Z0]² ⟺ Re(Z·conj(Z0))=0, and checked BOTH directions:
+        # points built ON the perpendicular (Z=t·i·Z0) land on |Γ|=1; points
+        # colinear WITH Z0 (Z=(1+t)·Z0, t>-1) stay strictly inside.
+        boundary_ok = True
+        for Z0 in anchors:
+            for t in (-3.0, -0.5, 0.3, 1.0, 5.0):
+                Zb = complex(0, 1) * t * Z0                # ⟂ to Z0 by construction
+                on_boundary = abs(abs(ring_chart_gamma(Zb, Z0)) - 1) < 1e-9
+                re_zero = abs((Zb * Z0.conjugate()).real) < 1e-9
+                boundary_ok = boundary_ok and on_boundary and re_zero
+            for t in (0.0, 1.0, 10.0):
+                Zi = (1 + t) * Z0                          # colinear, t>-1
+                interior = abs(ring_chart_gamma(Zi, Z0)) < 1 - 1e-9 or Z0 == 0
+                boundary_ok = boundary_ok and interior
+
+        # 3. conformal — constant-Re(Z)/constant-Im(Z) tangents stay orthogonal
+        # under the fold for a COMPLEX anchor too, not only Z0=50 real
+        h = 1e-5
+        Z0c = complex(3, 4)
+        zR = lambda x: ring_chart_gamma(complex(Z0c.real, x), Z0c)      # noqa: E731
+        zI = lambda r: ring_chart_gamma(complex(r, Z0c.imag), Z0c)      # noqa: E731
+        tR = (zR(Z0c.imag + h) - zR(Z0c.imag - h)) / (2 * h)
+        tI = (zI(Z0c.real + h) - zI(Z0c.real - h)) / (2 * h)
+        orth = abs(tR.real * tI.real + tR.imag * tI.imag) < 1e-6
+
+        # 4. the inversion is a π-ROTATION for ANY anchor: Γ(Z0²/Z) = −Γ(Z) —
+        # PW8's Y=1/Z duality was the SPECIAL CASE Y0=1/Z0; this is the
+        # general algebraic fact underneath it (derived: W=Z0²/Z ⟹
+        # Γ(W) = (Z0−Z)/(Z0+Z) = −Γ(Z), for any Z0≠0, Z≠0)
+        rotation = True
+        for Z0 in anchors:
+            for Z in (complex(25, 25), complex(-10, 3), complex(1, -8)):
+                W = Z0 * Z0 / Z
+                rotation = rotation and abs(ring_chart_gamma(W, Z0)
+                                            - (-ring_chart_gamma(Z, Z0))) < 1e-9
+
+        # 5. PLUGGABILITY — two genuinely unrelated integer-theoretic ring
+        # definitions (Ω(n), the lineage length; φ(n)/n, the unit density),
+        # nothing to do with impedance, folded through the SAME instrument.
+        # Anchor: n=1's own values (Ω(1)=0, φ(1)/1=1) — the Mingling point,
+        # picked because it is already this file's own zero/identity anchor,
+        # not because it is privileged for this ring pair.
+        ring1 = lambda n: float(factor_lineage(n)['omega'])   # noqa: E731
+        ring2 = lambda n: euler_phi(n) / n                    # noqa: E731
+        Z0_int = complex(ring1(1), ring2(1))                  # = 0+1j
+        pts = {n: two_ring_chart(n, ring1, ring2, Z0_int, 'Omega', 'phi/n')
+               for n in (1, 2, 97, 360, 1024)}
+        anchor_recovers = abs(pts[1]['gamma']) < 1e-12
+        bounded = all(r['abs_gamma'] <= 1 + 1e-9 for r in pts.values())
+        pluggable = anchor_recovers and bounded
+
+        ok = fp and boundary_ok and orth and rotation and pluggable
+        self._record(
+            'pathway.two_ring_chart_is_general',
+            'the Smith-chart fold Γ=(Z−Z0)/(Z+Z0) is a property of the MAP, '
+            'not of impedance: its fixed point, boundary, conformal '
+            'orthogonality and inversion π-rotation all survive an arbitrary '
+            '(including complex) anchor and an arbitrary pair of ring '
+            'definitions — so which two quantities the two ring families '
+            '"are" is a caller choice, not a constraint of the instrument', 1,
+            'ring_chart_gamma/two_ring_chart — PW8\'s fold, factored out and '
+            're-verified generically; PW9\'s number_chart_point is the '
+            'real-valued excursion/anchor specialisation of this',
+            True, ok,
+            f'[OURS] fixed point Γ(Z0)=0 for 4 anchors incl. 3 complex '
+            f'({fp}); boundary Re(Z·conj(Z0))=0 ⟺ |Γ|=1, checked both '
+            f'directions across anchors ({boundary_ok}); constant-Re/Im '
+            f'tangents stay orthogonal at a COMPLEX anchor Z0={Z0c} '
+            f'({orth}); Γ(Z0²/Z)=−Γ(Z) — the general inversion identity PW8\'s '
+            f'admittance duality is one instance of — holds for every anchor '
+            f'tested ({rotation}); and two unrelated ring definitions (Ω(n), '
+            f'φ(n)/n — nothing to do with impedance) fold through the SAME '
+            f'primitive, recover Γ=0 exactly at their own anchor n=1, and '
+            f'stay bounded ({pluggable}). NOT a new mathematical claim — the '
+            f'four invariants are standard Möbius-transform facts; what is '
+            f'OURS is confirming the fold does not secretly depend on R/X '
+            f'being resistance and reactance, which is what licenses reusing '
+            f'it as a general two-quantity snapshot instrument (e.g. on a '
+            f'box-kite strut pair — see this repo\'s engine/tools.py, '
+            f'report_strut_pair_chart(), descriptive, not self-tested here: '
+            f'no ground truth exists yet to score a strut-pair reading '
+            f'against).')
+
+    # ── PW11 — THE CRYSTAL: an unseen period recovered from repeats alone ────
+    def pw_key_length_is_a_stem_vote(self) -> None:
+        import random
+        rng = random.Random(20260823)
+        word = [7, 4, 17, 2, 19, 8]        # a fixed, internally non-repeating motif
+        results, ok = {}, True
+        for true_k in (5, 7, 11, 13):      # PRIME — see the honest caveat below
+            key = [(3 * i + 1) % 26 for i in range(true_k)]
+            plaintext: List[int] = []
+            for _ in range(40):
+                plaintext += [rng.randrange(26) for _ in range(rng.randint(5, 15))]
+                plaintext += word
+            cipher = vigenere_cipher(plaintext, key, alphabet=26)
+            dists = repeat_distances(cipher, n=4)
+            inferred = infer_period_by_stem_vote(dists, max_period=20)
+            recovered = inferred['best_period']
+            support = inferred['votes'].get(recovered, 0)
+            results[true_k] = (recovered, support, len(dists))
+            ok = ok and (recovered == true_k)
+        self._record(
+            'pathway.key_length_is_a_stem_vote',
+            'an unseen generating PERIOD (a cipher\'s key length) is recovered '
+            'from nothing but the CRYSTAL — the autocorrelation of repeated '
+            'n-grams\' positions — never comparing to the plaintext or key '
+            'directly. Kasiski/Friedman, generalised: R8\'s gcd/meet, applied '
+            'as a VOTE across every candidate period instead of one blind '
+            'reduction', 3,
+            'repeat_distances (the crystal) + divisibility voting — a COUNT '
+            'over candidates, R8\'s meet run many times rather than once',
+            True, ok,
+            f'[KNOWN (Kasiski 1863 / Friedman 1920s); the VOTE framing here is '
+            f'the standard fix for a blind gcd, which one spurious repeat '
+            f'collapses to 1] recovered period exactly equals the hidden true '
+            f'period, blind, for every k tested: ' +
+            '  '.join(f'k={k}→{r[0]} ({r[1]}/{r[2]} distances support it)'
+                      for k, r in results.items()) +
+            f'. HONEST CAVEAT, not hidden: only PRIME periods are tested here '
+            f'— a COMPOSITE period (e.g. 6) is genuinely ambiguous against its '
+            f'own divisors (2, 3) by this method alone, a real limitation of '
+            f'Kasiski examination itself (not a code fault); resolving that '
+            f'needs Friedman\'s Index of Coincidence on top, not built here. '
+            f'"Watch what input does to the geometry": sweeping the true '
+            f'period moves the vote histogram\'s peak with it, every time — '
+            f'the instrument never sees the key, only the crystal.')
+
+    # ── PW12 — THE JOIN: a permutation\'s order from its cycle-length stems ──
+    def pw_permutation_order_is_the_join(self) -> None:
+        import random
+        rng = random.Random(20260823)
+        n_trials, ok, worst_n = 400, True, 0
+        cycle_type_examples = {}
+        for _ in range(n_trials):
+            n = rng.randint(2, 14)
+            perm = list(range(n))
+            rng.shuffle(perm)
+            direct = permutation_order_direct(perm)
+            via_stems = permutation_order_via_stems(perm)
+            ok = ok and (direct == via_stems)
+            worst_n = max(worst_n, n)
+            lens = tuple(sorted(len(c) for c in permutation_cycles(perm)))
+            cycle_type_examples[lens] = direct
+        self._record(
+            'pathway.permutation_order_is_the_join',
+            'a permutation\'s ORDER (how many applications return it to '
+            'identity) is the JOIN of its cycle-length stems — order(π) = '
+            'lcm(cycle lengths), each length primary-decomposed by G3\'s '
+            'already-built cepstral machinery, combined with MAX exponent '
+            'per prime instead of R8\'s MIN/meet. Same stems, the dual '
+            'lattice operation', 3,
+            'primary_decomposition (G3, tier 3), combined by max instead of '
+            'sum/min — the lcm/join dual to R8\'s gcd/meet',
+            True, ok,
+            f'[KNOWN (elementary group theory: ord(π)=lcm of cycle lengths)] '
+            f'{n_trials} random permutations, sizes 2..{worst_n}: direct '
+            f'application-count and the stem-join agree on EVERY trial '
+            f'({ok}). Example cycle types and their orders: ' +
+            '  '.join(f'{lens}→{order}'
+                      for lens, order in list(cycle_type_examples.items())[:5]) +
+            f'. This is R8/G3\'s meet-vs-join pair made concrete on a second '
+            f'domain (permutations, not integers) — the SAME stems (prime '
+            f'exponents), read through the opposite lattice operation, '
+            f'recover a different but equally exact invariant.')
+
+    # ── PW13 — THE FACTORAL SPIRAL: the fold's scale factor is exact ────────
+    def pw_scale_factor_is_the_conformal_derivative(self) -> None:
+        """chart_scale_factor(Z, Z0) claims to be the EXACT |dΓ/dZ| of
+        ring_chart_gamma, not an approximation. Checked against central-
+        difference numerical differentiation at random (Z, Z0) — same
+        discipline as any other claimed-exact formula in this file: measured
+        against an independent method, not just algebra on paper."""
+        import random
+        rng = random.Random(20260825)
+        h = 1e-6
+        n_trials, max_rel_err = 300, 0.0
+        for _ in range(n_trials):
+            Z0 = complex(rng.uniform(0.2, 5.0), rng.uniform(-2.0, 2.0))
+            Z = complex(rng.uniform(-5.0, 5.0), rng.uniform(-5.0, 5.0))
+            if abs(Z + Z0) < 1e-3:
+                continue
+            exact = chart_scale_factor(Z, Z0)
+            # central-difference Jacobian magnitude via a small complex step
+            dG = (ring_chart_gamma(Z + h, Z0) - ring_chart_gamma(Z - h, Z0)) / (2 * h)
+            numeric = abs(dG)
+            rel_err = abs(exact - numeric) / max(numeric, 1e-12)
+            max_rel_err = max(max_rel_err, rel_err)
+        ok = max_rel_err < 1e-6
+        self._record(
+            'pathway.scale_factor_is_the_conformal_derivative',
+            'chart_scale_factor(Z,Z0) = |dΓ/dZ| exactly — the flattening '
+            'artifact behind the two-ring chart\'s curvilinear cells is a '
+            'real, computable quantity, checked against numerical '
+            'differentiation, not asserted from the Möbius algebra alone', 1,
+            'ring_chart_gamma (PW8/PW10) — its own derivative, in closed form',
+            True, ok,
+            f'[{n_trials} random (Z,Z0) pairs] max relative error vs central-'
+            f'difference numerical derivative: {max_rel_err:.2e}. The chart\'s '
+            f'"phase" reading (Cody, 2026-08-25) — what a flat (Re Γ, Im Γ) '
+            f'plot loses when a curved conformal map is flattened into 2D — '
+            f'is this quantity, exactly, not a qualitative description of it.')
+
+    # ── PW14 — THE PROCESS VECTOR: verified against a known real cipher ─────
+    def pw_process_trace_matches_the_cipher(self) -> None:
+        """pathway_decomposition() claims to record a process's real
+        dependency structure faithfully — not a forced linear chain. Two
+        independent checks: (1) the textbook Vigenere pair ATTACKATDAWN/
+        LEMON -> LXFOPVEFRNHR (a real, externally-checkable worked
+        example), re-derived through the generic DAG runner, not
+        vigenere_cipher()'s own function; (2) real RSA CRT-decrypt
+        (p=61, q=53 — verified prime in code, not recalled) as the control
+        case with a GENUINE (non-chain) dependency graph: m1 and m2 both
+        depend only on the input; h depends on BOTH m1 and m2; the final
+        m depends on h AND m2 again."""
+        ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        plaintext, key = 'ATTACKATDAWN', 'LEMON'
+        expected_ct = 'LXFOPVEFRNHR'
+
+        derived = []
+        for pos, ch in enumerate(plaintext):
+            kc = key[pos % len(key)]
+            ops = [ProcessOperator(
+                name='shift',
+                fn=lambda p_letter, kc=kc: ALPHABET[
+                    (ALPHABET.index(p_letter) + ALPHABET.index(kc)) % 26],
+                depends_on=('input',))]
+            result = pathway_decomposition(ch, ops, output_name='shift')
+            derived.append(result['real'])
+        ciphertext = ''.join(derived)
+        vigenere_ok = ciphertext == expected_ct
+
+        def is_prime(n):
+            return n > 1 and all(n % f for f in range(2, int(n ** 0.5) + 1))
+        p, q, e_pub = 61, 53, 17
+        assert is_prime(p) and is_prime(q)
+        n, phi = p * q, (p - 1) * (q - 1)
+        d = pow(e_pub, -1, phi)
+        m_true = 65
+        c = pow(m_true, e_pub, n)
+        dP, dQ, qInv = d % (p - 1), d % (q - 1), pow(q, -1, p)
+
+        rsa_ops = [
+            ProcessOperator('m1', lambda cc: pow(cc, dP, p), depends_on=('input',)),
+            ProcessOperator('m2', lambda cc: pow(cc, dQ, q), depends_on=('input',)),
+            ProcessOperator('h', lambda m1, m2: (qInv * (m1 - m2)) % p,
+                            depends_on=('m1', 'm2')),
+            ProcessOperator('m', lambda h, m2: m2 + h * q, depends_on=('h', 'm2')),
+        ]
+        rsa_result = pathway_decomposition(c, rsa_ops, output_name='m')
+        rsa_ok = rsa_result['real'] == m_true and rsa_result['dim'] == 4
+        # the real point: m2 appears as a dependency of TWO different
+        # later operators (h and m) — a genuine shared-node DAG, not
+        # reachable at all from a forced linear chain.
+        m2_fanout = sum(1 for op in rsa_ops if 'm2' in op.depends_on)
+        dag_ok = m2_fanout == 2
+
+        ok = vigenere_ok and rsa_ok and dag_ok
+        self._record(
+            'pathway.process_trace_matches_the_cipher',
+            'pathway_decomposition() reproduces a real cipher letter-for-'
+            'letter AND resolves a genuine (non-chain) dependency graph '
+            'correctly on real RSA CRT-decrypt', 1,
+            'the process IS the lineage — same move as factor_lineage, one '
+            'level up: read the output off its own generating operators, '
+            'in whatever dependency shape the process actually has',
+            True, ok,
+            f'Vigenere: {ciphertext!r} == {expected_ct!r} ({vigenere_ok}). '
+            f'RSA CRT-decrypt: recovered m={rsa_result["real"]} (true '
+            f'm={m_true}, {rsa_ok}), dim={rsa_result["dim"]} (m1, m2, h — '
+            f'3 imaginary + real m), operator order={rsa_result["order"]}. '
+            f'm2 feeds BOTH h and the final m — a real fan-out, resolved '
+            f'correctly ({dag_ok}) — not representable by the earlier '
+            f'linear-chain-only version this replaces.')
+
+    # ── PW15 — THE SCALE INVARIANT: cross-ratio survives every anchor,
+    # the raw angle does not ─────────────────────────────────────────────
+    def pw_cross_ratio_is_scale_blind(self) -> None:
+        """"What is the invariant when scale is removed" (Cody, 2026-08-25)
+        — SCALE is one of the three tier-0 irreducibles (ADD, SCALE, SIGN);
+        this is the first attempt at pulling it out of the two-ring fold
+        and naming what is left. FIRST candidate, tested and REJECTED, kept
+        in the record: arg(Z) is scale-blind for a bare complex number but
+        does NOT survive ring_chart_gamma() — the fold's fixed point sits
+        at Z0, not at the origin, so rescaling Z around 0 is not a
+        symmetry the fold respects. The cross-ratio of any four points IS
+        exactly preserved by the fold, for EVERY choice of anchor Z0 —
+        checked here across four wildly different anchors, including a
+        near-degenerate one close to the fold's own pole."""
+        Z1, Z2, Z3, Z4 = complex(2, 1), complex(0.5, -0.3), complex(4, 2.2), complex(1.1, 0.9)
+        cr_before = cross_ratio(Z1, Z2, Z3, Z4)
+
+        anchors = [complex(1, 0), complex(0.3, 0.7), complex(5, -2), complex(0.01, 0.01)]
+        cr_after = []
+        for z0 in anchors:
+            g1, g2, g3, g4 = (ring_chart_gamma(z, z0) for z in (Z1, Z2, Z3, Z4))
+            cr_after.append(cross_ratio(g1, g2, g3, g4))
+        cross_ratio_ok = all(abs(cr - cr_before) < 1e-9 for cr in cr_after)
+
+        # the REJECTED candidate, run alongside so the contrast is measured,
+        # not just asserted: does arg(Gamma) stay fixed as Z is rescaled
+        # around the origin (a symmetry of arg(Z) that is NOT a symmetry
+        # of the fold, since the fold's fixed point is Z0, not 0)?
+        base = complex(2.3, 1.1)
+        z0_fixed = complex(1.0, 0.0)
+        angles = [cmath.phase(ring_chart_gamma(lam * base, z0_fixed))
+                 for lam in (0.5, 1.0, 3.0, 50.0)]
+        angle_survives = all(abs(a - angles[0]) < 1e-6 for a in angles)
+
+        ok = cross_ratio_ok and not angle_survives
+        self._record(
+            'pathway.cross_ratio_is_scale_blind',
+            'the cross-ratio of any four points is exactly preserved by '
+            'ring_chart_gamma() regardless of anchor — the scale-blind '
+            'invariant underneath the fold; the raw angle is NOT (checked '
+            'as the rejected first candidate, not hidden)', 1,
+            'ring_chart_gamma (PW8/PW10) — the classical Mobius invariant '
+            'of the same fold, one level up from any single point',
+            True, ok,
+            f'cross-ratio identical across 4 different anchors '
+            f'{[f"{z:.2f}" for z in anchors]}: {cross_ratio_ok}. '
+            f'arg(Gamma) across lambda=[0.5,1,3,50] rescaling Z around the '
+            f'origin: {[round(a, 4) for a in angles]} — NOT constant '
+            f'({not angle_survives}), confirming the angle is the wrong '
+            f'candidate and the cross-ratio is the right one.')
 
     # ═══════════════════════════════════════════════════════════════════════
     # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.

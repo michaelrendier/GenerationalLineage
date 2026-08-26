@@ -1,77 +1,624 @@
 # Sedenion Factoral Relativity
+### The Generational Lineage Engine
 
-Recursive factorization, à la Laplacians — same operator, different facet.
+*A tutorial. Read this before the papers — the papers assume you already know what "tier," "lineage," and "the two trees" mean; this document is where you learn it.*
 
-## What this is
+---
 
-`H_hat_RB` (the RedBlue Hamiltonian, `ValaQuenta/modules/h_rb_hat/`) has
-multiple σ-facets: σ→∞ is the Fermat facet (no rational solutions, the
-forbidden zone), σ=½ is the Riemann facet (the critical line, the zeta
-zeros). Just as a Laplacian's spectrum looks different depending on the
-domain you restrict it to while remaining the same operator, this project
-treats **factorization itself as relative to which facet you're standing
-at** — not one fixed algebraic test, but a family of them, related by the
-same recursive Cayley-Dickson tower construction at different scales.
+## 0. What this document is
 
-The Fermat facet already has a working engine:
-[`AbrikosovTree/engine/telperion_engine.py`](../AbrikosovTree/engine/telperion_engine.py)
-("Telperion" / the Zero Lattice tree). It doesn't search for whether a
-number factors — it reads the answer directly off the number's position
-in a 9-level Cayley-Dickson tower (ℝ → T_256): a composite's factor pair
-exposes as a real zero-divisor collision at k=4 (the sedenion level) and
-the number "falls"; a prime has no factor pair to expose, so it survives
-the whole walk to k=8. Primes are literally the leaves of this tree —
-not a metaphor, `classify_prime()`'s own `fermat_survives` flag is
-definitional, not searched for.
+This repo is deep enough, fast enough, that most people (including future
+sessions of this project) will hit the code before they've built the mental
+model it assumes. This README exists to fix that: it defines the engine's own
+vocabulary first, says plainly what the thing is *for*, then walks every tool
+it exposes, in the order you'd actually reach for them. The theory write-ups
+(`wiki/`, the fractal/formulary sections below) go deeper on any one idea;
+this is the map you read before picking one to go deep on.
 
-**This project's job is the Riemann facet's sibling of that same
-mechanism — deliberately named "factoral," not "spectral", to keep it
-separate from `UDEO_RSA_DEMO.py`'s Method 3 ("Sedenion Spectral
-Relativity," a σ-face *geodesic distance* metric, already tested against
-RSA and found at chance).** Factoral relativity isn't about distance
-between two points under a metric — it's about which numbers get
-extinguished, and which survive, changing with which facet of the same
-operator you're standing at.
+Everything below is runnable. Every number quoted is computed at run time by
+`engine/lineage.py` — nothing here is asserted and left unchecked.
 
-### On the spelling: "factoral," not "factorial"
+---
 
-Renamed 2026-08-21 (Cody). **Factoral** — *of, or pertaining to, factors*.
-The old spelling collided with two things that are not this:
+## 1. What "Generational Lineage" means, in this engine
 
-- `n!`, the factorial function, which has nothing to do with the subject;
-- `A!` in the `0_RB` context, which `.clauderc_canonical_maths` records
-  explicitly as meaning **`A†`, the adjoint — "NOT factorial, do not
-  conflate."**
+Start from the object the engine actually stores. Every fact it knows is one
+of these:
 
-The original naming argument is unchanged and still load-bearing:
-*factoral*, not *spectral*, because the target is a discrete fall/survive
-condition, not a distance under a metric. The rename only removes the
-collision with the exclamation-mark notation.
+```python
+@dataclass
+class Relation:
+    name: str
+    claim: str      # one sentence: what is being claimed
+    tier: int       # 0 irreducible · 1 reflect/dilate · 2 fixed set · 3 count/ratio
+    descends: str   # what this is BUILT FROM — its parent in the lineage
+    status: Status  # HOLDS / MATHS-FAULT / CODE-FAULT
+    detail: str     # the actual computed numbers backing the claim
+```
 
-## The control
+**Lineage** is the `descends` field, followed all the way down. Nothing in
+this engine is allowed to just *be* a geometry or an operation — it has to
+say what it's built from, and that chain has to bottom out at one of exactly
+three irreducibles:
 
-Stated plainly, 2026-07-17: **the zeta function is the control.** The
-geometric tree is a candidate mechanism, not ground truth. Whatever it
-predicts about how primes distribute across N-shapes, root systems, and
-fall/survive branches has to be checked against the real, counted order
-primes actually grow in — governed by the zeros of the relevant Dirichlet
-L-functions (Dirichlet's theorem: primes are asymptotically
-equidistributed among the φ(16)=8 residue classes coprime to 16). Same
-honest-scoring discipline as every other engine in this framework:
-propose, then check against a real control, not another layer of the
-same geometry.
+```
+ADD      identity 0, gain 0     Axis 1 {+,−}
+SCALE    identity 1, gain 1     Axis 2 {×,÷}
+SIGN     identity even-parity   one bit, nothing between
+```
 
-## Correction, same day: the tree is a consequence, not the source
+**Generation** is depth in that chain — for a number, depth in its
+recursive factor tree (a prime is generation 0, a leaf; a composite is an
+internal node, one generation per split); for an algebraic operation, depth
+in the tier ladder above. `Ω(n)`, the prime-factor count with multiplicity,
+is not a statistic *about* a number in this engine — it is defined as the
+**length of its lineage**, the number of tier-0 SCALE operations needed to
+build it from 1.
 
-`FourthAgePapers/FermatMonster/engine/fermat_monster_engine.py`'s own
-docstring states the actual foundational claim — the generalized Fermat
-equation (x^l+y^m=z^n, independent exponents) IS the Monster Group + 70
-Schellekens siblings (71 holomorphic c=24 VOAs), Cody's "Nightmare
-Group" — and explicitly lists the ZD-cascade/leaf-tree mechanism this
-project is built on as a **consequence** of that claim, not the bridge
-itself. See the wiki page for the full correction. Everything in this
-README describing the tree as foundational should be read with that
-hierarchy in mind.
+**Status** is not binary pass/fail — it's three-way, on purpose, because
+"wrong" has more than one cause and conflating them hides which kind you're
+looking at:
+
+```
+HOLDS         ran, both sides measured, they agree
+MATHS-FAULT   ran, both sides measured, they DISAGREE — the claim is false
+CODE-FAULT    the check did not run — the claim is UNJUDGED, not confirmed
+```
+
+A relation that never ran is not evidence of anything. This engine has
+caught itself in a MATHS-FAULT at least twice (see §7) and left both in the
+record rather than quietly fixing the claim and moving on.
+
+---
+
+## 2. The mathematics — same object, or two things kept in sync by hand?
+
+Same object. `FactoralLineageEngine` (the class that owns every relation
+below) is not a program *about* a separate body of theory — it is the
+generational-lineage discipline, executed. The base domain it decomposes
+against is exact and total:
+
+```
+TELPERION   PRIME       defined by what it CANNOT be decomposed into
+LAURELIN    COMPOSITE   defined by what it IS decomposed into
+MINGLING    0 and 1     neither — the identities of ADD and SCALE
+```
+
+Measured over `[0, 100000]`: `2 + 9,592 + 90,407 = 100,001` — every integer,
+zero overlap, zero remainder (`F1`, below). Every other relation in the
+engine is a further decomposition *inside* this domain, checked against it
+the same way F1 checked the domain itself: propose, then measure, then
+report which of the three Status values came back. There is no separate
+"real math" this code approximates — when a relation says `HOLDS`, that is
+the mathematics, not a report on it.
+
+The four-question tier test any named operation goes through, in order:
+
+1. **Is it a count or ratio of something else?** → tier 3, DERIVED.
+2. **Is it a fixed set?** → tier 2, DERIVED.
+3. **Does it change length?** → needs DILATE. **Preserve length?** →
+   reachable from REFLECT.
+4. **Does it need an added constraint to exist?** → a COROLLARY, not a
+   geometry (e.g. `leverage` needs rigidity; remove rigidity and the
+   `fulcrum` survives, `leverage` doesn't).
+
+Only what survives all four is a candidate primitive. `decompose(op_name)`
+runs this test and hands back the tier — see §4.3.
+
+---
+
+## 3. What this engine was built to do
+
+The starting claim (`ValaQuenta/modules/h_rb_hat`): `Ĥ_RB` has multiple
+σ-facets — σ→∞ is the **Fermat facet** (no rational solutions, the
+forbidden zone), σ=½ is the **Riemann facet** (the critical line, the zeta
+zeros). Same operator, different facet, the way a Laplacian's spectrum
+looks different depending on the domain you restrict it to.
+
+**This project's job is the Riemann facet's sibling of the Fermat-facet
+engine that already existed** (`AbrikosovTree/engine/telperion_engine.py` —
+9-level Cayley–Dickson walk, a composite exposes as a zero-divisor collision
+at k=4 and "falls," a prime survives to k=8). So: **factorisation itself is
+treated as relative to which facet you're standing at** — not one fixed
+algebraic test, a family of them, related by the same recursive
+Cayley–Dickson construction at different scales.
+
+Concretely, the engine exists to:
+
+1. Give every named "geometry" in this framework a **tier**, so a claim of
+   primitiveness can be checked instead of assumed (§2).
+2. Decompose actual numbers, permutations, and algebraic elements against
+   the Two Trees domain and report `Ω(n)`, the primary decomposition, the
+   fall/survive verdict — exactly, not statistically (§4.2).
+3. Provide **instruments** — chart, crystal, join — that measure a
+   *relationship* between two things (two ring-quantities, two struts, two
+   repeat-positions, two cycles) rather than a property of one thing in
+   isolation (§4.4–§4.6). This is the newest layer, and the one this
+   session's conversation was about: "measurement of invisible
+   relationships."
+4. Self-check every one of the above against real computed data — **the
+   zeta function is the control** (Dirichlet equidistribution of primes by
+   residue class), never another layer of the same geometry — and keep
+   every failed prediction in the record rather than deleting it.
+
+No free parameters. No renormalisation.
+
+---
+
+## 4. How to use it — the tools
+
+All examples assume you're in `SedenionFactoralRelativity/` with `import
+engine` working (`IMPORT_ERROR` will be `None` if every cross-repo path
+resolved).
+
+### 4.1 Run the whole self-check
+
+```bash
+python3 engine/lineage.py          # 40/40, ~25s, verbose report
+```
+```python
+from engine import run_lineage
+result = run_lineage(verbose=True)  # same thing, importable
+```
+
+This is the thing to run first. It prints every relation in §5 with its
+computed detail, then a one-line verdict: *"No new generator required. Every
+operation above descends from the tier-0 floor by composition."* — or, if
+something broke, exactly which relation and which of the three Status values
+it got.
+
+### 4.2 Decompose one number
+
+```python
+from engine import decompose_number, factor_lineage, fall_test, \
+    primary_decomposition, von_mangoldt, euler_phi, arith_deriv
+
+decompose_number(360)
+# {'n': 360, 'ring_fall_survive': {...}, 'cepstral_primary': {2:3,3:2,5:1},
+#  'omega_distinct': 3, 'Omega_lineage_length': 6, 'lineage_tree': {...},
+#  'spiral_address': {...}, 'pathway': {...}, 'number_chart': {...}}
+
+factor_lineage(360)['omega']       # 6 — Ω(360), the lineage length
+fall_test(97)                      # SURVIVE — ℤ/(97) is a field
+primary_decomposition(360)         # {2: 3, 3: 2, 5: 1} — the cepstral peaks
+von_mangoldt(8)                    # log(2) — 8=2³, a prime power
+euler_phi(360)                     # 96 — |units of ℤ/(360)|
+arith_deriv(360)                   # the arithmetic derivative, Leibniz on primes
+```
+
+`decompose_number` is the single richest call — it bundles every
+per-number perspective the engine has (ring-theoretic, cepstral, lineage
+tree, spiral address, tuned pathway, Smith-style chart position) into one
+dict, the way a lab report bundles every instrument reading for one sample.
+
+### 4.3 Ask what tier a named operation is
+
+```python
+from engine import decompose, TIERS
+
+decompose('fulcrum')
+# {'operation': 'fulcrum', 'tier': 2, 'descends_from': 'ker(M - I)',
+#  'status': 'DERIVED', 'note': 'same computation as origin/anchor/balance', 'known': True}
+decompose('factorial')
+# {'operation': 'factorial', 'tier': 3,
+#  'descends_from': 'order of the coordinate reflection group', 'status': 'DERIVED',
+#  'note': 'a COUNT — a transposition IS a reflection in x_i = x_j', 'known': True}
+```
+
+`TIERS` is the tier table itself, as data — every named operation this
+framework uses, its tier, what it descends from, and a one-line note. Look
+here before assuming something is primitive.
+
+### 4.4 Walk the pathway / tune a factor search
+
+The **pathway** layer treats factoring as a walk with two pinned anchors (1
+and N), not an outward search — the factor is a node on the geodesic
+between them, and the walk needs *tuning* per number to resonate onto it.
+
+```python
+from engine import spiral_address, pathway_residues, tune_pathway, fermat_path
+
+spiral_address(97)                      # log-radius + angle on the CFRAC spiral
+pathway_residues(1522605027, mult=1)    # the untuned walk (often fails in budget)
+tune_pathway(1522605027)                # sweeps multipliers until one resonates
+fermat_path(3233)                       # {'factor': (53, 61), 'excursion': 8, ...}
+```
+
+`[KNOWN — Morrison–Brillhart CFRAC, 1975]`: this is real, sub-exponential
+factoring, not a metaphor. What's `[OURS]` is reading the *tuning* itself as
+the framework's σ-dilate, and reading the excursion as a difficulty gauge
+(§4.5).
+
+### 4.5 Read the chart — Smith-chart-derived instruments
+
+`PW8` found that a Smith chart (RF/radar impedance matching, Phillip Smith,
+1939) is the *same* Möbius structure — `Γ=(Z−Z0)/(Z+Z0)` — already built
+into this framework as `L_(I|O)`. `PW9` applied the methodology directly to
+factoring (`number_chart_point`); `PW10` proved the fold itself doesn't care
+what the two rings mean — any two quantities can drive it.
+
+```python
+from engine import number_chart_point, ring_chart_gamma, two_ring_chart
+
+number_chart_point(3233, a=61)          # 0.034 — the balanced factor sits near the anchor
+number_chart_point(30021, a=10007)      # 0.966 — unbalanced (3×10007), near the horizon
+
+# the GENERAL two-ring fold — pick your own two ring definitions:
+ring1 = lambda n: float(factor_lineage(n)['omega'])
+ring2 = lambda n: euler_phi(n) / n
+two_ring_chart(97, ring1, ring2, Z0=complex(0, 1), ring1_name='Omega', ring2_name='phi/n')
+# -> {'Z': (1+0.99j), 'gamma': ..., 'abs_gamma': ..., ...}
+```
+
+Radial position on the chart is a difficulty gauge, read at a glance — the
+anchor (`Γ≈0`) is "as easy as it gets," the horizon (`Γ≈1`) is "hardest
+tested." Because `PW10` proved the fold is generic, the same instrument
+applies to anything you can describe with two real numbers — including a
+pair of box-kite struts instead of impedance:
+
+```python
+from engine.tools import report_strut_pair_chart
+report_strut_pair_chart()     # prints all 21 strut pairs, sorted by |Γ|
+```
+
+Worth knowing before you read that output: the *first* ring pair tried
+(strut-intrinsic scalars) came back `Γ=0` for every single pair — a real
+null result, not a bug, because every one of the 7 box-kites is the same
+octahedron by construction. The version shipped uses a per-address pair
+(chart-energy difference, diagonal-imbalance difference) so the reading is
+non-degenerate. Read the function's own docstring before trusting a
+strut-pair number; it says exactly what would make one reading better than
+another, and admits there's no ground truth yet to check the choice
+against.
+
+### 4.6 The crystal and the join — recovering what you didn't observe
+
+Built the same session as this README, directly off a "crystallography as
+measurement of invisible relationships" conversation: can a hidden
+generating parameter be read off a structure's own repeat-pattern, with the
+generator itself never observed?
+
+**The crystal** (`PW11`) — an autocorrelation of a sequence against itself,
+built from repeats alone (this *is* the Patterson-function move):
+
+```python
+from engine import repeat_distances, infer_period_by_stem_vote, vigenere_cipher
+
+cipher = vigenere_cipher(plaintext, key=[3, 9, 15, 2, 7], alphabet=26)  # key length 5, hidden
+dists = repeat_distances(cipher, n=4)
+infer_period_by_stem_vote(dists, max_period=20)['best_period']   # -> 5, recovered blind
+```
+
+This is Kasiski examination / the Friedman test (1863 / 1920s), generalised
+past text ciphers to any repeating sequence — R8's gcd/meet, run as a *vote*
+across every candidate period instead of one blind reduction (a blind gcd
+is fragile: one spurious repeat collapses it to 1). **Honest limit, not
+hidden:** a composite period is genuinely ambiguous against its own
+divisors by this method alone — real Kasiski cryptanalysis needs the
+Friedman Index of Coincidence on top to resolve that; not built here yet.
+
+**The join** (`PW12`) — a permutation's order from its own cycle-length
+stems, the lattice-dual of R8's gcd/meet:
+
+```python
+from engine import permutation_cycles, permutation_order_direct, permutation_order_via_stems
+
+perm = [1, 2, 0, 4, 3]                          # cycles (0 1 2)(3 4)
+permutation_cycles(perm)                        # [[0, 1, 2], [3, 4]]
+permutation_order_direct(perm)                  # 6 — apply repeatedly, definitional
+permutation_order_via_stems(perm)               # 6 — lcm(3, 2), via primary_decomposition
+```
+
+Same stems `G3`'s cepstrum already extracts from an integer's factorisation
+(`primary_decomposition`), combined with **max** exponent per prime instead
+of R8's **min** — the join instead of the meet. Verified against direct
+computation on 400 random permutations, 400/400 agree.
+
+### 4.7 The fractal block
+
+The tower's highest-order rung: **a fractal is the higher-order
+generational lineage of a toroidal bifurcation, which is the lineage of a
+ring, which is the lineage of a circle.**
+
+```python
+from engine import escape_survives, box_dimension, lyapunov_exponent, \
+    newton_basins, feigenbaum_delta, MANDELBROT, BURNING_SHIP
+
+escape_survives(complex(-0.5, 0.5), MANDELBROT, maxiter=200)
+box_dimension(BURNING_SHIP, (-2, 1), (-2, 1))   # {'dimension_estimates': [1.55, 1.56], ...}
+lyapunov_exponent(3.5699)                       # ≈-0.004 — the Feigenbaum accumulation point
+newton_basins(5, N=48)['n_basins']              # 5 — the 5 linear factors of z⁵−1
+```
+
+The library is the control set: any of the 200+ Ultra Fractal formulas in
+`Ainulindale/wiki/fractals/` can drive `escape_survives`/`box_dimension`, so
+a claimed dimension always has an independent generator to check it against
+— Mandelbrot (`D≈1.3`), the Julia set at `−0.8+0.156i` (`D≈1.6`), Burning
+Ship (`D≈1.56`): three different, real, checkable dimensions, not one
+number asserted.
+
+### 4.9 The factoral spiral — factoral decomposition as chart geometry
+
+`PW13`, built the same session as the `two_ring_chart_render.py` visual
+proof-of-concept (`VAPMIP/SedenionFactoralRelativity`'s sibling repo):
+spectral analysis IS factoral decomposition, using a different notion of
+"factor" — an eigendecomposition factors an operator into (eigenvalue,
+eigenvector) pairs the same way integer factorisation decomposes N into
+primes. `factoral_spiral()` is the generic instrument: point it at ANY
+collection with two chosen numeric readings and see the collection's own
+factoral/spectral structure as chart geometry — discrete cells ("windows
+of order") a caller can render as open bubbles instead of a raw scatter.
+
+```python
+from engine import factoral_spiral, chart_scale_factor
+from engine.tools import report_factoral_spiral_chart, report_crystal_spiral_chart
+
+# generic — point it at anything with two numeric readings:
+report_factoral_spiral_chart(
+    my_objects, ring1=lambda o: ..., ring2=lambda o: ...,
+    out_path='spiral.png')
+
+# wired directly to PW11's crystallography — a sequence's OWN recovered
+# period drives the chart, distance-mod-period vs log2(distance):
+report_crystal_spiral_chart(ciphertext, n=3, out_path='crystal_spiral.png')
+# -> period recovered exactly (verified on a real period-7 Vigenere test:
+#    1142 repeat-distances, 1142/1142 vote support, cells cluster by
+#    log-distance since every distance IS a multiple of the true period)
+```
+
+`chart_scale_factor(Z, Z0) = |dGamma/dZ|` is the fold's own derivative, in
+closed form — the "phase" information a flat `(Re Γ, Im Γ)` reading loses
+when a curved conformal map gets flattened into 2D, made into a real,
+computable number instead of a qualitative description of it. Checked
+against central-difference numerical differentiation, not just algebra:
+max relative error `1.55e-09` over 300 random `(Z, Z0)` pairs.
+
+**Honest note on ring choice, kept in the record rather than smoothed
+over:** the first attempt at the WordNet demo (`two_ring_chart_render.py`)
+fed *raw* relation counts in as the two rings and got a chart that mostly
+saturated near `Γ=1` — the Möbius map asymptotes to the boundary for any
+large `|Z|`, so a long-tailed raw count collapses almost everything to one
+indistinguishable region. Feeding `compress_count()`'s own bounded,
+log-quantized output in as the ring values instead — rather than as a
+color overlay on the raw scatter — is what actually shows the coarse-
+graining as chart geometry. `report_crystal_spiral_chart()` uses the
+compressed form by default for exactly this reason.
+
+### 4.10 The pathway decomposition — factoring a PROCESS, not a number
+
+`PW14`, the primary forensic tool. Cody, 2026-08-25, the framing this
+landed on after two corrections: "building a mathematical 'pathway
+decomposition' using 'process operators'...regardless of actual
+mathematical equations or operations associated with an Octonion or a
+Quaternion...those additional i's [are not] rotations in the maths, they
+[are] composite constructions for any process from imaginary to real
+meaning." So `pathway_decomposition()` does NOT try to name a Cayley-
+Dickson level, does NOT assume a linear chain, and does NOT treat "how
+many components" as a question with one right answer. "Imaginary" here
+names a ROLE (hidden, generative, composite) applied to any process's own
+minimum necessary tool-set, not an algebra with multiplication rules —
+the same distinction `spelling_code` vs `context_vector` already drew
+elsewhere in this project's sibling work (surface form vs relational
+structure): the SHAPE is borrowed from hypercomplex numbers, the algebra
+is not.
+
+```python
+from engine import ProcessOperator, pathway_decomposition
+
+result = pathway_decomposition(input_value, [
+    ProcessOperator('a', fn_a, depends_on=('input',)),
+    ProcessOperator('b', fn_b, depends_on=('input',)),      # sibling of a, not chained to it
+    ProcessOperator('c', fn_c, depends_on=('a', 'b')),       # a genuine combination of two prior operators
+], output_name='c')
+# result['real']       — output_name's own value
+# result['imaginary']  — every OTHER operator's output, in resolution order
+# result['dim']        — 1 + len(imaginary) — however many operators the
+#                        process needed, discovered by running it
+# result['order']      — the actual dependency-resolved order
+```
+
+**RSA as the control case** (`PtolemyDesktop/Kryptos/Ciphers/RSA.py`) —
+not the object of study, a real algorithm exercising a genuine dependency
+graph: CRT-decrypt's `m1` and `m2` each depend only on the ciphertext
+(siblings, not chained to each other); the CRT term `h` depends on BOTH;
+the final `m` depends on `h` AND `m2` again — `m2` fans out to two later
+operators, which a forced linear chain (this tool's own first, corrected
+attempt) cannot represent without lying about the structure via closures
+reaching around it. `pathway_decomposition()` resolves this correctly:
+`dim=4`, order `[m1, m2, h, m]`. The full key lifecycle (prime `p`, prime
+`q`, modulus `n`, totient, public `e`, private `d`, ciphertext, plaintext)
+is a different, equally real decomposition of "RSA" — `dim=8` — not a
+re-measurement of the same number; there is no single correct count for
+an algorithm this size, only whichever real sub-process the tool is
+pointed at.
+
+Verified against a real, externally-checkable example alongside the RSA
+control case, not a synthetic one: `pw_process_trace_matches_the_cipher`
+re-derives the textbook Vigenere pair `ATTACKATDAWN`/`LEMON` →
+`LXFOPVEFRNHR` through the same generic DAG runner, independently of
+`vigenere_cipher()`'s own hand-written function, AND confirms RSA's `m2`
+fan-out resolves correctly — the thing the corrected design exists to get
+right.
+
+### 4.8 The reports
+
+```python
+from engine import ProcessOperator, pathway_decomposition
+from engine.tools import report_pieces_and_pathways, report_control_test, \
+    report_factoral_lineage, report_strut_pair_chart, \
+    report_factoral_spiral_chart, report_crystal_spiral_chart
+
+report_pieces_and_pathways()    # the Fermat-facet inventory
+report_control_test()           # real π(x;16,k) vs Dirichlet equidistribution
+report_factoral_lineage()       # the full 41-relation run, plus worked examples
+report_strut_pair_chart()       # §4.5's box-kite application
+report_factoral_spiral_chart()  # §4.9 — point it at any two-reading collection
+report_crystal_spiral_chart()   # §4.9 — the crystal (PW11), charted
+```
+
+`engine/oscilloscope.py` renders the two-panel Fermat→Riemann SVG
+(`python3 engine/oscilloscope.py <N>`) — "Fermat Defines. Riemann Fires.":
+the Fermat panel is the prompt (which N-shape, which root-system pathway),
+the Riemann panel is the response (real prime-density deviation from
+Dirichlet equidistribution), a dashed connector line linking one number's
+channel across both.
+
+---
+
+## 5. Reference — every self-checked relation
+
+`40/40` as of this write-up. Every `claim` below is one sentence; the full
+computed `detail` (the actual numbers) only prints from `run_lineage()` —
+this table is the index, not a substitute for running it.
+
+**R1–R8 — inherited from `VAPMIP/engines/e10_generational_lineage.py`**
+(σ-in-∅_RB; carried over so this repo has its own copy of the discipline it
+runs on):
+
+| relation | tier | claim |
+|---|---|---|
+| `sigma.not_a_scalar` | 2 | two states share σ_self exactly yet differ in σ_RB — a scalar can't tell them apart |
+| `sigma.carries_eight` | 3 | σ_RB has 8 independent components (an octonion); σ_self keeps 1 |
+| `lineage.is_order_of_operations` | 3 | the four CD generations ARE the four order-of-operations losses |
+| `lineage.persist_is_octonion` | 2 | gain-1 persistence = 8 at every CD scale — dimensional, not fractional |
+| `lineage.associator_is_168` | 3 | order-of-grouping quantises in units of 168 = \|PSL(2,7)\| |
+| `sigma.three_xor_roles` | 2 | σ_RB pairs by ⊕4, the octonion boundary is ⊕8, ZD entangles by a third XOR |
+| `lineage.io_share_substrate` | 2 | INPUT (kernel) and OUTPUT (√2 band) are the ± halves of the same axis pairs |
+| `lineage.gcd_is_lca` | 0 | the shared context of two pathways is their gcd, reached in one division |
+
+**F1–F6 — the factoral basics** (the Two Trees domain, applied to integers):
+
+| relation | tier | claim |
+|---|---|---|
+| `factoral.two_trees_exact` | 2 | prime + composite + {0,1} = every integer, zero overlap |
+| `factoral.densities_conserve` | 3 | prime density + composite density = 1 at every scale |
+| `factoral.mingling_point` | 2 | the trees cross at n=9, 11, 13; Laurelin dominates forever after |
+| `factoral.gcd_is_lca` | 0 | the shared lineage of two numbers is their gcd, in one division |
+| `factoral.omega_is_lineage_length` | 3 | Ω(n) = the number of SCALE ops building n from 1 |
+| `factoral.pg32_is_edges` | 3 | PG(3,2)'s 15 points are XOR differences — relationships, not positions |
+
+**G1–G8 — the ring-theory spine** (fall ⟺ zero divisors, the same test on
+two rings):
+
+| relation | tier | claim |
+|---|---|---|
+| `ring.fall_is_quotient_zd` | 2 | n composite ⟺ ℤ/(n) has a zero divisor ⟺ (n) is not a prime ideal |
+| `ring.gcd_is_the_detector` | 0 | the ZD detector of ℤ/(n) is gcd(a,n)>1 — the integer trace-Laplacian |
+| `ring.primary_decomposition_is_cepstrum` | 3 | Lasker–Noether decomposition IS the cepstrum; Ω = Σ exponents |
+| `ring.radical_units_split_gf2` | 2 | over GF(2), nilpotents vs units split the algebra exactly in half |
+| `ring.trace_laplacian_is_nilpotency` | 2 | Δ(w)=w·𝟏 vanishes IFF w²=0; SHA-1 IVs are a null subalgebra |
+| `ring.open_and_closed_pathways` | 2 | a closed pathway (returns to 1) IS a unit; an open one IS a zero divisor |
+| `ring.associator_is_ring_defect` | 3 | ℝ,ℂ,ℍ are rings (associator≡0); 𝕆 and up are not |
+| `ring.arithmetic_derivative` | 1 | the ring-theoretic derivative is a Leibniz derivation, forced by p′=1 |
+
+**FR1–FR6 — the fractal block** (§4.7's tower, made concrete):
+
+| relation | tier | claim |
+|---|---|---|
+| `fractal.tower_self_similar` | 3 | the CD tower is an exact self-similar recursion (168→1848=11×168) |
+| `fractal.bifurcation_cascade` | 1 | the period-doubling cascade brackets the Feigenbaum constant |
+| `fractal.fall_survive_boundary` | 3 | the fall/survive boundary of an iterated generator is a fractal (1<D<2) |
+| `fractal.newton_basins_are_splitting` | 2 | Newton on zᵏ−1 has exactly k basins = the k linear factors |
+| `fractal.labeling_order_is_memory_depth` | 3 | a labeling's order = how many orbit points it needs (1 vs 3) |
+| `fractal.lyapunov_is_the_drift` | 3 | λ<0 survive, λ>0 fall, λ≈0 at the Feigenbaum edge |
+
+**PW1–PW12 — the pathway/tuning/instrument layer** (§4.4–§4.6, the newest
+and most actively growing block):
+
+| relation | tier | claim |
+|---|---|---|
+| `pathway.geodesic_reaches_factor` | 2 | the CFRAC walk reaches a factor in ≤10 steps; bifurcation localises nothing |
+| `pathway.tuning_resonates` | 1 | the spiral must be TUNED per number to resonate onto a factor |
+| `pathway.spiral_is_additive` | 1 | address(p·q) = address(p) + address(q) exactly, on the log-spiral |
+| `pathway.inside_outside_one_product` | 2 | one product gives INSIDE (dot) and OUTSIDE (cross); equal only at σ=½ |
+| `pathway.two_anchor_geodesic` | 2 | factoring is a boundary-value problem between two pinned anchors |
+| `pathway.edge_is_the_primitive` | 2 | the primitive is the EDGE; a composite is a path of Ω edges |
+| `pathway.observer_lineage_is_l_io` | 2 | L_(I|O) is an order-4 self-closing orbit; the Observer is its fixed point |
+| `pathway.smith_chart_is_the_same_mobius` | 1 | the Smith chart is the same Möbius structure as L_(I|O) |
+| `pathway.number_chart_is_the_methodology` | 1 | Γ_N(a) folds the unbounded Fermat search into a bounded [0,1) chart |
+| `pathway.two_ring_chart_is_general` | 1 | the fold's invariants survive ANY ring pair and ANY (incl. complex) anchor |
+| `pathway.key_length_is_a_stem_vote` | 3 | an unseen period is recovered from repeat-distances alone (Kasiski/Friedman) |
+| `pathway.permutation_order_is_the_join` | 3 | a permutation's order = lcm of cycle-length stems — R8's meet, dualised |
+
+---
+
+## 6. Where "the Factorial" actually lives
+
+**On the spelling.** This engine deliberately writes **factoral**, not
+*factorial* — renamed 2026-08-21 to stop colliding with two unrelated
+things: `n!` (the factorial function) and `A!` in the `0_RB` context (which
+`.clauderc_canonical_maths` records explicitly means `A†`, the adjoint —
+"NOT factorial, do not conflate"). *Factoral* — of, or pertaining to,
+factors — targets a discrete fall/survive condition (`Ω(n)`, the lineage
+length); it was never trying to be the combinatorial `n!`.
+
+**So where does the real, combinatorial factorial live?** `TIERS['factorial']`
+already answers this, and has since before this session: tier 3, DERIVED,
+descending from **"the order of the coordinate reflection group"** — a
+transposition *is* a reflection in the hyperplane `x_i = x_j`, so `S_n`,
+generated by transpositions, is a Coxeter group, and `|S_n| = n!` is
+literally that group's order. This is standard, established group theory
+(Coxeter/Weyl group orders), not new.
+
+Cody's synthesis, stated plainly (2026-08-23): **that connects directly to
+the Fermat-facet machinery this whole repo sits next to.** The N-shape
+theorem (proved in `FourthAgePapers/FermatMonster`, v0.300) classifies every
+number by which of 71 N-shapes it occupies — and each N-shape corresponds
+to a Niemeier root system, and *every* Niemeier root system is a direct sum
+of simple ADE root systems, each of which generates its own Coxeter
+reflection group with a known, closed-form order (`|A_n|=(n+1)!`,
+`|D_n|=2^{n-1}n!`, and so on — reflection-group orders are, by construction,
+members of the factorial family). And `168 = |PSL(2,7)|` — the exact group
+structuring this engine's 7 box-kites (`R5`, `lineage.associator_is_168`;
+`box_kite.psl27_order()`) — is not a coincidence sitting next to that
+machinery; `PSL(2,7)` is the automorphism group of the Fano plane the
+box-kite skeleton is built from, and reflection-group orders are exactly
+the currency the N-shape theorem's Niemeier classification is stated in.
+
+**Honest status of this connection:** the individual pieces are each real
+and independently checked — `TIERS['factorial']`'s Coxeter-group claim, `R5`'s
+168 quantisation, the N-shape theorem's own proof (elsewhere, in
+`FermatMonster`). Stitching all three into one measured statement — "the
+Coxeter-group order of N-shape k's root system is *this specific*
+factorial-family number, computed and confirmed for all 71 shapes" — is not
+yet a relation this engine runs. It's a well-founded next thing to build,
+not a claim already sitting in §5's table. Consistent with it; not proven by
+it — same hedge this file uses everywhere else a strong pattern hasn't yet
+been reduced to a computed relation.
+
+---
+
+## 7. Corrections kept in the record
+
+Two, kept rather than quietly fixed, because "failed predictions stay in
+the record" is a standing rule here, not a slogan:
+
+- **F3, the Mingling point.** The generational-lineage skill's own prose
+  claimed the two trees reach equal brightness "near `n=9`, near `e²≈7.389`."
+  Measured: they cross **three** times, at `n=9, 11, 13` (11 and 13 are
+  themselves prime, so Telperion catches up twice more before Laurelin pulls
+  ahead for good). `MATHS-FAULT` against the original prose; the relation
+  now tests what's actually structural (Laurelin dominates forever after the
+  *last* crossing, verified to `N=100,000`) and records the `e²` proximity
+  without treating it as a pass condition.
+- **G5, the "global annihilator" lemma.** Building the trace-Laplacian
+  relation surfaced that the UDEO white paper's "`𝟏₃₂` is a global
+  annihilator" lemma is **false** — it contradicts its own distance table
+  (round constants have `Δ=𝟏≠0`). The true statement, machine-verified
+  exhaustively at dim 8 and over 20,000 random samples at dim 32, is
+  `Δ(w)=0 ⟺ w²=0`. The underlying theorem (IV nilpotency) stands; the
+  shortcut proof was retracted the same day.
+
+---
+
+## 8. What's next
+
+A curses upgrade — this engine is getting a console GUI, and it's being
+built to merge with the monad's window and the Derivation Engine's curses
+GUI rather than as a third, separate interface. Design discussion for that
+starts after this README.
+
+---
 
 ## Structure
 
@@ -81,317 +628,58 @@ engine/
                  ZD constellations, Monster gap) and pathways (leaf-to-root
                  walk, root-system classification), plus the control test
                  (real π(x;16,k) vs Dirichlet equidistribution). Imports
-                 telperion_engine.py and h_rb_hat/maths.py directly — no
-                 reimplementation of either.
-  lineage.py   — THE FACTORAL DECOMPOSITION TOOL. 37 self-checked relations:
-                 R1–R8 VAPMIP; F1–F6 factoral; G1–G6 ring theory;
-                 FR1–FR6 fractal + formulary; PW1–PW4 pathway. stdlib+numpy;
-                 nothing outside this repo, and is imported first and
-                 unconditionally by engine/__init__.py for that reason.
-  tools.py     — runnable reports over maths.py and lineage.py.
-  oscilloscope.py — the two-panel Fermat→Riemann oscilloscope.
+                 telperion_engine.py and h_rb_hat/maths.py directly.
+  lineage.py   — THE GENERATIONAL LINEAGE ENGINE. §5's 40 self-checked
+                 relations. stdlib+numpy; nothing outside this repo, and is
+                 imported first and unconditionally by engine/__init__.py.
+  tools.py     — runnable reports over maths.py and lineage.py (§4.8).
+  oscilloscope.py — the two-panel Fermat→Riemann oscilloscope (§4.8).
 wiki/
-  Sedenion-Factoral-Relativity.md — fuller write-up, orientation
-  (leaf/root, dendritic/tap/clonal root systems), open design questions.
+  Sedenion-Factoral-Relativity.md — fuller theory write-up, open design
+  questions this README doesn't cover.
 ```
-
-## The factoral decomposition tool — `engine/lineage.py`
-
-Added 2026-08-21. The Generational Lineage engine, carried over from
-`VAPMIP/engines/e10_generational_lineage.py` so this repo has the
-decomposition machinery locally instead of reaching across repos for it.
-
-A decomposition tool is not an accessory here — it *is* the instrument. If
-factorisation is relative to which σ-facet you stand at, then the first thing
-you need is a way to tell a **primitive** operation from a **derived** one, and
-to say what any named "geometry" descends from.
-
-```
-python3 engine/lineage.py          # 37/37, ~23s
-```
-
-**What it gives this repo that it did not have:**
-
-**1. A domain to decompose against.** The Two Trees partition every integer,
-exactly and with no overlap — Telperion = PRIME (defined by what it *cannot* be
-decomposed into), Laurelin = COMPOSITE (defined by what it *is* decomposed
-into), Mingling = `{0, 1}` (neither, because they are the identities of ADD and
-SCALE — which is also *why* neither can be prime). Measured over `[0, 100000]`:
-
-```
-2 mingling + 9,592 prime + 90,407 composite = 100,001 = N+1     exact
-```
-
-**2. A tier test**, so a named geometry can be shown derived rather than assumed
-primitive. Four questions asked in order (`decompose()`):
-
-```
-chirality  → t3 DERIVED    a count: the parity of a reflection count
-fulcrum    → t2 DERIVED    a fixed set: ker(M − I), same computation as
-                           origin / anchor / balance — one object, four names
-dilate     → t1            primitive at t1, and INDEPENDENT of reflect
-add        → t0 PRIMITIVE  irreducible; identity 0
-leverage   → t3            a COROLLARY, not a geometry — it needs rigidity
-                           added; remove that and the fulcrum survives while
-                           leverage does not
-gnarl      → UNPLACED      the emergence signal, not a licence to invent a tier
-```
-
-**3. `factor_lineage(n)`** — the generational lineage of a factorisation.
-Generation = depth in the recursive factor tree; a prime is a leaf, a composite
-an internal node. `Ω(n)` is not a statistic *about* `n` — it is the **length of
-its lineage**, the number of tier-0 SCALE operations that build `n` from the
-multiplicative identity. Verified over `[2, 3000)` with zero disagreements.
-
-**4. `gcd` as the lowest common ancestor**, measured over 20,000 random pairs
-with zero disagreements: the shared lineage of two numbers is reached in *one
-division*. "How much context" is exact — enough to reach the ancestor, no more.
-
-**5. The factoring map is on the EDGES.** `C(16,2) = 120` pairs; the 15 nonzero
-XOR differences partition them exactly 8 apiece; 35 lines (`a ⊕ b = c`, so
-knowing two forces the third); every difference lies in exactly 7 of them
-(`105/15`). The 15 "points" of `PG(3,2)` are **relationships, not positions** —
-which is why this domain is the factoring map, and why an operator should be
-decomposed by the *relation* it expresses, never by the objects it connects.
-
-**Three kinds of wrong are kept apart** and the engine reports which:
-`CODE-FAULT` (the check did not run — unjudged) · `MATHS-FAULT` (both sides
-measured, they disagree — false) · method error (correct code, correct maths,
-wrong question — invisible to both, and surfaces downstream).
-
-### A measured correction to the skill's own prose
-
-`F3` was written to check the skill's statement that the two trees reach equal
-brightness at *"n ~ 9, near e² = 7.389"*. It returned **MATHS-FAULT**, and the
-measurement was right: the counting functions cross **three** times — at
-`n = 9, 11, 13` — because 11 and 13 are themselves prime, so Telperion catches
-up twice more before Laurelin pulls away for good. The first crossing is 1.61
-from `e²`; the last is 5.61 from it.
-
-The relation now tests what is actually structural — **after the last crossing
-Laurelin dominates forever**, verified to `N = 100,000` — and records the `e²`
-proximity without making it part of the pass condition. One integer near one
-constant is not a result, and the engine does not dress it as one.
-
-## The ring-theory spine — `engine/lineage.py`, relations G1–G6
-
-Added 2026-08-22. Factoral decomposition, named in its proper ring theory. The
-whole tower collapses to one statement, measured by **G1**:
-
-> **An element FALLS if and only if its quotient ring has zero divisors.**
-
-- **The integers (ℤ, an associative UFD).** N composite ⟺ ℤ/(N) has a zero
-  divisor ⟺ (N) is not a prime ideal → N falls (Laurelin). N prime ⟺ ℤ/(N) is a
-  field → N survives (Telperion). **The Two Trees ARE this dichotomy.** 0 and 1
-  are the Mingling: the degenerate quotients ℤ/(0)=ℤ and ℤ/(1)=0.
-- **The algebra (T₃₂/GF(2), non-associative).** A constant falls ⟺ it is
-  nilpotent ⟺ it lies in the zero-divisor set. Same test, different ring.
-
-And the **detector is the same kind of object** on both sides — one operation.
-On ℤ it is `gcd(a, N) > 1` (**G2**); on GF(2) it is the trace-Laplacian
-`Δ(w) = w·𝟏` (**G5**). `gcd` is the integer trace-Laplacian; that is why R8/F4
-already read "gcd is the lowest common ancestor, in one division."
-
-| # | relation | tier | what it pins down |
-|---|---|---|---|
-| G1 | `fall_is_quotient_zd` | 2 | fall ⟺ ℤ/(n) has zero divisors — checked for every n ≤ 2000 |
-| G2 | `gcd_is_the_detector` | 0 | gcd is the ℤ detector; census units φ(n) + zd + {0} = n closes exactly |
-| G3 | `primary_decomposition_is_cepstrum` | 3 | Lasker–Noether (n)=⋂(pᵢ^aᵢ) **is** the cepstrum; Ω=Σexponents, von Mangoldt Λ on the prime powers |
-| G4 | `radical_units_split_gf2` | 2 | over GF(2), x² ∈ {0, e₀}: the radical (nilpotents) vs units, split 128/128 at dim 8 |
-| G5 | `trace_laplacian_is_nilpotency` | 2 | Δ(w)=0 ⟺ w²=0 (exact); 𝟏 is **not** a global annihilator; SHA-1 IVs = null subalgebra at distance 0, round constants at 32 |
-| G6 | `associator_is_ring_defect` | 3 | the associator is the **obstruction to being a ring**: ≡0 for ℝ,ℂ,ℍ, ≠0 from 𝕆 up |
-
-**The tower, in its ring-theoretic names** — value → curvature → torsion, read
-off a discrete decomposition path:
-
-| order | DSP name | ring theory | repo object |
-|---|---|---|---|
-| 1 | spectrum / cymatic | zero-divisor set = ∪ associated primes | Δ(w)=w·𝟏; where SHA-1 fell |
-| 2 | cepstrum | **primary decomposition** (Lasker–Noether); von Mangoldt Λ | `factor_lineage`, Ω = lineage length |
-| 3 | bispectrum | the associator — failure of the ring axiom | R5 (168-quantised), G6 |
-
-**A find, kept on the record (G5, marked OURS).** Building G5 surfaced that the
-UDEO white paper's "𝟏₃₂ is a global annihilator" lemma is **false** — it
-contradicts its own distance table (the round constants have `Δ = 𝟏 ≠ 0`). The
-true statement, machine-verified exhaustively at dim 8 and over 20 000 random at
-dim 32, is `Δ(w) = 0 ⟺ w² = 0`. The theorem (IV nilpotency, null subalgebra)
-stands; the shortcut proof was retracted in `TuringStack` the same day.
-
-### New public helpers
-
-```python
-from engine.lineage import fall_test, primary_decomposition, von_mangoldt, \
-    quotient_zero_divisors, trace_laplacian_gf2, is_nilpotent_gf2, euler_phi
-
-fall_test(12)              # FALL — ℤ/(12) has zero divisors; primary {2:2, 3:1}
-fall_test(97)              # SURVIVE — ℤ/(97) is a field
-primary_decomposition(360) # {2:3, 3:2, 5:1}  — the cepstral peaks
-trace_laplacian_gf2(0x67452301)  # 0 — a SHA-1 IV, on the nodal line
-```
-
-`decompose()` now also places the ring operations: `ideal` (t2, kernel of a
-quotient map), `quotient` (t1, the collapse = the FALL), `radical` (t2),
-`unit`/`zero-divisor` (survivors/fallen), `associator` (t3, the ring defect),
-`primary-decomposition` (t3, the cepstrum).
-
-## Fractal decomposition — the highest-order rung (FR1–FR3, built 2026-08-22)
-
-Now in the engine — the fractal block, three self-checking relations:
-
-| # | relation | tier | what it measures |
-|---|---|---|---|
-| FR1 | `tower_self_similar` | 3 | the CD tower is an **exact** self-similar recursion: associator events 168 → 1848 = 11·168, persist core = 8 at every scale. "The same maths at every level," made exact. |
-| FR2 | `bifurcation_cascade` | 1 | the period-doubling cascade "bifurcates emergently"; successive interval ratios bracket the **Feigenbaum constant δ = 4.6692**. J₂ is the generator; the accumulation is a Cantor set. |
-| FR3 | `fall_survive_boundary` | 3 | the fall/survive boundary of an iterated generator is a **fractal (1 < D < 2)** — fall = escape, survive = bounded, **G1's dichotomy read on dynamics**. |
-
-**The library is the control set.** `escape_survives()` and `box_dimension()`
-take the generator as an argument, so any of the 200+ Ultra Fractal formulas in
-`Ainulindale/wiki/fractals/` can drive them. FR3 runs three as controls —
-Mandelbrot (D ≈ 1.3), Julia −0.8+0.156i (D ≈ 1.6), Burning Ship (D ≈ 1.56) — all
-fractal, all **distinct**, so the instrument separates generators. Each formula
-is both a control (known dimension to calibrate against) and an instruction
-manual (its escape rule is a different higher-order lineage). FR3 is labelled
-**FRONTIER**: the fall/survive ↔ factoring correspondence is structural and said
-so, not a claim that the Mandelbrot set *is* the primes.
-
-## The UF formulary, integrated (FR4–FR6, 2026-08-22)
-
-The fractal library at `PtolemyDesktop/Archimedes/Maths/Formula/UFformulary/`
-(~3,800 generators `.ufm`, ~480 labelings `.ucl`, ~210 transforms `.uxf`) is
-integrated on both axes — **the generators are the fractals, the labelings are
-the decompositions**:
-
-| # | relation | tier | what it integrates |
-|---|---|---|---|
-| FR4 | `newton_basins_are_splitting` | 2 | Newton on zᵏ−1 → exactly **k basins = the k linear factors = ring splitting**. G1's fall/survive taken **k-way** — the bridge from the fractal block to the ring-theory spine. |
-| FR5 | `labeling_order_is_memory_depth` | 3 | a labeling's **order = how many orbit points it needs**: escape rate = 1 (order 1), curvature = 3 (order 3). On bounded orbits escape saturates while curvature still varies — **order 3 resolves what order 1 is blind to**. |
-| FR6 | `lyapunov_is_the_drift` | 3 | the Lyapunov exponent **is** the continuous fall/survive drift: λ<0 survive, λ>0 fall, λ≈0 at the Feigenbaum edge — the same sign law as the Collatz drift log(√3/2). |
-
-**The labelings are the decomposition tower, lifted from the `.ucl` sources:**
-
-| labeling helper | UF `.ucl` source | rung |
-|---|---|---|
-| `smooth_escape` | smooth iteration | order 1 — the escape rate |
-| `orbit_trap` | orbit traps | order 1 — the support (which structures the orbit visits) |
-| `orbit_curvature` | `dmj-Curvature` (Kerry Mitchell triangle-inequality) | order 3 — the associator on dynamics |
-| `lyapunov_exponent` | `dmj-Lyapunov` | the drift |
-| `basin_of` / `newton_basins` | Newton/Nova basins | k-way fall/survive = ring splitting |
-
-`label_orbit(c, step)` returns all labelings of one orbit — the per-pixel data a
-**visualiser** paints. `escape_survives` / `box_dimension` are guarded against
-Magnet-type divide-by-zero, so any of the 213 `.ufm` generators drives them.
-Assessment of the full library: `wiki/` (the evaluation is in the session
-record). Engine runtime ~23s, **26/26**.
-
-The direction, now with the code under it:
-
-The tower has a natural continuation, and it is the one Cody named across the
-2026-08-22 session: **a fractal is the higher-order generational lineage of a
-toroidal bifurcation, which is the higher-order generational lineage of a ring,
-which is the higher-order generational lineage of a circle.** Each level is the
-lineage operator applied to the one below — and "the same maths at every level"
-*is* self-similarity, i.e. the tower is itself a fractal.
-
-The rungs, with the ring theory that governs each (the honest split of
-KNOWN vs. frontier framing):
-
-- **Circle → ring.** Partition the circle into `n` points → the `n`-th roots of
-  unity → the **cyclotomic ring ℤ[ζₙ]**. The circle's generational lineage *is*
-  a ring. How a prime `p` behaves in ℤ[ζₙ] — split, ramified, or inert,
-  decided by `p mod n` (Dedekind/Kummer) — is the **fall/survive test one level
-  up**: the same G1 dichotomy, now for prime *ideals* in a cyclotomic ring.
-  (KNOWN: cyclotomic ring theory.)
-- **Ring → toroidal bifurcation.** A torus is `S¹ × S¹` — a product of circles,
-  hence a lattice of roots of unity: the point where ring theory and geometry
-  intersect. The **Riemann toroidal energy** (Cody's model, new as of
-  2026-08-21) sits on that torus, around the involution axis `R − B` (the
-  critical line σ = ½), and **bifurcates emergently** into the two trees. This
-  is where **J₂ enters: it is a torus involution** (already recorded in
-  `Ainulindale/wiki/90`), swapping R ↔ B across that axis — the generator of
-  the bifurcation. (FRONTIER: the toroidal-on-Riemann model is provisional and
-  labelled as such.)
-- **Toroidal bifurcation → fractal.** Iterate the bifurcation and you get a
-  self-similar decomposition tree — a **fractal**. This is the higher-order
-  factoral decomposition: decompose, then decompose the decomposition, in the
-  limit. Ring theory is the algebraic skeleton — each level is a
-  quotient/sub-structure of the last, and the associator (order 3) is the
-  torsion that keeps the branches from stacking flat, exactly as it turns two
-  reflections into a rotation and a rotation-plus-log-advance into the
-  Archimedes screw.
-
-**The experiment set already exists.** `Ainulindale/wiki/fractals/` catalogues
-200+ Ultra Fractal formulas (Kerry Mitchell, Samuel Monnier, Damien Jones'
-Nova/Halley/Phoenix and Torus formulas, …). These are the fractals to run the
-ring-theoretic decomposition against — the place, as Cody put it, where ring
-theory will really shine.
-
-**Why emergence is load-bearing.** Fix a value anywhere and you have *chosen* a
-scale. Let the operations emerge from the geometry — the torus intersected with
-its axis, with ∅_RB as the inductive geometric coupling (used as a Hamiltonian)
-supplying the equations rather than a fitted constant — and each one picks its
-own scale and its own path. That is what makes the instrument a **complete
-self-diagnostic tool, from the inside and the outside at once**: nothing is
-imposed, so nothing can hide an imposed scale. Noether again — a conserved
-current, not a chosen parameter.
 
 ## Status
 
-v2.2 (2026-08-22) — the NUMBER CHART (PW9): the Smith-chart methodology, applied; `37/37`.
+v2.6 (2026-08-25) — THE PATHWAY DECOMPOSITION (`PW14`), the primary
+forensic tool: `pathway_decomposition()` factors a PROCESS into named
+`ProcessOperator`s and their real dependency graph — a genuine DAG, not a
+forced linear chain, and no rounding a stage count to the nearest
+division algebra ("imaginary" names a role, not an algebra with rotation
+rules). Verified against a real cipher (textbook Vigenere, independently
+of its own hand-written function) and against real RSA CRT-decrypt as the
+control case, correctly resolving a genuine fan-out (`m2` feeding two
+later operators) that an earlier chain-only version of this tool could
+not represent. 42/42 relations hold.
 
-v2.1 (2026-08-22) — the Smith chart, an independent Möbius confirmation (PW8); `36/36`.
+v2.5 (2026-08-25) — THE FACTORAL SPIRAL (`PW13`): `factoral_spiral()`
+generalises the two-ring chart to a whole collection at once, with exact
+`chart_scale_factor()` (`|dΓ/dZ|`, checked against numerical
+differentiation, max rel. err. 1.55e-09/300 trials) as the "flattening
+artifact" reading — and wired directly to `PW11`'s crystallography
+(`report_crystal_spiral_chart`), so a sequence's own recovered period
+drives the chart. 41/41 relations hold.
 
-v2.0 (2026-08-22) — the arithmetic derivative (G8): ring theory's calculus; `35/35`.
+v2.4 (2026-08-23) — THE CRYSTAL and THE JOIN (`PW11`–`PW12`): an unseen
+period recovered from repeat-structure alone (Kasiski/Friedman,
+generalised), and a permutation's order as the lcm/join dual of R8's
+gcd/meet.
 
-v1.9 (2026-08-22) — open/closed pathways = zero-divisor/unit (G7); `34/34`.
+v2.3 (2026-08-23) — the TWO-RING CHART (`PW10`): the Smith-chart fold,
+generalised beyond impedance to any ring pair.
 
-v1.8 (2026-08-22) — the Observer's lineage is L_(I|O) (PW7); `33/33`.
+v2.2 (2026-08-22) — the NUMBER CHART (`PW9`): the Smith-chart methodology,
+applied.
 
-v1.7 (2026-08-22) — the edge primitive (PW6): node→edge→pathway; `32/32`.
+v2.1 (2026-08-22) — the Smith chart, an independent Möbius confirmation
+(`PW8`).
 
-v1.6 (2026-08-22) — two-anchor geodesic (PW5), mathematical X-ray crystallography; `31/31`.
+v2.0 (2026-08-22) — the arithmetic derivative (`G8`): ring theory's
+calculus.
 
-v1.5 (2026-08-22) — the pathway/tuning layer (PW1–PW4); `30/30` relations hold.
+v1.9–v1.1 — the pathway layer, the UF formulary integration, the fractal
+block, the ring-theory spine, and the original factoral decomposition tool,
+all 2026-08-21/22. Full per-version relation counts are in git history from
+here on rather than repeated in this file.
 
-v1.4 (2026-08-22) — the UF formulary is integrated (FR4–FR6); `26/26` relations hold.
-
-v1.3 (2026-08-22) — the fractal block (FR1–FR3) is in; `23/23` relations hold.
-
-v1.2 (2026-08-22) — the ring-theory spine (G1–G6) is in; `20/20` relations hold.
-
-v1.1 (2026-08-21) — the factoral decomposition tool is in, `14/14` relations
-hold, and a pre-existing import bug is fixed (see below).
-
-v1. The inventory (pieces/pathways) is real and wired to the actual
-existing engines. One honest control test is implemented: does the
-Monster gap {1,11,15} (the 3 N-shapes no Niemeier root system can reach)
-show any real density deviation from Dirichlet equidistribution in
-counted primes? First run, N=200,000: chi-square 0.38 (7 dof) — no
-detectable deviation. Gap and dendritic classes track the uniform
-expectation to within a tenth of a percent.
-
-**Not yet built:** the actual Riemann-facet "fall" condition — a
-structural, per-number test analogous to "does this factor pair expose
-as a ZD collision," but keyed to a prime's own relationship to the real
-zeta zeros (not the P1 hash-index proxy used elsewhere in this
-framework). That design question is open, not glossed over — see the
-wiki page.
-
-## Fixed, 2026-08-21
-
-`engine/maths.py` pointed `_H_RB_HAT_MODULE` at
-`ThePlace/AinulindaleBAK/ValaQuenta/modules/h_rb_hat` — a stale path from the
-pre-NVMe layout that no longer exists. Consequence: `import engine` raised
-`ModuleNotFoundError: No module named 'maths'` for anyone importing the package
-rather than running a module directly. Pre-existing, confirmed against a clean
-checkout of `1b76527` before being touched. Now points at the real
-`ValaQuenta/modules/h_rb_hat`.
-
-`engine/__init__.py` now imports `lineage` **first and unconditionally**, and
-guards the cross-repo `maths`/`tools` imports behind `IMPORT_ERROR`. The
-decomposition tool depends on nothing outside this repo and should never be
-taken down by a path that moved somewhere else.
-
-No free parameters. No renormalization. Failed predictions — and failed
-assertions — stay in the record.
-
-White Hat.
+White Hat. No free parameters. Failed predictions stay in the record.
