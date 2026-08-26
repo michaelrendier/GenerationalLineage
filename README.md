@@ -440,6 +440,39 @@ re-derives the textbook Vigenere pair `ATTACKATDAWN`/`LEMON` →
 fan-out resolves correctly — the thing the corrected design exists to get
 right.
 
+### 4.11 The unit lineage — a THIRD domain for the same decomposition
+
+`PW16`. Cody, 2026-08-25: *"information lives in the units...units can
+spectrally show direct generational lineage...mitochondrial lineage if you
+will...units are directly how the geometries hold the permutation."* Every
+named compound SI unit (Newton, Joule, Watt, Volt, Weber, Tesla) is a point
+in the 7-axis lattice of SI base dimensions (`kg,m,s,A,K,mol,cd` — the
+leaves), with an exact, computable lineage back to them — the same
+leaf/composite discipline this file already runs on numbers
+(`factor_lineage`) and processes (`pathway_decomposition`), applied to a
+third domain rather than reinvented for it. A unit is a **geometry** in
+exactly this project's sense: it carries no numeric content and does no
+work itself, but it determines which recombinations of content are legal.
+
+```python
+from engine import unit_vector, unit_mul, unit_div, unit_lineage_decompose, SI_BASE
+
+MOL, LITER = unit_vector((0,0,0,0,0,1,0), name='mol'), unit_vector((0,3,0,0,0,0,0), name='L')
+concentration = unit_div(MOL, LITER)          # mol/L
+recombined = unit_mul(concentration, LITER)   # cancels back to mol EXACTLY
+```
+
+**Caught and fixed while building this, not hidden**: the first version of
+`unit_lineage_decompose` stored a composite's lineage as bare parent names
+(`('Wb', 'm')` for Tesla) and always *added* the parents' vectors — running
+it immediately failed all six named units, because Tesla is `Wb/m²`, a
+divide by a square, not an add of `Wb` and `m`. Fixed by storing signed
+`(parent, power)` pairs per lineage step (`(('Wb',1),('m',-2))`); re-run,
+all six match exactly (`N,J,W,V,Wb,T` all `True`), and `mol/L * L` returns
+bit-for-bit to `mol`. Ported from an independent build,
+`PtolemyDesktop/Archimedes/UnitVector.py` (verified there first against the
+same Tesla/Joule derivations), not re-derived from scratch here.
+
 ### 4.8 The reports
 
 ```python
@@ -640,6 +673,19 @@ wiki/
 ```
 
 ## Status
+
+v2.7 (2026-08-25) — THE UNIT LINEAGE (`PW16`): units as a THIRD domain for
+this file's own decomposition discipline (numbers, processes, now
+dimensional exponent vectors) — every named compound SI unit traces an
+exact lineage back to the 7 SI base leaves, cancellation is exact vector
+arithmetic, and a unit is a geometry (no numeric content, determines which
+permutations of content are legal) in exactly this project's established
+sense. A first version silently summed lineage steps as if every one were
+an addition; running it caught the fault immediately (all six named units
+failed), fixed by carrying signed `(parent, power)` per step. Also folds in
+`PW15` (THE SCALE INVARIANT: the cross-ratio survives every anchor of the
+two-ring fold; the raw angle, tested first, does not), added since v2.6
+without its own version note. 44/44 relations hold.
 
 v2.6 (2026-08-25) — THE PATHWAY DECOMPOSITION (`PW14`), the primary
 forensic tool: `pathway_decomposition()` factors a PROCESS into named

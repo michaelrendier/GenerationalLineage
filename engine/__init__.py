@@ -27,6 +27,7 @@ from .lineage import (
     fermat_path, number_chart_point,
     # the two-ring chart (2026-08-23) -- the Smith-chart fold, generalised
     ring_chart_gamma, two_ring_chart, chart_scale_factor, factoral_spiral, ProcessOperator, pathway_decomposition, cross_ratio,
+    SI_BASE, unit_vector, unit_mul, unit_div, unit_lineage_decompose,
     # the crystal + the join (2026-08-23) -- unseen periods from repeat-
     # structure alone (Kasiski/Friedman), and a permutation's order as the
     # lcm/join dual of R8's gcd/meet
@@ -69,6 +70,7 @@ __all__ = [
     'spiral_address', 'pathway_residues', 'tune_pathway', 'decompose_number',
     'fermat_path', 'number_chart_point',
     'ring_chart_gamma', 'two_ring_chart', 'chart_scale_factor', 'factoral_spiral', 'ProcessOperator', 'pathway_decomposition', 'cross_ratio',
+    'SI_BASE', 'unit_vector', 'unit_mul', 'unit_div', 'unit_lineage_decompose',
     'repeat_distances', 'infer_period_by_stem_vote', 'vigenere_cipher',
     'permutation_cycles', 'permutation_order_direct', 'permutation_order_via_stems',
 ]

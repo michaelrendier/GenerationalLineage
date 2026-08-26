@@ -1478,6 +1478,79 @@ def decompose(operation: str) -> Dict[str, Any]:
     }
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# UNITS — dimensional exponent vectors as a THIRD domain for the same
+# factoral-decomposition discipline this file already runs on numbers
+# (factor_lineage: prime/composite) and processes (pathway_decomposition:
+# operator DAGs). 2026-08-25, Cody: "information lives in the units...units
+# can spectrally show direct generational lineage...mitochondrial lineage if
+# you will...units are directly how the geometries hold the permutation."
+# A unit is a geometry in exactly this project's sense — it carries no
+# numeric content and does no work itself, but it is what determines which
+# recombinations (permutations) of content are physically legal. Ported
+# from PtolemyDesktop/Archimedes/UnitVector.py (independently built and
+# verified there against real SI derivations), not re-derived from scratch.
+# ═══════════════════════════════════════════════════════════════════════════
+
+SI_BASE = ('kg', 'm', 's', 'A', 'K', 'mol', 'cd')  # the 7 leaves
+
+
+def unit_vector(exponents: Sequence[float], name: str = None,
+                lineage: Tuple[str, ...] = ()) -> Dict[str, Any]:
+    """A unit as a point in the 7-axis SI exponent lattice. Multiplying
+    quantities ADDS exponent vectors; dividing SUBTRACTS; cancellation is a
+    component landing on zero — no special-casing, it falls out of vector
+    arithmetic the same way factor_lineage's leaves just ARE the answer."""
+    if len(exponents) != len(SI_BASE):
+        raise ValueError(f'need exactly {len(SI_BASE)} exponents (kg,m,s,A,K,mol,cd)')
+    return {'exponents': tuple(exponents), 'name': name, 'lineage': lineage}
+
+
+def unit_mul(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
+    return unit_vector([x + y for x, y in zip(a['exponents'], b['exponents'])])
+
+
+def unit_div(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
+    return unit_vector([x - y for x, y in zip(a['exponents'], b['exponents'])])
+
+
+def unit_lineage_decompose(u: Dict[str, Any], table: Dict[str, Dict]) -> Dict[str, Any]:
+    """Trace a named composite unit's generational lineage back to the 7 SI
+    leaves, and verify the trace RECOMBINES to the exact same exponent
+    vector declared directly — the same round-trip discipline as
+    factor_lineage (leaves recombine to N) and pathway_decomposition
+    (operators recombine to the real output), applied to a third domain.
+
+    `lineage` entries are (parent_name, power) pairs -- a composite is not
+    just built FROM its parents, it is built from a signed EXPONENT of each
+    (Joule = Newton^1 * metre^1; Watt = Joule^1 * second^-1) -- collapsing
+    that to bare names (first draft of this function, caught by running it,
+    not assumed correct) silently treated every lineage step as addition
+    regardless of whether it was really a multiply or a divide."""
+    def _walk(name):
+        if name in SI_BASE:
+            v = [0] * len(SI_BASE)
+            v[SI_BASE.index(name)] = 1
+            return tuple(v), [name]
+        node = table[name]
+        acc = [0] * len(SI_BASE)
+        path = [name]
+        for parent, power in node['lineage']:
+            pv, ppath = _walk(parent)
+            acc = [a + power * b for a, b in zip(acc, pv)]
+            path.extend(ppath)
+        return tuple(acc), path
+
+    traced_exponents, path = _walk(u['name'])
+    return {
+        'name': u['name'],
+        'declared_exponents': u['exponents'],
+        'traced_exponents': traced_exponents,
+        'matches': traced_exponents == u['exponents'],
+        'lineage_path': path,
+    }
+
+
 class FactoralLineageEngine(GenerationalLineageEngine):
     """The VAPMIP sigma relations (R1-R8), plus six factoral relations (F1-F6)."""
 
@@ -2025,7 +2098,8 @@ class FactoralLineageEngine(GenerationalLineageEngine):
                    self.pw_permutation_order_is_the_join,
                    self.pw_scale_factor_is_the_conformal_derivative,
                    self.pw_process_trace_matches_the_cipher,
-                   self.pw_cross_ratio_is_scale_blind):
+                   self.pw_cross_ratio_is_scale_blind,
+                   self.pw_unit_lineage_is_a_geometry):
             pw()
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -2711,6 +2785,57 @@ class FactoralLineageEngine(GenerationalLineageEngine):
             f'origin: {[round(a, 4) for a in angles]} — NOT constant '
             f'({not angle_survives}), confirming the angle is the wrong '
             f'candidate and the cross-ratio is the right one.')
+
+    # ── PW16 — THE UNIT LINEAGE: a third domain for the same decomposition ──
+    def pw_unit_lineage_is_a_geometry(self) -> None:
+        """Units are a third domain for the discipline this engine already
+        runs on numbers (factor_lineage) and processes (pathway_decomposition):
+        every named compound unit has an exact, computable lineage back to
+        7 irreducible leaves (the SI base dimensions), and cancellation
+        (Cody, chemistry: "when all sorts of units cancel out and leave
+        weird shit behind") is exact vector arithmetic, not string
+        bookkeeping — checked against PtolemyDesktop/Archimedes/UnitVector.py's
+        independently-verified Tesla/Joule lineage, not re-derived here."""
+        table = {
+            # (parent, power) -- Newton = kg^1 * m^1 * s^-2; Joule = N^1 * m^1; etc.
+            'N':  {'exponents': (1, 1, -2, 0, 0, 0, 0), 'lineage': (('kg', 1), ('m', 1), ('s', -2))},
+            'J':  {'exponents': (1, 2, -2, 0, 0, 0, 0), 'lineage': (('N', 1), ('m', 1))},
+            'W':  {'exponents': (1, 2, -3, 0, 0, 0, 0), 'lineage': (('J', 1), ('s', -1))},
+            'V':  {'exponents': (1, 2, -3, -1, 0, 0, 0), 'lineage': (('W', 1), ('A', -1))},
+            'Wb': {'exponents': (1, 2, -2, -1, 0, 0, 0), 'lineage': (('V', 1), ('s', 1))},
+            'T':  {'exponents': (1, 0, -2, -1, 0, 0, 0), 'lineage': (('Wb', 1), ('m', -2))},
+        }
+        results = {}
+        for name, node in table.items():
+            u = unit_vector(node['exponents'], name=name, lineage=node['lineage'])
+            results[name] = unit_lineage_decompose(u, table)
+        all_match = all(r['matches'] for r in results.values())
+
+        # cancellation, the chemistry case: mol/L * L must return EXACTLY
+        # to mol's own vector — not approximately, not via string diffing
+        MOL = unit_vector((0, 0, 0, 0, 0, 1, 0), name='mol')
+        LITER = unit_vector((0, 3, 0, 0, 0, 0, 0), name='L')
+        concentration = unit_div(MOL, LITER)
+        recombined = unit_mul(concentration, LITER)
+        cancellation_ok = recombined['exponents'] == MOL['exponents']
+
+        ok = all_match and cancellation_ok
+        self._record(
+            'units.unit_lineage_is_a_geometry',
+            'named compound units (N,J,W,V,Wb,T) each have an exact, '
+            'traceable lineage back to the 7 SI leaves that recombines to '
+            'their own declared exponent vector; cancellation (mol/L * L) '
+            'is exact vector arithmetic returning bit-for-bit to mol', 3,
+            'the SAME discipline as factor_lineage (numbers) and '
+            'pathway_decomposition (processes) — a third domain, not a new '
+            'mechanism: a geometry (the exponent vector) that carries no '
+            'numeric content and does no work itself, but determines which '
+            'permutations of content are legal',
+            True, ok,
+            'lineage matches: ' +
+            ', '.join(f'{n}={results[n]["matches"]}' for n in results) +
+            f'. Tesla path: {" <- ".join(results["T"]["lineage_path"])}. '
+            f'cancellation mol/L*L == mol exactly: {cancellation_ok}')
 
     # ═══════════════════════════════════════════════════════════════════════
     # THE FORMULARY BLOCK (FR4–FR6). Added 2026-08-22.
