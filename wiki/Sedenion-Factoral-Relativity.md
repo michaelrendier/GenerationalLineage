@@ -271,7 +271,7 @@ One integer near one constant is not a result and is not dressed as one.
 ```python
 from engine.lineage import run, decompose, factor_lineage, two_trees
 
-run()                    # all 14 relations, tiered and self-checked
+run()                    # all relations, tiered and self-checked (44/44)
 decompose('chirality')   # → tier 3, DERIVED: a count of reflection parity
 decompose('gnarl')       # → UNPLACED: the emergence signal
 factor_lineage(360)      # → Ω=6, generations=5, leaves [2,2,2,3,3,5]
@@ -292,7 +292,69 @@ package down.
   returns `UNPLACED` for anything not already in `TIERS`. It cannot yet
   *derive* a tier for a new operation from its behaviour — it can only
   tell you that the domain does not contain it. That is honest, and it is
-  also the obvious next piece of work.
+  also the obvious next piece of work. *(Partly addressed 2026-08-27 —
+  see the roll-down below.)*
+
+---
+
+## ADD / SCALE / SIGN — the roll-down (2026-08-27)
+
+`decompose()` names an operation's tier and immediate parent.
+**`root_irreducible(op)`** finishes the walk — past REFLECT / DILATE, past
+every fixed set and count — down to the one tier-0 irreducible it rests on:
+`ADD`, `SCALE` or `SIGN`. `ROOT_OF` is the table; `AFF1` names the structure
+`Aff(1,ℝ) = ADD ⋊ (SCALE × SIGN) = (fold count) ⋊ (size × direction)`, bracket
+`[SCALE, ADD] = ADD`. `decompose()` now also returns a `root` key. Shared
+primitive and the full write-up: `ValaQuenta/wiki/add_scale_sign.md`.
+
+```python
+from engine.lineage import root_irreducible
+root_irreducible('spiral')   # → root 'SCALE', root_path 'spiral ← … ← SCALE'
+root_irreducible('factorial') # → root 'SIGN'  (a count of SIGN-compositions)
+```
+
+## The Sieve IS the generational lineage (2026-08-27)
+
+Cody: *"The Sieve IS Generational Lineage … fibonacci under factoring waves …
+the list of primes is the list of decompositional order, the ordinal values."*
+Measured (`VAPMIP/engines/e10` R10–R12; here as `sieve_lineage` /
+`sieve_recurrence`):
+
+| claim | result |
+|---|---|
+| composite `n` first struck on the pass of `spf(n)`; `generation(n) = π(spf(n))` | HOLDS exactly (182 015 / 182 015 at N = 2·10⁵) |
+| one deterministic forward sweep, `π(√N)` working passes, no backtracking | MATCH — *this is why the factoral lineage is stable: one pass per prime, not a fixed-point iteration* |
+| Legendre `φ(x,a) = φ(x,a−1) − φ(x/pₐ, a−1)` — Fibonacci's 2-term shape, 2nd term SCALE-shifted by a prime | HOLDS a = 1..6 |
+| closed form `φ = Σ_{d\|Pₐ} μ(d)·⌊x/d⌋` = ADD ∘ SIGN ∘ SCALE | MATCH |
+| prime set + disjoint partition are order-invariant; `generation = π(spf)` is **unique to the ordinal order** (which also minimises generation entropy) | HOLDS — ζ-weight order `ln p/√p` finds the same primes but scrambles the generations |
+
+```python
+from engine.lineage import sieve_lineage, sieve_recurrence
+sieve_lineage(20_000, order='ordinal')   # generation_matches_pi_spf → True
+sieve_lineage(20_000, order='zeta')      # same primes, → False
+sieve_recurrence(30_030, 6)              # the 2-term trace + Möbius closed form
+```
+
+## The biological factoral tower — `engine/bio.py` (STUB)
+
+Cody: *"so knots start that generational lineage … this is the biological
+factoral decomposition … Tower Level Decomposition."* Scaffolding only —
+every entry point raises `NotImplementedError` or, with `plan_only=True`,
+returns the intended decomposition **path**. **Structural decomposition only;
+no functional, physiological or medical inference is made or intended.**
+
+| level | algebra | dim | coordinates |
+|---|---|---|---|
+| knot / bond topology | 𝕊 | 16 | 16 nodes, 15 edge-relations, one spanning tree |
+| **molecule** | T₃₂ | 32 | bond graph — atoms = nodes, bonds = edges |
+| **DNA** | T₆₄ | 64 | 4³ = 64 codons; the codon *is* the basis index |
+| protein folding | T₁₂₈ | 128 | backbone dihedral pairs (φ, ψ) |
+| genome | T₂₅₆ | 256 | chromosome-scale; T₁₂₈ doubled |
+
+`molecular_decomposition`, `dna_decomposition`, `protein_folding_decomposition`,
+`genome_decomposition`, `tower()`. ADD = the march along the chain / reading
+frame; SCALE = the tower level (nesting); SIGN = chirality (strand sense, L/D,
+fold mountain/valley).
 
 ---
 

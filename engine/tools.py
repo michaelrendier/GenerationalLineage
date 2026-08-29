@@ -332,3 +332,27 @@ def report_crystal_spiral_chart(seq, n: int = 3, max_period: int = 20,
         distances, ring1, ring2, Z0=complex(period / 2.0, 1.0),
         ring1_name=f'distance mod {period}', ring2_name='log2(distance+1)',
         out_path=out_path, verbose=verbose)
+
+
+def report_add_scale_sign(x: float = 0.15625):
+    """The ADD:SCALE:SIGN datatype as an engine in the decomposer suite,
+    with the fast inverse square root as the worked example."""
+    from .add_scale_sign import ASS, compose, fisr_word, CAMSHAFT, BRACKET
+    print("=" * 74)
+    print("  ADD:SCALE:SIGN  —  the tier-0 floor as a value type")
+    print("=" * 74)
+    T = compose(ASS.SIGN(-1), ASS.SCALE(3.0), ASS.ADD(4.0))
+    print(f"\n  T = SIGN(-1) ∘ SCALE(3) ∘ ADD(4)  =  {T}")
+    print(f"    camshaft {CAMSHAFT}   {BRACKET}")
+    print(f"    round-trip (~T∘T)(x)=x : "
+          f"{all(abs((~T)(T(v)) - v) < 1e-12 for v in (-2.0, 0.0, 7.5))}")
+    w = T.lineage('chrono')
+    print(f"    u = {w.u_total():.6g}   Γ = {w.gamma():.6g}   "
+          f"firing defect (g-1)ln s = {w.firing_defect():+.6g}")
+    print(f"    chrono: {w.as_equation()}")
+    print(f"    zeta  : {T.lineage('zeta').as_equation()}")
+    print(f"    smith : {T.to_smith()['notation']}")
+    print(f"\n  FAST INVERSE SQUARE ROOT  (0x5f3759df)  —  ADD:SCALE:SIGN in log2:")
+    for k, v in fisr_word(x).items():
+        print(f"    {k:28s} {v}")
+    print()

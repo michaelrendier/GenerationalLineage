@@ -473,6 +473,108 @@ bit-for-bit to `mol`. Ported from an independent build,
 `PtolemyDesktop/Archimedes/UnitVector.py` (verified there first against the
 same Tesla/Joule derivations), not re-derived from scratch here.
 
+### 4.12 The generational lineage of a Clay Millennium Problem  `[TUTORIAL — new factoring methods]`
+
+`engine/clay.py`. The same decomposition discipline this file runs on numbers,
+processes and units, applied to the **seven Clay Millennium Problems** — each
+read as a *decomposed object* / structural mapping, with **Poincaré as the
+control** (it is solved). The full engine output is at the end of this README;
+this section documents the two factoring methods added to make it possible.
+
+```python
+from engine import (clay_lineage_report, generational_lineage_of,
+                    descriptive_or_definitional, import_deficit, CLAY)
+
+generational_lineage_of('riemann')   # one problem's decomposition dict
+clay_lineage_report()                # all seven + the consistency check + the bone
+```
+
+**This is a curated structural mapping with a consistency checker — not a
+derivation of any conjecture.** `check_consistency()` verifies five internal
+invariants (I1–I5); `clay.py`'s value is that the machine confirms the mapping
+is self-consistent and that **Poincaré is the only one of the seven with no
+import deficit.**
+
+#### New method 1 — `descriptive_or_definitional(builds, imported_symbol)`
+
+Classify an object by whether it carries a construction of its own answer:
+
+- **DEFINITIONAL** — a procedure that *produces* the answer. The Sieve produces
+  the primes; Ricci flow produces the diffeomorphism to S³. Remove nothing and
+  it still computes.
+- **DESCRIPTIVE** — it *references* a set or quantity it does not build. ζ(s)
+  references its zeros; an L-function references its order of vanishing at
+  `s = 1`. It needs that piece supplied from outside.
+
+This generalises the RH-addendum move (`RiemannHypothesisProof/ADDENDUM_
+generational_lineage_2026-08-28.md` §A): ζ is descriptive, the "313 Sieve" is
+definitional, and the pair is a *decomposition detector* — does the object build
+its answer, or import it?
+
+#### New method 2 — `import_deficit(problem)`
+
+The **single piece** the problem's generational lineage cannot derive from the
+tier-0 floor (ADD / SCALE / SIGN). `None` iff the problem is solved (its central
+tool is definitional). For the open six, **this string *is* the open problem.**
+
+#### The result (the "bone")
+
+Run the lineage on all seven. Poincaré — the solved one — is the only one whose
+central tool is DEFINITIONAL and whose lineage terminates with no deficit. Every
+open problem has a DESCRIPTIVE central object that imports **exactly one** piece
+its lineage cannot derive, and that imported piece *is* the open problem. **A
+problem is open exactly when it is described but not constructed; solving it
+means supplying the one missing construction.** Four of the six fit the pattern
+cleanly (RH, Yang–Mills, P vs NP, BSD); two are reframed by it (Navier–Stokes —
+the singularity as a coordinate artifact of a dropped channel; Hodge — an
+emptiness claim about an irreducible set).
+
+`decompose_h_rb_hat()` and `shape_diff_navier_stokes()` (same module) do the
+same move at the operator level: **0_RB is the reference decomposition a
+well-formed equation must match.** `decompose_h_rb_hat` breaks `Σ_RB` into its
+tier-0 pieces (`Σ_p`=ADD, `p^{-σ}`=SCALE, `R̂_p=xp`=SCALE, `B̂_p`=SIGN,
+`∂̂_∂M`=SIGN, `†`=SIGN, self-adjoint=SIGN) and confirms the shape matches 0_RB
+(whole Two-Trees span, 8 DOF, †-fixed) with one import — "a self-adjoint domain
+exists". `shape_diff_navier_stokes` compares standard NS (LAURELIN only, no
+SIGN, blow-up flag fires) to halocline-modified NS (adds one operator, `∂̂_∂M`
+the critical-angle interface, which brings `B̂` and `†`; shape then matches
+0_RB, flag clears) — **the shadow of the missing operator in standard NS is the
+halocline.**
+
+### 4.13 General spectral decomposition — factoring wavelengths  `[not sedenion-specific]`
+
+`engine/spectral.py`. "Spectral analysis IS factoral decomposition, using a
+different order datum" (Cody). This engine factors numbers, processes, units and
+the sieve; this module adds **factoring a signal into its wavelengths**, with
+the leftover reported as the residual — the BAO "what no component absorbs"
+reading, made general. stdlib + numpy, works on any real or complex sequence.
+
+```python
+from engine import spectral_decompose, spectral_lines, spectral_residue, dominant_period
+
+d = spectral_decompose(signal, keep='auto')      # or keep=int, keep='all'
+d['wavelength_factors']   # the leaves: [{wavelength, freq, amplitude, phase, power, rel_power}, ...]
+d['residual']             # what no wavelength absorbs
+d['residual_rel']         # RMS residual / RMS signal  (0 = fully resolved)
+d['round_trip_exact']     # Parseval: do the lines carry all the signal's energy?
+d['residue_plateaus_at']  # kept lines past which the residual stops moving
+```
+
+| function | does |
+|---|---|
+| `dft` / `idft` / `power_spectrum` | the transform and `|X|²/N` |
+| `spectral_lines(x, top=, min_rel_power=)` | the wavelength factors, strongest first; real inputs merge the ±k bins |
+| `reconstruct(lines, n)` | sum the identified components back |
+| `spectral_residue(x, keep)` | keep the top `keep` lines, subtract, report the leftover |
+| `autocorrelation` / `dominant_period` | frequency-space period detection — complements the position-space `repeat_distances` / Kasiski already here |
+| `spectral_decompose(x, keep=)` | the full report + a **residue convergence trace** (residual_rel vs lines kept; flags where it plateaus — the generalisation of "the residue does not move once the real content is out") |
+
+*Reading:* signal = composite; each `wavelength_factor` = an irreducible leaf;
+residual = the residue no wavelength absorbs. Verified: 3 planted sinusoids +
+noise → all three λ, amplitudes and phases recovered, round-trip Parseval error
+`1e-15`, residual = the noise floor, plateau detected. `SedenionSpectralRelativity`
+remains the sedenion-specific spectrograph; this is the algebra-free tool.
+
 ### 4.8 The reports
 
 ```python
@@ -653,6 +755,200 @@ starts after this README.
 
 ---
 
+## The Seven Clay Millennium Problems — Generational Lineage Output
+
+Raw output of `python3 -m engine.clay` (`engine/clay.py`, §4.12). A curated
+structural mapping with a consistency checker — **not** a derivation of any
+conjecture. Poincaré is the control (solved). Regenerate rather than hand-edit.
+
+```
+==============================================================================
+GENERATIONAL LINEAGE — THE SEVEN CLAY MILLENNIUM PROBLEMS
+==============================================================================
+ #  problem                            status  tier root   two-trees  kind         verdict
+--------------------------------------------------------------------------------------------
+ 7  Poincaré Conjecture                SOLVED     1 SCALE  TELPERION  DEFINITIONAL CONTROL
+ 1  Riemann Hypothesis                 OPEN       2 SIGN   MINGLING   DESCRIPTIVE  CONFIRM
+ 2  Yang–Mills Existence and Mass Gap  OPEN       3 ADD    MINGLING   DESCRIPTIVE  CONFIRM
+ 3  Navier–Stokes Existence & Smoothness OPEN     1 SCALE  LAURELIN   DESCRIPTIVE  CONFOUND
+ 4  P vs NP                            OPEN       3 ADD    LAURELIN   DESCRIPTIVE  CONFIRM
+ 5  Hodge Conjecture                   OPEN       3 SIGN   LAURELIN   DESCRIPTIVE  CONFOUND
+ 6  Birch and Swinnerton-Dyer          OPEN       3 ADD    MINGLING   DESCRIPTIVE  CONFIRM
+
+consistency: HOLDS (I1, I2, I3, I4, I5 over 7 problems)
+control: Poincaré Conjecture
+fits the pattern (CONFIRM): Riemann Hypothesis, Yang–Mills, P vs NP, Birch and Swinnerton-Dyer
+reframes it (CONFOUND):     Navier–Stokes, Hodge Conjecture
+
+── [7] Poincaré Conjecture  (SOLVED) — CONTROL
+   object     : a simply-connected closed 3-manifold M³ — is M³ ≅ S³?
+   central op : Ricci flow with surgery  (∂g/∂t = −2 Ric, cut at singularities)
+   floor      : tier 1, root SCALE, TELPERION, DEFINITIONAL
+   bone       : the tool is DEFINITIONAL: Ricci flow *constructs* the diffeomorphism to S³;
+                nothing is imported; the lineage terminates — every simply-connected closed
+                3-manifold flows to the round S³. Solved because the tool builds the answer.
+
+── [1] Riemann Hypothesis  (OPEN)
+   object     : the non-trivial zeros of ζ(s) — do they all lie on Re(s)=½?
+   central op : analytic continuation + the explicit formula ψ(x) = x − Σ_ρ x^ρ/ρ − …
+   floor      : tier 2, root SIGN, MINGLING, DESCRIPTIVE
+   IMPORTS    : the locus of the imported zero set {ρ} — i.e. C1 / the Berry–Keating
+                self-adjointness step. ζ describes the zeros; the Sieve (definitional) would
+                place them.
+   emergence  : a fixed set (the nodal line) whose dimension must be shown to equal the
+                reflection's fixed set — not yet shown
+   bone       : ζ is DESCRIPTIVE — every operation it performs is on the floor (∏=SCALE,
+                Σlog=ADD, s↔1−s=SIGN, σ=SCALE knob) EXCEPT the sum over zeros, a set it does
+                not build. That one import is the whole of RH. The Two Trees partition (a
+                zero-gradient harmonic field) gives a construction-side route to the same
+                nodal line.
+
+── [2] Yang–Mills Existence and Mass Gap  (OPEN)
+   object     : the mass gap Δ>0 — the least energy of a non-vacuum state; and existence of
+                the 4-D quantum theory
+   central op : the spectral infimum above the vacuum (a difference of eigenvalues);
+                non-abelian self-interaction [A_μ,A_ν]
+   floor      : tier 3, root ADD, MINGLING, DESCRIPTIVE
+   IMPORTS    : the 10³ factor in GAP = Ω_ZS − d*·ln10 ≈ 1/(1000√2). The 1/√2 is the σ=½
+                symmetry (SIGN); the 10³ = the count of Cayley–Dickson doublings / d*_RG —
+                not derived from first principles.
+   emergence  : a graded quantity (the gap magnitude) sitting where the sign structure is
+                one bit — the magnitude is the un-named part
+   bone       : Δ>0 is structurally forced — the vacuum and the first excited state cannot
+                coincide because the identities are separated at the Mingling. What is
+                imported is one scalar factor (10³), exactly the way RH imports one set.
+
+── [3] Navier–Stokes Existence and Smoothness  (OPEN)
+   object     : global-in-time smoothness of 3-D incompressible flow — or a finite-time
+                singularity
+   central op : advection u·∇u (self-SCALE, gain>1 threat) + diffusion νΔu (ADD, the
+                Laplacian average) + incompressibility ∇·u=0 (a constraint = COROLLARY)
+   floor      : tier 1, root SCALE, LAURELIN, DESCRIPTIVE
+   IMPORTS    : the discarded imaginary / Blue channel. NS = Yang–Mills with i → 0; the
+                construction (restore i, show the apparent blow-up is a bounded 90° rotation
+                into the Blue half) is not done — see Ainulindale/wiki/106.
+   emergence  : THE canonical §5 signature — a quantity (the velocity gradient) that changes
+                length without bound where only isometries were in play
+   bone       : the singularity is read as a coordinate artifact of dropping the Blue
+                channel: a SIGN rotation (r↔1/r, θ→θ+π/2) misread as unbounded SCALE. R̂†=B̂
+                ⇒ the Noether current can only rotate, not be destroyed. Confounds "maybe it
+                blows up" — the blow-up is the shadow of a discarded half.
+
+── [4] P vs NP  (OPEN)
+   object     : is every quickly-checkable problem quickly-solvable? (search ≟ verification)
+   central op : verification (one forward pass = ADD) vs search (a bifurcation tree = tier-1
+                SCALE); J_red (forward) vs J_blue (reverse), adjoint but not isomorphic
+   floor      : tier 3, root ADD, LAURELIN, DESCRIPTIVE
+   IMPORTS    : the bridge: proving "adjoint ≠ isomorphic in the sedenion" ⇒ "P ≠ NP as a
+                complexity statement". A THEORETICAL step, not a reduction.
+   bone       : verification is J_red (forward, cheap); search is J_blue (reverse). In a
+                non-commutative algebra the reverse traversal is NOT the forward one — it
+                carries information forward does not. So P ≠ NP structurally: the adjoint
+                costs more. Confirms the expected answer, with a mechanism.
+
+── [5] Hodge Conjecture  (OPEN)
+   object     : is every rational Hodge class of type (p,p) a rational combination of
+                classes of algebraic subvarieties?
+   central op : the Hodge decomposition Hⁿ = ⊕ H^{p,q} (splitting into reflection
+                eigen-subspaces = tier-2 SIGN) + the cycle class map (subvarieties →
+                cohomology = an ADD-sublattice)
+   floor      : tier 3, root SIGN, LAURELIN, DESCRIPTIVE
+   IMPORTS    : the missing cycles — a construction that produces an algebraic cycle for
+                every Hodge class (or a proof that none beyond the known ones is needed).
+   emergence  : a fixed set of possibly the wrong dimension — H^{p,p}(ℚ) may exceed the span
+                of algebraic cycles; the conjecture asserts the dimensions match
+   bone       : the lineage reads Hodge as the claim "the TELPERION set at type (p,p) is
+                empty — there is no Hodge class that cannot be built from cycles". That is
+                the *opposite* shape to RH, where the irreducibles (the primes) are the
+                entire point. Hodge is an emptiness claim about an irreducible set.
+
+── [6] Birch and Swinnerton-Dyer  (OPEN)
+   object     : for an elliptic curve E/ℚ: does rank E(ℚ) = ord_{s=1} L(E,s)? (algebraic
+                rank ≟ analytic rank)
+   central op : rank = count of free generators of E(ℚ) ≅ ℤ^r (tier-3 ADD); ord_{s=1} L =
+                multiplicity of a zero (tier-3 ADD)
+   floor      : tier 3, root ADD, MINGLING, DESCRIPTIVE
+   IMPORTS    : the r ≥ 2 construction — a map between analytic rank and r independent
+                rational points, general r (known: r = 0, 1 — Gross–Zagier, Kolyvagin).
+   emergence  : a collision that unpacks where the encoder should have made it impossible —
+                two unrelated machineries (algebraic count, analytic count) conjectured to
+                always agree
+   bone       : BSD is the RH descriptive-vs-definitional split localised to one curve: the
+                L-function (descriptive) vs the rank (definitional, count the generators).
+                Same pattern, one object.
+
+==============================================================================
+THE BONE
+==============================================================================
+Poincaré — the one that is SOLVED — is the only one of the seven whose central
+tool is DEFINITIONAL (Ricci flow constructs the diffeomorphism; nothing imported)
+and whose lineage terminates with no deficit. Every OPEN problem has a
+DESCRIPTIVE central object that imports exactly one piece its lineage cannot
+derive from ADD/SCALE/SIGN — and that imported piece IS the open problem:
+
+  · Riemann Hypothesis  → the locus of the imported zero set {ρ}  (C1 / Berry–Keating)
+  · Yang–Mills          → the 10³ factor in GAP ≈ 1/(1000√2)  (the doubling count / d*_RG)
+  · Navier–Stokes       → the discarded Blue channel  (NS = Yang–Mills with i → 0)
+  · P vs NP             → the bridge  non-commutativity ⇒ complexity bound
+  · Hodge               → the missing cycles  (or a proof none are needed)
+  · Birch–Swinnerton-Dyer → the r ≥ 2 construction  (known: r = 0, 1)
+
+A problem is open exactly when it is DESCRIBED but not CONSTRUCTED. Solving it
+means supplying the one missing construction.
+```
+
+The same treatment lives, per problem, on the Ainulindalë wiki
+(`13`, `50`, `38`, `93`, `105`, `106`) and on `ValaQuenta/wiki/clay_millennium.md`;
+the Riemann case is developed at length in
+`RiemannHypothesisProof/ADDENDUM_generational_lineage_2026-08-28.md`.
+
+---
+
+## ValaQuenta — Generational Lineage Calibration
+
+`engine/valaquenta_calibration.py` (`python3 -m engine.valaquenta_calibration`).
+The Millennium problems are *open* objects — of course they import. **ValaQuenta
+is working, deliberately-designed machinery**, so running the same decomposition
+on every ValaQuenta engine is a **calibration check on the factoral
+decomposition itself**: a well-designed engine should come out **CLEAN**
+(DEFINITIONAL, one clean tier-0 root, a definite Two-Trees node, no import
+deficit, no emergence signature). The calibration number is *does the
+generational-lineage verdict agree with ValaQuenta's own status label?*
+
+```
+engines            : 46
+CLEAN              : 22   (decompose as designed)
+DESCRIPTIVE-OK     :  6   (instruments / renderers / validators — construct nothing by design)
+FLAGGED            : 18   (an import deficit or an emergence signature)
+
+agreement w/ status: 0.957   (verdict matches ValaQuenta's own ESTABLISHED / THEORETICAL /
+                              CONJECTURE / OPEN / UNTESTED / defect label)
+confusion : CLEAN∩ESTABLISHED 21 · CLEAN∩soft 1 · FLAGGED∩soft 17 · FLAGGED∩ESTABLISHED 1
+roots     : SCALE 16 · SIGN 15 · ADD 14   (no bias in the tier-0 classifier)
+trees     : LAURELIN 25 · MINGLING 11 · TELPERION 10   (most engines construct → Laurelin)
+
+disagreements (the signal) —
+  · bao_mass_gap   : FLAGGED (the 10³ factor is un-derived; "Δ = 1/(1000√2)" is a 3-sig-fig
+                     coincidence, and the "spectral residue" is the same Ω−d*·ln10 subtraction
+                     renamed) but the page says ESTABLISHED. See the Claim audit on that page.
+  · t32_nilpotency : CLEAN (the trace-Laplacian test constructs cleanly) but the page says
+                     THEORETICAL — the decomposition rates this engine more solid than its label.
+
+  Was 3 disagreements — `noether` (recorded `forced_sigma` large-E defect) FIXED 2026-08-28
+  (the balance F=B is linear in σ; one Newton step from any σ₀); FLAG cleared.
+```
+
+**Reading:** 95.7% agreement between an independent structural decomposition and
+the hand-assigned status labels, on ~46 engines that were each explicitly
+designed, is the calibration — the factoral decomposition recovers the design
+status. The 18 FLAGGED-and-soft and 20 CLEAN-and-ESTABLISHED engines are the
+method and the labels confirming each other; the 2 off-diagonal pairs are the
+only places worth a second look. Per-engine blocks are appended toward the
+bottom of each `ValaQuenta/wiki/*.md` page. Scripts:
+`.claude/scratchpad/2026-08-28_valaquenta-calibration/`.
+
+---
+
 ## Structure
 
 ```
@@ -667,12 +963,61 @@ engine/
                  imported first and unconditionally by engine/__init__.py.
   tools.py     — runnable reports over maths.py and lineage.py (§4.8).
   oscilloscope.py — the two-panel Fermat→Riemann oscilloscope (§4.8).
+  bio.py       — STUB: the biological factoral tower (knot 𝕊 → molecule T₃₂ →
+                 DNA T₆₄ → protein T₁₂₈ → genome T₂₅₆). Structural only.
+  clay.py      — §4.12: the generational lineage of the seven Clay Millennium
+                 Problems, Poincaré the control. Curated mapping + consistency
+                 checker; the two new factoring methods
+                 (descriptive_or_definitional, import_deficit).
+  valaquenta_calibration.py — the same decomposition run on every ValaQuenta
+                 engine, as a calibration check on the factoral decomposition
+                 itself. 0.957 agreement with ValaQuenta's own status labels.
+                 Per-engine block appended to each ValaQuenta/wiki/*.md page.
 wiki/
   Sedenion-Factoral-Relativity.md — fuller theory write-up, open design
   questions this README doesn't cover.
 ```
 
 ## Status
+
+v2.10 (2026-08-28) — GENERAL SPECTRAL DECOMPOSITION (`engine/spectral.py`, §4.13)
++ SHAPE-MATCH DECOMPOSERS (`decompose_h_rb_hat`, `shape_diff_navier_stokes` in
+the calibration module). `spectral.py` factors any real/complex signal into its
+wavelengths with the leftover as the residual (the BAO reading, made general):
+`spectral_decompose` / `spectral_lines` / `spectral_residue` / `dominant_period`
++ a residue-convergence trace. **Not sedenion-specific.** Verified: 3 planted
+sinusoids + noise → all λ, amplitudes, phases recovered; Parseval round-trip
+`1e-15`. `shape_diff_navier_stokes` names the missing operator in standard NS
+(`∂̂_∂M` = the halocline; standard NS is LAURELIN-only, no SIGN, the blow-up flag
+fires; halocline-NS adds `∂̂_∂M` + `B̂` + `†`, shape matches 0_RB, flag clears).
+Relations still 44/44; calibration still 0.957.
+
+v2.9 (2026-08-28) — THE VALAQUENTA CALIBRATION (`engine/valaquenta_calibration.py`):
+the generational-lineage decomposition run on **every ValaQuenta engine** (46) as
+a calibration check on the factoral decomposition itself — working machinery
+should decompose CLEAN. Result: **0.957 agreement** between the lineage verdict
+(CLEAN / DESCRIPTIVE-OK / FLAGGED) and ValaQuenta's own status label; 21 CLEAN∩
+ESTABLISHED, 17 FLAGGED∩soft, 2 off-diagonal (`bao_mass_gap`, `t32_nilpotency`).
+A 3rd off-diagonal — `noether`'s recorded `forced_sigma` large-E defect — was
+**fixed** 2026-08-28 (the balance `F=B` is `E(1−2σ)=0`, linear in σ; solved in
+one Newton step from any σ₀), and the BAO "spectral residue = mass gap exactly"
+claim was **audited** (disproven as stated; `Δ>0` and `Δ ≈ Ω−d*·ln10` stand,
+`Δ = 1/(1000√2)` is a 3-sig-fig coincidence). Per-engine block appended toward
+the bottom of each `ValaQuenta/wiki/*.md`. Relations still 44/44.
+
+v2.8 (2026-08-28) — THE CLAY LINEAGE (`engine/clay.py`, §4.12): the seven Clay
+Millennium Problems run through the same decomposition discipline this engine
+applies to numbers, processes and units — each read as a decomposed object /
+structural mapping, with **Poincaré as the control**. Two new factoring methods:
+`descriptive_or_definitional` (does the object build its answer or import it?)
+and `import_deficit` (the one tier-0-underivable piece — `None` iff solved). The
+result: Poincaré alone is DEFINITIONAL and deficit-free; every open problem is
+DESCRIPTIVE and names exactly one import — *a problem is open exactly when it is
+described but not constructed*. `check_consistency()` verifies five invariants
+(I1–I5), all hold. Curated mapping, not a derivation. Full output at the end of
+this README. Also filed:
+`RiemannHypothesisProof/ADDENDUM_generational_lineage_2026-08-28.md`. Relations
+still 44/44.
 
 v2.7 (2026-08-25) — THE UNIT LINEAGE (`PW16`): units as a THIRD domain for
 this file's own decomposition discipline (numbers, processes, now

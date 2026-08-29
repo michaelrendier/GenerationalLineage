@@ -507,6 +507,140 @@ def factor_lineage(n: int) -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# THE SIEVE IS THE GENERATIONAL LINEAGE  (2026-08-27)
+# ───────────────────────────────────────────────────────────────────────────
+# Cody: "The Sieve IS Generational Lineage ... fibonacci under factoring waves
+# ... the list of primes is the list of decompositional order, the ordinal
+# values."  Measured in VAPMIP/engines/e10 (R10–R12) and here:
+#
+#   • composite n is first struck on the pass of prime spf(n);
+#     generation(n) = π(spf(n))  — the ordinal index of that prime.
+#   • the sieve is ONE deterministic forward sweep of π(√N) passes: no
+#     iteration to a fixed point, no backtracking.  This is why the factoral
+#     lineage is STABLE — one pass per prime, not a convergence.
+#   • Legendre count:  φ(x,a) = φ(x,a−1) − φ(x/pₐ, a−1)  — Fibonacci's linear
+#     two-term shape, with the 2nd term's argument SCALED by a prime (a
+#     "factoring wave") instead of the index shifted by 1.
+#   • closed form:  φ(x,a) = Σ_{d | Pₐ} μ(d)·⌊x/d⌋
+#                 = ADD (Σ_d) ∘ SIGN (μ(d) ∈ {−1,0,+1}) ∘ SCALE (⌊x/d⌋).
+#   • the ordinal (ascending prime) order is the ONLY one for which
+#     generation = π(spf); it also minimises the generation entropy.  A
+#     Riemann-ζ weight order (primes by ln p/√p) finds the same primes and a
+#     disjoint partition, but scrambles the generation map.
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def _spf_table(n: int) -> List[int]:
+    """smallest prime factor of every k in 0..n (0 for the Mingling 0, 1)."""
+    s = [0] * (n + 1)
+    for i in range(2, n + 1):
+        if s[i] == 0:
+            for j in range(i, n + 1, i):
+                if s[j] == 0:
+                    s[j] = i
+    return s
+
+
+def _mobius_table(n: int) -> List[int]:
+    mu = [1] * (n + 1)
+    mu[0] = 0
+    flags = _sieve(n)
+    for p in range(2, n + 1):
+        if not flags[p]:
+            continue
+        for j in range(p, n + 1, p):
+            mu[j] *= -1
+        for j in range(p * p, n + 1, p * p):
+            mu[j] = 0
+    return mu
+
+
+def _sieve_traced(N: int, order):
+    """Sieve marking multiples in `order`; record the pass that FIRST strikes
+    each k and how many passes did real work."""
+    marked_on = [None] * (N + 1)
+    working = 0
+    for pass_i, p in enumerate(order):
+        if p * p > N:
+            continue
+        working += 1
+        for k in range(p * p, N + 1, p):
+            if marked_on[k] is None:
+                marked_on[k] = pass_i
+    return marked_on, working
+
+
+def _phi_legendre(x: int, a: int, primes) -> int:
+    """φ(x,a): count of 1..x divisible by none of the first a primes.
+    φ(x,a) = φ(x,a−1) − φ(x/pₐ, a−1) — the Fibonacci-shaped recurrence."""
+    if a == 0:
+        return x
+    return _phi_legendre(x, a - 1, primes) - _phi_legendre(x // primes[a - 1], a - 1, primes)
+
+
+def sieve_lineage(N: int = 20_000, order: str = 'ordinal') -> Dict[str, Any]:
+    """The Sieve read as the generational lineage of every integer ≤ N.
+
+    order = 'ordinal'    ascending prime — generation(n) = π(spf(n)), the
+                         canonical (minimum-entropy) decomposition order
+          = 'zeta'       primes by ln p/√p descending (σ=½ von-Mangoldt weight)
+          = 'descending' largest prime first (greatest-prime-factor order)
+    """
+    spf = _spf_table(N)
+    primes = [k for k in range(2, N + 1) if spf[k] == k]
+    if order == 'zeta':
+        seq = sorted(primes, key=lambda p: math.log(p) / math.sqrt(p), reverse=True)
+    elif order == 'descending':
+        seq = sorted(primes, reverse=True)
+    else:
+        seq = sorted(primes)
+    pos = {p: i for i, p in enumerate(seq)}
+    marked_on, working = _sieve_traced(N, seq)
+    comps = [n for n in range(4, N + 1) if spf[n] != n]
+    root_primes = sum(1 for p in primes if p * p <= N)
+    return {
+        'N': N, 'order': order, 'order_head': seq[:8],
+        'working_passes': working, 'pi_sqrt_N': root_primes,
+        'one_pass_per_prime': working == root_primes,
+        'generation_matches_pi_spf': all(marked_on[n] == pos[spf[n]] for n in comps),
+        'n_composites': len(comps),
+        'generation_of': {n: marked_on[n] for n in comps},
+    }
+
+
+def sieve_recurrence(x: int = 30_030, a: int = 6) -> Dict[str, Any]:
+    """"Fibonacci under factoring waves": the two-term Legendre recurrence and
+    its signed-division-wave closed form, decomposed against ADD/SCALE/SIGN."""
+    primes = [p for p, ok in enumerate(_sieve(max(200, 2 * a * a))) if ok]
+    trace = []
+    ok = True
+    for aa in range(1, a + 1):
+        r = _phi_legendre(x, aa, primes)
+        t1 = _phi_legendre(x, aa - 1, primes)
+        t2 = _phi_legendre(x // primes[aa - 1], aa - 1, primes)
+        d = sum(1 for k in range(1, x + 1) if all(k % p for p in primes[:aa]))
+        ok &= (r == d == t1 - t2)
+        trace.append({'a': aa, 'p_a': primes[aa - 1], 'phi': r,
+                      'term1': t1, 'term2_scaled': t2, 'direct': d})
+    Pa = 1
+    for p in primes[:a]:
+        Pa *= p
+    mu = _mobius_table(Pa)
+    closed = sum(mu[dd] * (x // dd) for dd in range(1, Pa + 1) if Pa % dd == 0)
+    return {
+        'x': x, 'a': a, 'P_a': Pa,
+        'recurrence_trace': trace,
+        'recurrence_exact': ok,
+        'closed_form_sum_mu_floor': closed,
+        'closed_form_matches': closed == _phi_legendre(x, a, primes),
+        'decomposition': {'sum_d': 'ADD', 'mu(d)': 'SIGN in {-1,0,+1}',
+                          'floor(x/d)': 'SCALE'},
+        'fibonacci_note': 'F(n)=F(n-1)+F(n-2) is the degenerate case where p_a '
+                          'acts as a +1 index shift instead of an x/p_a scaling',
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # RING-THEORY MACHINERY (2026-08-22)
 # ═══════════════════════════════════════════════════════════════════════════
 # The factoral tower, named in its proper ring theory. The unifying statement,
@@ -1464,11 +1598,11 @@ def decompose(operation: str) -> Dict[str, Any]:
         return {
             'operation': operation, 'tier': tier, 'descends_from': descends,
             'status': 'PRIMITIVE' if tier == 0 else 'DERIVED',
-            'note': note, 'known': True,
+            'root': ROOT_OF.get(key), 'note': note, 'known': True,
         }
     return {
         'operation': operation, 'tier': None, 'descends_from': None,
-        'status': 'UNPLACED',
+        'root': None, 'status': 'UNPLACED',
         'note': 'Not in the domain. Per section 5 of the skill this is the '
                 'EMERGENCE SIGNAL, not a licence to invent a tier: either show '
                 'it is reachable by composition from ADD/SCALE/SIGN, or accept '
@@ -1476,6 +1610,82 @@ def decompose(operation: str) -> Dict[str, Any]:
                 'than a name.',
         'known': False,
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ADD / SCALE / SIGN — the roll-down, and the Aff(1,R) factor structure
+# ───────────────────────────────────────────────────────────────────────────
+# decompose() places an operation on a tier and names its immediate parent.
+# root_irreducible() finishes the walk: past REFLECT/DILATE, past every fixed
+# set and every count, down to the ONE tier-0 irreducible it rests on.
+#
+#     ADD    the flow / the fold COUNT      identity 0,  gain 0,  Axis {+,-}
+#     SCALE  the size / the gain            identity 1,  gain 1,  Axis {x,/}
+#     SIGN   the direction / one bit        even parity, det ±1,  no middle
+#
+# REFLECT is SIGN + a fixed axis, so anything whose content is a reflection, a
+# parity, or a fixed set OF a reflection roots on SIGN; anything that changes a
+# length roots on SCALE; only the raw flow / count roots on ADD.
+#
+#     Aff(1,R) = R ⋊ (R_{>0} × Z/2) = ADD ⋊ (SCALE × SIGN)
+#              = (fold COUNT) ⋊ (fold SIZE × fold DIRECTION)
+# The product is semidirect, not direct: SCALE and SIGN reparametrise ADD, and
+# [SCALE, ADD] = ADD is the one non-trivial bracket. ADD alone is affine (no
+# fixed point); SCALE alone is linear (fixes 0); together = every 1-D similarity.
+# ═══════════════════════════════════════════════════════════════════════════
+
+ROOT_OF: Dict[str, str] = {
+    'add': 'ADD', 'scale': 'SCALE', 'sign': 'SIGN', 'gcd': 'SCALE',
+    'reflect': 'SIGN', 'rotate': 'SIGN', 'dilate': 'SCALE', 'contract': 'SCALE',
+    'derivative': 'ADD', 'quotient': 'SCALE',
+    'bifurcation': 'SCALE', 'spiral': 'SCALE', 'tuning': 'SCALE',
+    'vector': 'SIGN', 'boundary': 'SIGN', 'origin': 'SIGN', 'fulcrum': 'SIGN',
+    'anchor': 'SIGN', 'balance': 'SIGN', 'ideal': 'SIGN', 'radical': 'SIGN',
+    'zero-divisor': 'SIGN', 'basin': 'SIGN', 'pathway': 'ADD',
+    'inside-outside': 'SIGN',
+    'chirality': 'SIGN', 'factorial': 'SIGN', 'factoral': 'SIGN',
+    'leverage': 'SIGN', 'unit': 'SCALE', 'associator': 'SIGN',
+    'primary-decomposition': 'ADD', 'self-similar': 'SCALE', 'fractal': 'SCALE',
+    'orbit-trap': 'ADD', 'orbit-curvature': 'SIGN', 'lyapunov': 'SCALE',
+}
+
+AFF1: Dict[str, Any] = {
+    'group': 'Aff(1,R) = R ⋊ (R_{>0} × Z/2) = ADD ⋊ (SCALE × SIGN)',
+    'reading': '(fold COUNT) ⋊ (fold SIZE × fold DIRECTION)',
+    'bracket': '[SCALE, ADD] = ADD   (the only non-trivial one)',
+    'identities': ('0', '1', '+1'),
+    'factors': (
+        ('ADD',   'R',      'the normal factor — translations, the flow, order-dependent'),
+        ('SCALE', 'R_{>0}', 'scales the translation; ≅ ADD in the log chart'),
+        ('SIGN',  'Z/2',    'flips the translation; commutes with SCALE; one bit'),
+    ),
+}
+
+
+def root_irreducible(operation: str) -> Dict[str, Any]:
+    """Walk an operation past its tier and immediate parent, all the way down
+    to the tier-0 irreducible it rests on: ADD, SCALE or SIGN.
+
+    Returns the decompose() dict extended with 'root' and 'root_path'. A None
+    root on a KNOWN operation means the roll-down table has a gap (report it);
+    a None root on an UNKNOWN operation is the section-5 emergence signal.
+    """
+    d = decompose(operation)
+    key = operation.strip().lower()
+    root = ROOT_OF.get(key)
+    if root is None and d['known']:
+        d['root_path'] = 'KNOWN operation, no roll-down entry — table gap, please fill'
+    elif root is None:
+        d['root_path'] = 'UNPLACED — section-5 emergence signal, not a new root'
+    else:
+        chain = [operation]
+        if d.get('descends_from') and d['descends_from'] not in ('—', root):
+            chain.append(d['descends_from'])
+        if d['tier'] != 0:
+            chain.append(root)
+        d['root_path'] = ' ← '.join(chain)
+    d['root'] = root
+    return d
 
 
 # ═══════════════════════════════════════════════════════════════════════════
