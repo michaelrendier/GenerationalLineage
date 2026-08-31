@@ -640,6 +640,126 @@ def sieve_recurrence(x: int = 30_030, a: int = 6) -> Dict[str, Any]:
     }
 
 
+# ───────────────────────────────────────────────────────────────────────────
+# THE RECURSIVE UN-SIEVE  (2026-08-30)
+# ───────────────────────────────────────────────────────────────────────────
+# `sieve_lineage` watches the composites FALL — die on the pass of their
+# smallest prime factor, `generation(n) = π(spf(n))`, extinction order.
+#
+# The un-sieve watches them ARRIVE. Ground state: "Just Prime Numbers" — only
+# primes exist. Turn primes on one at a time; a composite is BORN the moment
+# its LAST needed prime factor is switched on. Four orders:
+#
+#   A  extinction low→high   gen = rank_asc(spf(n))   the classic sieve
+#   B  extinction high→low   gen = rank_desc(gpf(n))  strike big primes first
+#   C  birth      low→high   gen = rank_asc(gpf(n))   un-sieve, primes ascending
+#   D  birth      high→low   gen = rank_desc(spf(n))  un-sieve, primes descending
+#
+# Measured, N = 10^5 (`ContextPlease/claude/scratchpad/2026-08-30_prime-dna/`):
+#   • D == reverse(A) EXACTLY — birth high→low mirrors extinction low→high,
+#     bit for bit; H(A) = H(D) = 2.491 bits (reflection preserves entropy).
+#   • B == reverse(C) likewise; H(B) = H(C) = 9.685 bits.
+#   • The gpf orders carry ~4x the entropy of the spf orders: same composites,
+#     same information, spread over ~5000 generations instead of 65.
+#     H(C) − H(A) = +7.19 bits — the birth order is broad and flat where the
+#     death order is compact and front-loaded (55% of composites die on the
+#     p=2 pass alone).
+#   • Two boundary primes: extinction completes at the largest prime with
+#     p^2 <= N (= 313 for N=10^5 — the "313 Sieve"); birth completes at the
+#     largest prime with 2p <= N (= 49999). The sieve finishes KILLING at
+#     sqrt(N) but finishes BIRTHING at N/2. 60.5% of all composites are born
+#     AFTER the extinction boundary (gpf > 313) — the residual / fine
+#     structure, a mass-gap-like separation of the two scales.
+
+def _spf_gpf_tables(N: int):
+    spf = [0] * (N + 1)
+    primes: List[int] = []
+    for i in range(2, N + 1):
+        if spf[i] == 0:
+            spf[i] = i
+            primes.append(i)
+        for p in primes:
+            if p > spf[i] or i * p > N:
+                break
+            spf[i * p] = p
+    gpf = [0] * (N + 1)
+    for n in range(2, N + 1):
+        m, g = n, 1
+        while m > 1:
+            p = spf[m]
+            g = p
+            while m % p == 0:
+                m //= p
+        gpf[n] = g
+    return spf, gpf, primes
+
+
+def _entropy(hist: List[int]) -> float:
+    tot = sum(hist)
+    if not tot:
+        return 0.0
+    h = 0.0
+    for c in hist:
+        if c:
+            q = c / tot
+            h -= q * math.log2(q)
+    return h
+
+
+def un_sieve(N: int = 100_000) -> Dict[str, Any]:
+    """The recursive un-sieve: the four birth/extinction orders of the
+    composites <= N, the D == reverse(A) mirror, the C-vs-A residual, and the
+    two boundary primes. Companion to `sieve_lineage`."""
+    spf, gpf, primes = _spf_gpf_tables(N)
+    pi = {p: i for i, p in enumerate(primes)}
+    P = len(primes)
+    asc = lambda p: pi[p]
+    desc = lambda p: P - 1 - pi[p]
+    comps = [n for n in range(4, N + 1) if spf[n] != n]
+
+    gens = {
+        'A_extinction_lo_hi': [asc(spf[n]) for n in comps],
+        'B_extinction_hi_lo': [desc(gpf[n]) for n in comps],
+        'C_birth_lo_hi':      [asc(gpf[n]) for n in comps],
+        'D_birth_hi_lo':      [desc(spf[n]) for n in comps],
+    }
+    hists, summ = {}, {}
+    for k, g in gens.items():
+        h = [0] * P
+        for x in g:
+            h[x] += 1
+        hists[k] = h
+        nz = [i for i, c in enumerate(h) if c]
+        summ[k] = {'gen_range': (nz[0], nz[-1]), 'entropy_bits': _entropy(h),
+                   'top_pass_share': h[nz[0]] / len(comps)}
+
+    A, D = gens['A_extinction_lo_hi'], gens['D_birth_hi_lo']
+    mirror = all(D[i] == P - 1 - A[i] for i in range(len(comps)))
+
+    hA, hC = hists['A_extinction_lo_hi'], hists['C_birth_lo_hi']
+    resid = sorted(((g, hC[g] - hA[g]) for g in range(min(80, P))),
+                   key=lambda t: -abs(t[1]))[:8]
+
+    ext_b = max(p for p in primes if p * p <= N)
+    birth_b = max(p for p in primes if 2 * p <= N)
+    born_after = sum(1 for n in comps if gpf[n] > ext_b)
+
+    return {
+        'N': N, 'n_primes': P, 'n_composites': len(comps),
+        'orders': summ,
+        'D_equals_reverse_A': mirror,
+        'H_C_minus_H_A': _entropy(hC) - _entropy(hA),
+        'residual_C_minus_A_top': [(g, primes[g], r) for g, r in sorted(resid)],
+        'extinction_boundary_prime': ext_b,          # p^2 <= N  (313 @ 1e5)
+        'birth_boundary_prime': birth_b,             # 2p  <= N  (49999 @ 1e5)
+        'composites_born_after_extinction_boundary': born_after,
+        'residual_fraction': born_after / len(comps),
+        'note': ('extinction is compact/front-loaded (kills by sqrt(N)); birth '
+                 'is broad/flat (finishes at N/2). D mirrors A exactly; C is '
+                 'not a mirror — the gap is the fine structure.'),
+    }
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # RING-THEORY MACHINERY (2026-08-22)
 # ═══════════════════════════════════════════════════════════════════════════
