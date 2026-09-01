@@ -53,6 +53,15 @@ from .spectral import (
     autocorrelation, dominant_period, spectral_decompose,
 )
 
+from .emerger import (
+    # the ascent dual of lineage.py -- sedenion/CD bracketing & firing order
+    emerge as emerge_brackets, firing_order as bracket_firing_order,
+    verify as emerger_verify, report_emergence, lineage_report as emerger_lineage_report,
+    domain_of, on_zd_equator, is_zero_divisor as cd_is_zero_divisor,
+    sigma_rb as emerger_sigma_rb, scale_partitions, legal_orders,
+    bracketings_for, STANDARD_BRACKETINGS, CANONICAL_ORDER, coerce_vec,
+)
+
 from .add_scale_sign import (
     ASS, ASSWord, compose as ass_compose, word as ass_word,
     fast_inverse_sqrt, fisr_word, reduces_everything,
@@ -119,4 +128,10 @@ __all__ = [
     'SI_BASE', 'unit_vector', 'unit_mul', 'unit_div', 'unit_lineage_decompose',
     'repeat_distances', 'infer_period_by_stem_vote', 'vigenere_cipher',
     'permutation_cycles', 'permutation_order_direct', 'permutation_order_via_stems',
+    # the EMERGER -- ascent dual of lineage.py; sedenion/CD bracketing &
+    # firing order of emergence (generalized; SSR has the sedenion spectrograph)
+    'emerge_brackets', 'bracket_firing_order', 'emerger_verify',
+    'report_emergence', 'emerger_lineage_report', 'domain_of', 'on_zd_equator',
+    'cd_is_zero_divisor', 'emerger_sigma_rb', 'scale_partitions', 'legal_orders',
+    'bracketings_for', 'STANDARD_BRACKETINGS', 'CANONICAL_ORDER', 'coerce_vec',
 ]
