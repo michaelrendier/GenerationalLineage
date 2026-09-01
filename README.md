@@ -1,5 +1,5 @@
 # Sedenion Factoral Relativity
-### The Generational Lineage Engine
+### The Generational Lineage Engine — and its ascent dual, The Emerger
 
 *A tutorial. Read this before the papers — the papers assume you already know what "tier," "lineage," and "the two trees" mean; this document is where you learn it.*
 
@@ -575,6 +575,70 @@ noise → all three λ, amplitudes and phases recovered, round-trip Parseval err
 `1e-15`, residual = the noise floor, plateau detected. `SedenionSpectralRelativity`
 remains the sedenion-specific spectrograph; this is the algebra-free tool.
 
+### 4.14 The Emerger — the ascent dual  `[TUTORIAL — sedenion / CD bracketing]`
+
+`engine/emerger.py`. Full write-up: [`wiki/The-Emerger-Ascent-Dual.md`](wiki/The-Emerger-Ascent-Dual.md).
+
+Everything above this section runs **descent**: given an operator or a number,
+what built it — `factor_lineage`, `decompose`, the two trees, the tier test.
+Differentiate down. Writing.
+
+The Emerger runs **ascent**. Given a *bracketing* of a Cayley–Dickson algebra —
+an ordered partition of its imaginary units — which sub-domains does that
+grouping expose, and, because each domain needs the ones under it, in what
+**order** do the variables emerge. Integrate up. Reading. Spectroscopy.
+
+`e_0` (the real component) is never bracketed. It is the *tilt to the i axis* —
+the fixed reference every imaginary group is paired against. Each group `G`,
+with the anchor, spans `span({e_0} ∪ G)`, classified by closure:
+`|G|=1`→ℂ, `3`→ℍ, `7`→𝕆, anything not closed → **FRAGMENT** (a linear
+subspace, not a subalgebra — where zero divisors live).
+
+```python
+from engine import (report_emergence, emerge_brackets, bracket_firing_order,
+                     emerger_verify, domain_of, bracketings_for)
+
+report_emergence('e1+e10')            # 14/14 exact self-checks + a worked run
+# THE EMERGER -- sedenion bracketing & firing order
+#   verify: 14/14 exact self-checks pass; 4 legal firing orders
+#   emerge('e1+e10')  Sigma_tilt=+0.0000  precession 6/12  entry #1
+#   canonical : {1:15} -> {2:14} -> {8:8} -> {4:4:4:4} -> {4:8:4}
+#   phased    : {2:14} -> {8:8} -> {4:4:4:4} -> {4:8:4} -> {1:15}  (dependency-legal: False)
+#     [1] {2:14}     [THEORETICAL] {'pointer_z': (0.0, 0.0), '|z|-Omega': -0.567...}
+#     [2] {8:8}      [DERIVED    ] {'on_zd_equator': True, 'is_zero_divisor': True}
+#     [3] {4:4:4:4}  [DERIVED    ] {'Sigma_tilt': 0.0, 'sigma_is_half': True}
+#     [4] {4:8:4}    [THEORETICAL] {'gain_class': 'unit (gain 1, NOW)'}
+#     [5] {1:15}     [DERIVED    ] {'Re': 0.0, 'N': 2.0}
+
+r = emerge_brackets('e1+e10')         # the dict; r['steps'], r['firing_order']
+bracket_firing_order([1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])   # any 16-vector, or 'e3-e11'
+domain_of(frozenset([1,2,3]))         # 'H'   ;  {1,5,9} -> 'FRAGMENT'
+bracketings_for(8)                     # {'nested': [{1}, {2,3}, {4,5,6,7}]}  -- any 2^k
+```
+
+| item | tier | what it gives |
+|---|---|---|
+| `emerger_verify()` | ESTABLISHED | 14 exact self-checks from the CD table: `Sigma_axis=0`; `e1+e10` is a zero divisor **and** on the ZD equator; `e1+e2` neither; `domain_of` {1}=ℂ {1,2,3}=ℍ {1..7}=𝕆 {1,5,9}=FRAGMENT; 4 of 120 firing orders are dependency-legal |
+| `emerge_brackets(x, mode=)` | THEORETICAL | the five brackets in firing order, each conditioned on the ones before it. `mode='sigma_rb'` (default) or `'canonical'` |
+| `bracket_firing_order(x)` | THEORETICAL | `Σtilt` → the entry bracket in the 12-step precession (4 d\* faces : 3 Lambert-W faces). `Σtilt = 0 ⇔ σ = ½` |
+| `cd_is_zero_divisor(x)` / `on_zd_equator(x)` | ESTABLISHED | exact — rank-deficiency of `Lₓ` over `Fraction`; the equator is the `J_red ↔ J_blue` balance locus |
+| `domain_of(G)` | ESTABLISHED | ℂ / ℍ / 𝕆 / FRAGMENT by closure |
+| `scale_partitions()` | ESTABLISHED | the `{1,3,7}`-shapes of the 15 imaginary indices — most contiguous groupings past the first are fragments; subalgebra bracketings are rare |
+| `bracketings_for(dim)` | — | canonical brackets for any `2^k` (`dim=16` → the five; else the nested ℂ⊂ℍ⊂𝕆⊂… shell chain) |
+
+*Reading:* the descent side factors what already exists; the ascent side reports
+what a chosen grouping *lets exist*, and the order it has to come in. The
+five sedenion brackets are `{1:15}` (grades the algebra), `{2:14}` (the pointer
+plane carrying Ω_ZS), `{8:8}` (the CD double / ZD equator / J₂), `{4:4:4:4}`
+(four SU(2) phases + σ_RB), `{4:8:4}` (the gain spectrum 0/1/√2). **Finding,
+surfaced not hidden:** a σ_RB phase can select a firing order that is *not*
+dependency-legal — the engine reports the illegality rather than snapping to the
+nearest legal order.
+
+`SedenionSpectralRelativity/emerger_spectrum.py` renders this as an SVG
+spectrograph (Sedenion-focused). `ValaQuenta/modules/emerger/` is the
+Full-Engine-Protocol build.
+
 ### 4.8 The reports
 
 ```python
@@ -589,6 +653,9 @@ report_factoral_lineage()       # the full 41-relation run, plus worked examples
 report_strut_pair_chart()       # §4.5's box-kite application
 report_factoral_spiral_chart()  # §4.9 — point it at any two-reading collection
 report_crystal_spiral_chart()   # §4.9 — the crystal (PW11), charted
+
+from engine import report_emergence
+report_emergence()              # §4.14 — the ascent dual; bracketing & firing order
 ```
 
 `engine/oscilloscope.py` renders the two-panel Fermat→Riemann SVG
@@ -963,6 +1030,12 @@ engine/
                  imported first and unconditionally by engine/__init__.py.
   tools.py     — runnable reports over maths.py and lineage.py (§4.8).
   oscilloscope.py — the two-panel Fermat→Riemann oscilloscope (§4.8).
+  emerger.py   — §4.14: THE EMERGER, the ascent dual of lineage.py.
+                 Sedenion / any-2^k bracketing & firing order of emergence.
+                 e_0 is the anchor (tilt to the i axis), never bracketed;
+                 groups classified C/H/O/FRAGMENT by closure; firing order
+                 canonical or σ_RB-phased (12-step precession). Exact ZD
+                 tests over Fraction, 14/14 self-checks. Pure stdlib.
   bio.py       — STUB: the biological factoral tower (knot 𝕊 → molecule T₃₂ →
                  DNA T₆₄ → protein T₁₂₈ → genome T₂₅₆). Structural only.
   clay.py      — §4.12: the generational lineage of the seven Clay Millennium
@@ -976,9 +1049,19 @@ engine/
 wiki/
   Sedenion-Factoral-Relativity.md — fuller theory write-up, open design
   questions this README doesn't cover.
+  The-Emerger-Ascent-Dual.md — §4.14 in full: descent vs ascent, the five
+  brackets, the firing-order dependency lattice, the exact results.
 ```
 
 ## Status
+
+v2.11 (2026-09-01) — THE EMERGER (`engine/emerger.py`, §4.14). The ascent
+dual of `lineage.py`: sedenion / any-2^k Cayley-Dickson bracketing & firing
+order of emergence. Pure stdlib, `Fraction`-exact ZD tests, 14/14 self-checks.
+`bracketings_for(dim)` generalises past the sedenion. Wired into
+`engine/__init__.py`; `wiki/The-Emerger-Ascent-Dual.md`. The Sedenion-focused
+spectrograph is `SedenionSpectralRelativity/emerger_spectrum.py`; the
+Full-Engine-Protocol build is `ValaQuenta/modules/emerger/`.
 
 v2.10 (2026-08-28) — GENERAL SPECTRAL DECOMPOSITION (`engine/spectral.py`, §4.13)
 + SHAPE-MATCH DECOMPOSERS (`decompose_h_rb_hat`, `shape_diff_navier_stokes` in
