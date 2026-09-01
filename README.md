@@ -639,6 +639,52 @@ nearest legal order.
 spectrograph (Sedenion-focused). `ValaQuenta/modules/emerger/` is the
 Full-Engine-Protocol build.
 
+### 4.15 The Emerger–Lineage unification — ping 0 from a modulus  `[TUTORIAL — RSA regime classifier]`
+
+`engine/ping.py`. Full write-up:
+[`wiki/Ping-and-the-Counter-Operator-Laplacian.md`](wiki/Ping-and-the-Counter-Operator-Laplacian.md).
+
+The two structural hop axes, merged: the **operator hop** (descent — the RSA
+hardness **counter-operators**: Fermat ← `p≈q`, trial division ← `q` small,
+Pollard p−1 ← `p−1` smooth, Williams p+1, ECM, Wiener, batch GCD, Coppersmith,
+and GNFS/Shor as the floor) and the **bracket hop** (ascent — the Emerger,
+which runs free on any modulus's embedding, no factors needed).
+
+```python
+from engine import ping, counter_operator_laplacian, emerger_lineage_unify, report_ping
+
+report_ping(3233)                     # 61·53 -> trial division fires at 53
+ping(72326039160604451)               # |p-q| ~ 1e6 -> Fermat fires (regime: p ~ q)
+r = ping(N, e=e, corpus=[...])        # -> {factored, factors, regime, path, bracket_map,
+                                      #     laplacian, flat_diagram_depth}
+emerger_lineage_unify(N)              # both axes: modulus -> 0_RB path + bracket firing order
+```
+
+- **`ping(N)`** hops the counter-operators permutatively. Returns 0_RB — factors
+  N — **iff N sits in one broken regime**. For a properly generated modulus,
+  `regime = "floor — GNFS/Shor only"`. The bracket-hop structural map comes back
+  either way.
+- **The first bifurcation is the ± distinction.** The `r = 3` pitchfork
+  (period-1 → period-2) *is* SIGN — the sheet, `±√N`, `{+p,+q}` / `{−p,−q}`.
+  That is why Fermat (`N = a²−b²`) lives there.
+- **`counter_operator_laplacian()`** — `L = D − A` of the counter-operator
+  graph. **`L` is symmetric → its spectrum is permutation-invariant → the
+  regime verdict is order-independent; only the schedule is order-sensitive.**
+  An order-independent Laplacian is a **classifier, not a pathfinder**: it names
+  the regime, never the factorisation. So it draws a modulus→0 path *only* for a
+  modulus in a broken regime.
+- **`flat_diagram_depth_note(N)`** — the bifurcation diagram is a 2-D
+  projection. N's column has `~π(√N)²` apparent `p×q` meetings; **exactly one is
+  a real crossing**, the rest are **passes** (`pq ≠ N`). The distinguishing
+  coordinate is the projected-out **depth** = `ln(q/p)`, the erased coordinate.
+  Reconstructing it *is* factoring. For a 69-bit N: `~2.8×10¹⁷` passes, one
+  crossing — the flatness is where the information went.
+
+*Reading:* `ping` is a **complete regime classifier** — it factors any modulus
+in a broken regime and honestly names the floor for one that is not. RSA is the
+zero-overhead corner of this map: `p·q` is the whole specification, so the
+inverse has no handhold.
+
 ### 4.8 The reports
 
 ```python
@@ -656,6 +702,9 @@ report_crystal_spiral_chart()   # §4.9 — the crystal (PW11), charted
 
 from engine import report_emergence
 report_emergence()              # §4.14 — the ascent dual; bracketing & firing order
+
+from engine import report_ping
+report_ping(3233)               # §4.15 — the Emerger–Lineage unification / regime classifier
 ```
 
 `engine/oscilloscope.py` renders the two-panel Fermat→Riemann SVG
@@ -1031,6 +1080,16 @@ engine/
   tools.py     — runnable reports over maths.py and lineage.py (§4.8).
   oscilloscope.py — the two-panel Fermat→Riemann oscilloscope (§4.8).
   emerger.py   — §4.14: THE EMERGER, the ascent dual of lineage.py.
+  ping.py      — §4.15: THE EMERGER-LINEAGE UNIFICATION. ping 0 from a
+                 modulus via the RSA-hardness counter-operators (Fermat,
+                 trial div, Pollard p-1, Williams p+1, ECM, Wiener, batch
+                 GCD, Coppersmith; GNFS/Shor = the floor). The
+                 counter-operator Laplacian is symmetric -> the regime
+                 verdict is order-independent (a classifier, not a
+                 pathfinder). The first bifurcation (r=3 pitchfork) is the
+                 +/- (SIGN) distinction. flat_diagram_depth_note: the 2-D
+                 projection hides ~pi(sqrt N)^2 passes around the one real
+                 crossing. stdlib + numpy.
                  Sedenion / any-2^k bracketing & firing order of emergence.
                  e_0 is the anchor (tilt to the i axis), never bracketed;
                  groups classified C/H/O/FRAGMENT by closure; firing order
@@ -1049,11 +1108,21 @@ engine/
 wiki/
   Sedenion-Factoral-Relativity.md — fuller theory write-up, open design
   questions this README doesn't cover.
-  The-Emerger-Ascent-Dual.md — §4.14 in full: descent vs ascent, the five
-  brackets, the firing-order dependency lattice, the exact results.
+  The-Emerger-Ascent-Dual.md — §4.14 in full.
+  Ping-and-the-Counter-Operator-Laplacian.md — §4.15 in full: the two hop
+  axes merged, the counter-operators, the order-independent Laplacian, the
+  flat-diagram depth.
 ```
 
 ## Status
+
+v2.12 (2026-09-01) — THE EMERGER-LINEAGE UNIFICATION (`engine/ping.py`,
+§4.15). ping 0 from a modulus via the RSA-hardness counter-operators; the
+counter-operator Laplacian (symmetric -> order-independent verdict -> a
+classifier, not a pathfinder); the first bifurcation = the +/- (SIGN)
+distinction; flat_diagram_depth_note (the 2-D projection hides ~pi(sqrt N)^2
+passes around one real crossing). Wired into engine/__init__.py;
+wiki/Ping-and-the-Counter-Operator-Laplacian.md.
 
 v2.11 (2026-09-01) — THE EMERGER (`engine/emerger.py`, §4.14). The ascent
 dual of `lineage.py`: sedenion / any-2^k Cayley-Dickson bracketing & firing

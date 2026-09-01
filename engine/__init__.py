@@ -53,6 +53,13 @@ from .spectral import (
     autocorrelation, dominant_period, spectral_decompose,
 )
 
+from .ping import (
+    # THE EMERGER-LINEAGE UNIFICATION -- ping 0 from a modulus via the RSA
+    # hardness counter-operators; the counter-operator Laplacian; both hop axes
+    ping, counter_operator_laplacian, emerger_lineage_unify, report_ping,
+    flat_diagram_depth_note, COUNTER_OPS, FLOOR_MARKERS, FIRST_BIFURCATION,
+)
+
 from .emerger import (
     # the ascent dual of lineage.py -- sedenion/CD bracketing & firing order
     emerge as emerge_brackets, firing_order as bracket_firing_order,
@@ -134,4 +141,8 @@ __all__ = [
     'report_emergence', 'emerger_lineage_report', 'domain_of', 'on_zd_equator',
     'cd_is_zero_divisor', 'emerger_sigma_rb', 'scale_partitions', 'legal_orders',
     'bracketings_for', 'STANDARD_BRACKETINGS', 'CANONICAL_ORDER', 'coerce_vec',
+    # ping -- the Emerger-Lineage unification / RSA regime classifier
+    'ping', 'counter_operator_laplacian', 'emerger_lineage_unify',
+    'report_ping', 'flat_diagram_depth_note', 'COUNTER_OPS',
+    'FLOOR_MARKERS', 'FIRST_BIFURCATION',
 ]

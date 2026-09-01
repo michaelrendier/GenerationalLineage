@@ -74,6 +74,14 @@ is *not* dependency-legal (`e₁+e₁₀` phases into `{2:14}` before `{1:15}`).
 clock names the entry; the engine reports the illegality rather than snapping
 to the nearest legal order.
 
+## The Lineage unification
+
+`engine/ping.py` merges this ascent engine with `lineage.py`'s descent into
+one permutative harness — the **bracket hop** (this engine, runs free on any
+modulus) against the **operator hop** (the RSA-hardness counter-operators).
+`emerger_lineage_unify(N)` walks both axes; `ping(N)` classifies N's regime.
+Full write-up: [`Ping-and-the-Counter-Operator-Laplacian.md`](Ping-and-the-Counter-Operator-Laplacian.md).
+
 ## Related
 
 `engine/lineage.py` (descent) · `engine/spectral.py` ("spectral analysis IS

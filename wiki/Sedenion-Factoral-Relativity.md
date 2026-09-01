@@ -775,3 +775,18 @@ N, √N — not data points among many), and a tuning **dial** (the multiplier k
 PW2) as the second control, exactly mirroring the Smith chart's rotate + add-a-
 stub two-control interface. `decompose_number(N)['number_chart']` is now the
 visualiser's chart datum, alongside its other perspectives.
+
+## The Emerger–Lineage unification (`engine/ping.py`, 2026-09-01)
+
+The ascent engine (`emerger.py`) and the descent engine (`lineage.py`) merged
+into one permutative harness. The operator hop is the set of **RSA-hardness
+counter-operators** (Fermat ← p≈q at the r=3 pitchfork, trial division ← q
+small, Pollard p−1 / Williams p+1 ← p∓1 smooth, ECM, Wiener, batch GCD,
+Coppersmith; GNFS/Shor = the floor). The bracket hop is the Emerger, free on
+any modulus. `ping(N)` returns the regime; it factors N iff N is in a broken
+regime. The **counter-operator Laplacian is symmetric** → the verdict is
+order-independent → a classifier, not a pathfinder. The **first bifurcation
+(r=3 pitchfork) is the ± (SIGN) distinction**. The 2-D bifurcation projection
+hides ~π(√N)² *passes* around the one real *crossing* — the depth (`ln(q/p)`,
+the erased coordinate) is where that information went. Full write-up:
+`Ping-and-the-Counter-Operator-Laplacian.md`.
