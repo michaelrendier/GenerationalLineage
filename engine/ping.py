@@ -118,7 +118,7 @@ def _split(n: int, d: int) -> Optional[Tuple[int, int]]:
 
 def op_trial_division(N: int, B: int = 1 << 20, **_) -> Dict[str, Any]:
     """<- q small.  The floor branch of the bifurcation."""
-    for p in _primes_upto(min(B, int(N ** 0.5) + 1)):
+    for p in _primes_upto(min(B, math.isqrt(N) + 1)):
         if N % p == 0:
             return {'fired': True, 'factors': _split(N, p), 'work': p,
                     'regime': 'q small (trial-divisible)'}
@@ -456,7 +456,7 @@ def counter_operator_laplacian() -> Dict[str, Any]:
 
 def flat_diagram_depth_note(N: int) -> Dict[str, Any]:
     root = math.isqrt(N)
-    approx_pi = int(root / math.log(root)) if root > 2 else 1
+    approx_pi = root // max(1, int(math.log(root))) if root > 2 else 1
     apparent = approx_pi * (approx_pi + 1) // 2
     return {
         'apparent_pxq_crossings_near_N_column': apparent,
