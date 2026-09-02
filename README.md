@@ -142,6 +142,61 @@ point-inverted, *not* home — the "orders are not the same" fact in one operato
 
 See §4.16 for the toolsets and `engine/lines.py` for the registry.
 
+### 2b. The two charts — continuous and discrete, each in the other's jurisdiction
+
+The two lines have a geometric restatement worth keeping here, before the tutorial
+proper, because it is the same asymmetry in a different vocabulary.
+
+**The Smith chart is how the continuous sees the discrete.** The Cayley transform
+`w = (z−1)/(z+1)` is the textbook continuous→discrete intertwiner (von Neumann: an
+unbounded self-adjoint generator becomes a bounded unitary; Stone's theorem turns
+a one-parameter flow into a circle rotation you can stroboscope). Its coordinate
+circles are a *parabolic pencil* — all tangent at one point. The degenerate chart.
+
+**The Apollonian gasket is how the discrete sees the continuous.** It is the limit
+set of a discrete (thin, Kleinian) subgroup of `PSL(2,ℂ)`: countable generating
+data, uncountable fractal invariant. Patterson–Sullivan theory makes the exchange
+a theorem — the Hausdorff dimension `δ` is at once the abscissa of a *discrete*
+orbit sum and the bottom of a *continuous* Laplace spectrum, `λ₀ = δ(2−δ)`. The
+integer gasket is an `O_f(ℤ)` orbit of the Descartes form — the discreteness
+reaches into which whole numbers appear (Bourgain–Kontorovich–Sarnak).
+
+Both are `PSL(2,ℂ)` on the disk — one continuous one-parameter subgroup with its
+invariant pencil, one finitely-generated discrete subgroup with its limit set.
+They are **not mirror images.** They compose into one loop:
+
+```
+continuum --(Cayley / Smith)--> disk --(discrete Kleinian orbit)--> gasket limit set --(δ(2−δ)=λ₀)--> continuous spectrum
+```
+
+The Cayley leg is a genuine isomorphism — its "discreteness" is the observer's
+chosen grid, a reparametrisation (**descent: free**). The gasket leg is an
+*emergence* — genuinely discrete group, genuinely continuous invariant, no
+observer choice (**ascent: work**). The §2a free/paid split, one row up in
+abstraction.
+
+`Mandelbrot ↔ Julia` is this exact duality one polynomial degree higher —
+parameter space vs dynamical space — and the statement that the two are columns of
+one table is **Sullivan's dictionary** (Kleinian groups ↔ rational maps). Where it
+breaks is informative: a Möbius family has no critical point, so it does not
+bifurcate, so there is no fractal "Mandelbrot boundary" in impedance space — the
+Smith chart is `M` with its bifurcation set contracted to a point.
+
+**In code:** if `class GR` reads output from `class QM`, it receives it only
+through `GR` types — `GR.observe(qm) : QM.State → GR.StressEnergy`, i.e.
+`⟨ψ|T̂_μν|ψ⟩`, a forgetful functor whose kernel (relative phase, the which-path
+superposition of the source, the entanglement partition) is exactly what "gravity
+gives up on." **Scope is jurisdiction; parentage** — the `class Physics` neither
+theory subclasses — **is the anchor** (`e₀`, the reference the Emerger never
+brackets). Writing `Physics → {GR, QM}` is the free descent nobody can perform,
+because the parent is not there; building `Physics` up from the two children is
+quantum gravity, the work direction. `GR.observe(QM)` is a pushforward (forward,
+cheap); recovering the `QM.State` behind a given `T_μν` is a fiber (a whole
+preimage class, no stored tape, uphill) — "the adjoint is the one that costs."
+
+Full treatment, with the Collatz case and the conversation it came from:
+[`wiki/The-Two-Charts-and-Jurisdiction.md`](wiki/The-Two-Charts-and-Jurisdiction.md).
+
 ---
 
 ## 3. What this engine was built to do
@@ -782,6 +837,7 @@ lines.build_up('scale', {'x': 2.0, 'y': 9.0},        # AscentNotFree('a second (
 | **archimedes_screw** | both | read the pitch `ln(b/a)` off a step — one log | climb to a target height in rungs of `ln 2`; the remainder is lifted by hand |
 | **inversion** (`J_N`) | both | apply `(r,θ) → (1/r, θ+π/2)` once | period to identity is 4 — the cost of a full round trip between the jurisdictions |
 | **t32_nilpotency** | both | decode a base-97 address to its path — one Horner sweep; trailing zeros ⇒ nilpotent | place digits one at a time to realise a target path |
+| **cipher** | both | break a classical cipher — the period is the GCD-vote of the repeat-distance gaps (Kasiski = factoral decomposition of the gap multiset); IoC is its continuous shadow, χ² classifies the facet | encrypt with a chosen key (the emerger choice), or recover the key given the period (`p·26` column trials — the period is the owed constraint) |
 | **oscilloscope** | decomposition | Fermat N-shape (0..15) + root-system pathway of one number | *refused* — a shape is `N mod 16`, recovering `N` owes the rest of the digits |
 
 `engine/lines.py` also carries `DECOMPOSITION_LINE` / `EMERGER_LINE` (the
@@ -1186,6 +1242,17 @@ wiki/
   Ping-and-the-Counter-Operator-Laplacian.md — §4.15 in full: the two hop
   axes merged, the counter-operators, the order-independent Laplacian, the
   flat-diagram depth.
+  Two-Lines-and-Jurisdiction.md — §2a in full: descent free, ascent work,
+  the adjoint is the one that costs.
+  Cipher.md — the classical-cryptanalysis toolset ported from
+  Kryptos/analysis.py; which direction of each break serves factoral
+  decomposition (cipher→analysis for almost all; Kasiski IS it).
+  The-Two-Charts-and-Jurisdiction.md — §2b in full: the Smith chart
+  (continuous→discrete, Cayley) and the Apollonian gasket
+  (discrete→continuous, Patterson–Sullivan) as one loop through PSL(2,ℂ);
+  Mandelbrot/Julia via Sullivan's dictionary; the Collatz side-eye;
+  `class GR` reading `class QM` — scope is jurisdiction, parentage is the
+  anchor.
 ```
 
 ## Status

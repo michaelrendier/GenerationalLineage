@@ -72,7 +72,9 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
     },
     "scale": {
         "module": "engine.toolsets.scale", "line": "both",
-        "free": "s = value / reference — one division",
+        "free": "s = value / reference — one division; charts(s) also reads it in "
+                "both jurisdictions (Smith chart = continuous/GR, Apollonian "
+                "gasket = discrete/QM)",
         "work": "solve for s under a constrained target — underdetermined, needs a second reading",
     },
     "units": {
@@ -104,6 +106,14 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
         "module": "engine.toolsets.t32_nilpotency", "line": "both",
         "free": "decode a base-97 address to its path",
         "work": "find an address that realises a desired path — a search",
+    },
+    "cipher": {
+        "module": "engine.toolsets.cipher", "line": "both",
+        "free": "break a classical cipher — the period is the GCD-vote of the "
+                "repeat-distance gaps (Kasiski = factoral decomposition of the "
+                "gap multiset); IoC is its continuous shadow; χ² classifies the facet",
+        "work": "encrypt with a chosen key (the emerger choice), or recover the "
+                "key given the period (p·26 column trials — the period is the owed constraint)",
     },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
