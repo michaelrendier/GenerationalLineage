@@ -1,5 +1,5 @@
 """
-SedenionFactoralRelativity.engine.add_scale_sign
+GenerationalLineage.engine.add_scale_sign
 ================================================
 THE ADD:SCALE:SIGN DATATYPE, as an ENGINE in the decomposer suite.
 
@@ -256,3 +256,56 @@ def reduces_everything(op: str) -> Dict[str, Any]:
     gen = {"ADD": ASS.ADD(1.0), "SCALE": ASS.SCALE(2.0), "SIGN": ASS.SIGN(-1)}.get(root)
     return {"operation": op, "root": root, "as_generator": str(gen) if gen else None,
             "detail": r}
+
+
+# ════════════════════════════════════════════════════════════════════════
+#  TOOLSET CONTRACT  (engine/lines.py — the two lines)
+# ════════════════════════════════════════════════════════════════════════
+NAME = "add_scale_sign"
+LINE = "both"
+
+
+def descend(value, reference: float = 1.0):
+    """FREE: read SIGN, SCALE, ADD off a real number relative to a reference —
+    three lookups, no search."""
+    x = float(value)
+    r = float(reference)
+    g = 1 if x >= 0 else -1
+    s = abs(x) / abs(r) if r else abs(x)
+    el = compose(ASS.SIGN(g), ASS.SCALE(s))
+    return {"toolset": NAME, "value": x, "sign": g, "scale": s, "add": 0.0,
+            "element": str(el),
+            "lineage": [str(p) for p in el.lineage("chrono")],
+            "free": True, "cost": 0, "note": "three lookups — the free reading"}
+
+
+def build_up(target, orders=None):
+    """WORK: find the firing order of {SIGN, SCALE, ADD} that produces
+    target = {'a':, 's':, 'g':} as the map x -> g*s*x + a. Because
+    [SCALE, ADD] = ADD the order is NOT free — search the 6 permutations,
+    report which land it and the cost (permutations tried)."""
+    from itertools import permutations
+    a = float(target.get("a", 0.0))
+    s = float(target.get("s", 1.0))
+    g = int(target.get("g", 1))
+    gens = {"SIGN": ASS.SIGN(g), "SCALE": ASS.SCALE(s), "ADD": ASS.ADD(a)}
+    want = lambda x: g * s * x + a
+    probe = (-2.0, 0.0, 1.0, 7.5)
+    hits, tried = [], 0
+    for perm in (orders or permutations(("SIGN", "SCALE", "ADD"))):
+        tried += 1
+        el = compose(*(gens[p] for p in perm))
+        if all(abs(el(x) - want(x)) < 1e-9 for x in probe):
+            hits.append(tuple(perm))
+    return {"toolset": NAME, "target": {"a": a, "s": s, "g": g},
+            "orders_that_hit": hits, "n_hits": len(hits), "cost": tried,
+            "free": False,
+            "note": "searched the firing orders — [SCALE,ADD]=ADD makes order matter"}
+
+
+def verify():
+    d = descend(-12.0, 3.0)
+    ok_d = d["sign"] == -1 and abs(d["scale"] - 4.0) < 1e-12
+    b = build_up({"a": 1.0, "s": 4.0, "g": -1})
+    ok_b = b["n_hits"] >= 1 and b["cost"] == 6
+    return {"ok": ok_d and ok_b, "descend": ok_d, "build_up": ok_b}

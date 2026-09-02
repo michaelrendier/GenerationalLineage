@@ -1,4 +1,4 @@
-"""SedenionFactoralRelativity.engine.valaquenta_calibration
+"""GenerationalLineage.engine.valaquenta_calibration
 
 Run the generational-lineage decomposition on every ValaQuenta engine, as a
 **calibration check on the factoral decomposition itself.**
@@ -743,7 +743,7 @@ def wiki_block(name: str) -> str:
     agree = ('agrees with' if r['agrees_with_status'] else '**disagrees with**')
     return (
         "## Generational Lineage — calibration (2026-08-28)\n\n"
-        "Decomposed by `SedenionFactoralRelativity/engine/valaquenta_calibration.py` "
+        "Decomposed by `GenerationalLineage/engine/valaquenta_calibration.py` "
         "(`python3 -m engine.valaquenta_calibration`) as a check on the factoral "
         "decomposition itself — working, deliberately-designed machinery should "
         "decompose CLEAN.\n\n"

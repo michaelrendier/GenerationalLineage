@@ -111,5 +111,23 @@ mechanism.
 (same day, sibling pages, independent ports per this project's per-repo
 self-containment convention); `PtolemyDesktop/Archimedes/UnitVector.py`
 (the original string-list-based design this engine's vector arithmetic was
-checked against); `Sedenion-Factoral-Relativity.md` §4.11 (this repo's own
+checked against); `The-Generational-Lineage-Engine.md` §4.11 (this repo's own
 engine-usage documentation for `PW16`).
+
+---
+
+## As a toolset (the two lines)
+
+`engine/toolsets/units.py` · line: **both**.
+
+- **descend (free):** a compound unit → its exponent vector over the 7 SI axes
+  `(kg, m, s, A, K, mol, cd)`. Exact vector arithmetic. `N` →
+  `(1, 1, -2, 0, 0, 0, 0)`. `cost = 0`.
+- **build_up (work):** a bare exponent vector → the named physical laws of that
+  dimension, by scanning the law index. `cost` = entries scanned.
+
+```python
+from engine import line_descend, line_build_up
+line_descend('units', 'N')          # vector (1,1,-2,0,0,0,0)
+line_build_up('units', 'J')         # candidate_laws: ['E = 1/2 m v^2', 'E = m c^2', ...]
+```

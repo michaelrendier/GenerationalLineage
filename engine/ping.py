@@ -1,5 +1,5 @@
 """
-SedenionFactoralRelativity.engine.ping
+GenerationalLineage.engine.ping
 =======================================
 THE EMERGER-LINEAGE UNIFICATION  --  ping 0 from a modulus.
 

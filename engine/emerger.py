@@ -1,5 +1,5 @@
 """
-SedenionFactoralRelativity.engine.emerger
+GenerationalLineage.engine.emerger
 ==========================================
 THE EMERGER -- Sedenion (and general Cayley-Dickson) Bracketing & Firing Order.
 

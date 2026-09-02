@@ -1,5 +1,5 @@
 """
-SedenionFactoralRelativity.engine.maths
+GenerationalLineage.engine.maths
 ==========================================
 Core pieces and pathways for the Fermat facet of H_hat_RB (the Zero
 Lattice tree, `AbrikosovTree/engine/telperion_engine.py`), plus the first

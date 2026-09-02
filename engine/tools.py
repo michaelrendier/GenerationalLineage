@@ -1,5 +1,5 @@
 """
-SedenionFactoralRelativity.engine.tools
+GenerationalLineage.engine.tools
 ==========================================
 Runnable reports over engine.maths. Simplified from ValaQuenta's full
 EquationModule/registry contract (h_rb_hat/tools.py's pattern) since this

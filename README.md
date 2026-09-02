@@ -1,7 +1,11 @@
-# Sedenion Factoral Relativity
-### The Generational Lineage Engine — and its ascent dual, The Emerger
+# The Generational Lineage Engine
+
+### two lines — the decomposition line (descent) and The Emerger (ascent)
 
 *A tutorial. Read this before the papers — the papers assume you already know what "tier," "lineage," and "the two trees" mean; this document is where you learn it.*
+
+*Formerly "Sedenion Factoral Relativity" / "FactoralDecomposition" — the engine
+is the same; the name now says what it does.*
 
 ---
 
@@ -105,6 +109,39 @@ The four-question tier test any named operation goes through, in order:
 Only what survives all four is a candidate primitive. `decompose(op_name)`
 runs this test and hands back the tier — see §4.3.
 
+### 2a. Two lines — and why their maths differs by direction
+
+The engine runs in two directions, and they are **not the same computation run
+backwards**. They are two jurisdictions:
+
+```
+DECOMPOSITION LINE   descent   "what built this"       anchor: engine/lineage.py
+EMERGER LINE         ascent    "what does this build"   anchor: engine/emerger.py
+```
+
+> *The extinction order is not the rebirth order. Extinction is free; rebirth
+> requires work.*
+
+**Descent is the deductive sieve of Eratosthenes** — mark the multiples, read
+off what is left. Single pass, no search, no stored tape. It is
+forward-propagating: the direction the maths is *built* to go. On any toolset,
+`descend()` costs nothing (`free = True`, `cost = 0`).
+
+**Ascent is induction** — to rebuild an object you must *choose*: which
+bracketing, which firing order (4 legal of 120), which pitch to climb, which
+pencil factors a relation into two. Choice is work. On any toolset, `build_up()`
+searches or needs an added constraint, and reports a `cost`; a descent-only
+toolset *refuses* and names what the caller owes.
+
+One direction is an **adjoint** of the other, not a companion — and the adjoint
+is the one that costs. (When GR looks at QM it describes QM in GR's terms;
+when QM looks at GR it sees GR in QM's terms — same object, two jurisdictions,
+one way free and the other paid.) `engine/toolsets/inversion.py` (`J_N`) is the
+map between them: apply it four times and you are home; twice and you are
+point-inverted, *not* home — the "orders are not the same" fact in one operator.
+
+See §4.16 for the toolsets and `engine/lines.py` for the registry.
+
 ---
 
 ## 3. What this engine was built to do
@@ -147,7 +184,7 @@ No free parameters. No renormalisation.
 
 ## 4. How to use it — the tools
 
-All examples assume you're in `SedenionFactoralRelativity/` with `import
+All examples assume you're in `GenerationalLineage/` with `import
 engine` working (`IMPORT_ERROR` will be `None` if every cross-repo path
 resolved).
 
@@ -340,7 +377,7 @@ number asserted.
 ### 4.9 The factoral spiral — factoral decomposition as chart geometry
 
 `PW13`, built the same session as the `two_ring_chart_render.py` visual
-proof-of-concept (`VAPMIP/SedenionFactoralRelativity`'s sibling repo):
+proof-of-concept (`VAPMIP/GenerationalLineage`'s sibling repo):
 spectral analysis IS factoral decomposition, using a different notion of
 "factor" — an eigendecomposition factors an operator into (eigenvalue,
 eigenvector) pairs the same way integer factorisation decomposes N into
@@ -716,9 +753,46 @@ channel across both.
 
 ---
 
+### 4.16 The toolsets — the two lines  `[the pieces the decomposition rolls to / builds from]`
+
+The engines the Generational Lineage map identified as feeding a part of the
+decomposition, ported standalone into `engine/toolsets/` (plus the two older
+ports, `engine/add_scale_sign.py` and `engine/oscilloscope.py`). Each follows
+one contract — `descend()` (free), `build_up()` (work), `verify()` — and is
+tagged to a line in `engine/lines.py`.
+
+```python
+from engine import lines
+
+print(lines.describe_lines())          # the roster, split by line
+lines.verify_all()                     # every toolset self-checks -> {'_ok': True}
+
+lines.descend('scale', 15.0, reference=3.0)          # {'scale': 5.0, 'cost': 0, ...}   FREE
+lines.build_up('scale', {'x': 2.0, 'y': 9.0},        # AscentNotFree('a second (x, y) reading')
+               probes=[(5.0, 21.0)])                 # -> {'scale': 4.0, 'add': 1.0, 'cost': 2}  WORK
+```
+
+| toolset | line | `descend()` — free | `build_up()` — work |
+|---|---|---|---|
+| **add_scale_sign** (`ASS`) | both | read SIGN/SCALE/ADD off a value — 3 lookups | search the 6 firing orders for one that hits a target map (`[SCALE,ADD]=ADD` makes order matter) |
+| **scale** | both | `s = value / reference` — one division | recover `s` for a constrained target — one `(x,y)` is undetermined, refuses until you supply a probe |
+| **units** | both | quantity → its point in the 7-axis SI lattice (exact vector arithmetic) | dimension signature → candidate physical laws — a scan of the law index |
+| **box_kite** | both | index pair → the edge (one XOR) and the lines it lies on | edge → its 7 pencils (the factorings into two relations) |
+| **noether** | both | check `J_red + J_blue` held along a descent — one pass | filter candidate ascent orders to those the conservation law permits |
+| **archimedes_screw** | both | read the pitch `ln(b/a)` off a step — one log | climb to a target height in rungs of `ln 2`; the remainder is lifted by hand |
+| **inversion** (`J_N`) | both | apply `(r,θ) → (1/r, θ+π/2)` once | period to identity is 4 — the cost of a full round trip between the jurisdictions |
+| **t32_nilpotency** | both | decode a base-97 address to its path — one Horner sweep; trailing zeros ⇒ nilpotent | place digits one at a time to realise a target path |
+| **oscilloscope** | decomposition | Fermat N-shape (0..15) + root-system pathway of one number | *refused* — a shape is `N mod 16`, recovering `N` owes the rest of the digits |
+
+`engine/lines.py` also carries `DECOMPOSITION_LINE` / `EMERGER_LINE` (the
+name lists), `TOOLSETS` (the descriptor dict), and `AscentNotFree` (the
+"rebirth requires work, here is the work you owe" exception).
+
+---
+
 ## 5. Reference — every self-checked relation
 
-`40/40` as of this write-up. Every `claim` below is one sentence; the full
+`44/44` as of this write-up. Every `claim` below is one sentence; the full
 computed `detail` (the actual numbers) only prints from `run_lineage()` —
 this table is the index, not a substitute for running it.
 

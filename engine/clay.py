@@ -1,4 +1,4 @@
-"""SedenionFactoralRelativity.engine.clay
+"""GenerationalLineage.engine.clay
 
 The generational lineage of the seven Clay Millennium Problems, each read as a
 *decomposed object* / structural mapping — to confirm or confound current

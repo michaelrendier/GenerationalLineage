@@ -1,4 +1,4 @@
-"""SedenionFactoralRelativity.engine.spectral
+"""GenerationalLineage.engine.spectral
 
 General spectral decomposition — **not tied to the sedenion framework.**
 

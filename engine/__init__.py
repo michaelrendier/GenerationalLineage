@@ -1,4 +1,4 @@
-"""SedenionFactoralRelativity.engine
+"""GenerationalLineage.engine
 
 The FACTORAL DECOMPOSITION TOOL (`lineage`) is imported FIRST and
 unconditionally: it is stdlib + numpy only and depends on nothing outside this
@@ -75,6 +75,15 @@ from .add_scale_sign import (
     CAMSHAFT, BRACKET as ASS_BRACKET,
 )
 
+# ── the two lines (2026-09-02): the decomposition line (descent, free) and the
+#    emerger line (ascent, work), plus the toolset ports in engine/toolsets/ ──
+from .lines import (
+    describe_lines, verify_all as verify_toolsets,
+    descend as line_descend, build_up as line_build_up,
+    DECOMPOSITION_LINE, EMERGER_LINE, TOOLSETS as LINE_TOOLSETS, AscentNotFree,
+)
+from . import toolsets  # noqa: F401
+
 from .valaquenta_calibration import (
     ENGINES as VQ_ENGINES, calibration_report, lineage_of as vq_lineage_of,
     wiki_block as vq_wiki_block, decompose_h_rb_hat, shape_diff_navier_stokes, decompose_the_lineage_engine,
@@ -145,4 +154,8 @@ __all__ = [
     'ping', 'counter_operator_laplacian', 'emerger_lineage_unify',
     'report_ping', 'flat_diagram_depth_note', 'COUNTER_OPS',
     'FLOOR_MARKERS', 'FIRST_BIFURCATION',
+    # the two lines + toolset ports
+    'describe_lines', 'verify_toolsets', 'line_descend', 'line_build_up',
+    'DECOMPOSITION_LINE', 'EMERGER_LINE', 'LINE_TOOLSETS', 'AscentNotFree',
+    'toolsets',
 ]

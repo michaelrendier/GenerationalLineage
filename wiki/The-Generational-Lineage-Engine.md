@@ -1,4 +1,4 @@
-# Sedenion Factoral Relativity
+# The Generational Lineage Engine
 
 Session origin: 2026-07-17, arising directly out of the SHA-1-first UDEO
 session (see `TuringStack`'s `.clauderc_context_1` entry) and Cody's own
@@ -179,6 +179,21 @@ framing (FLT as the *negative* facet of H_hat_RB, "not a projection of
 what the operator produces") is the likely anchor for what "negative
 maths" means here, not yet connected further.
 
+
+## The two lines — decomposition and emerger
+
+The engine runs in two directions, and they are not one computation run
+backwards. **Descent** (`engine/lineage.py`) is the deductive sieve — free,
+single-pass, forward-propagating. **Ascent** (`engine/emerger.py`) is induction
+— it must choose a bracketing / firing order / pitch, so it costs. One is the
+adjoint of the other. `engine/toolsets/inversion.py` (`J_N`) is the map between
+them. Full treatment: [Two-Lines-and-Jurisdiction.md](Two-Lines-and-Jurisdiction.md).
+
+Toolset ports (`engine/toolsets/`, each with a free `descend()` and a working
+`build_up()`): [Scale](Scale.md), [Units](Units-and-the-Equation-Index.md),
+[Box-Kite](Box-Kite.md), [Noether](Noether.md),
+[Archimedes-Screw](Archimedes-Screw.md), [Inversion](Inversion.md),
+[T32-Nilpotency](T32-Nilpotency.md), [ADD:SCALE:SIGN](ADD-SCALE-SIGN-Datatype.md).
 
 ## The factoral decomposition tool — `engine/lineage.py`
 

@@ -1,4 +1,4 @@
-"""SedenionFactoralRelativity.engine.bio — the biological factoral tower.
+"""GenerationalLineage.engine.bio — the biological factoral tower.
 
 STUB.  Cody, 2026-08-27: "so knots start that generational lineage ... this is
 the biological factoral decomposition ... Tower Level Decomposition."

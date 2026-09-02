@@ -179,3 +179,44 @@ if __name__ == "__main__":
     with open(out, 'w') as f:
         f.write(svg)
     print(f"Saved {out}  (N={N})")
+
+
+# ════════════════════════════════════════════════════════════════════════
+#  TOOLSET CONTRACT  (engine/lines.py — the two lines)
+#  The oscilloscope is a DESCENT-ONLY instrument: it reads the two facets
+#  (Fermat prompt shape, Riemann firing) off one number. There is no free
+#  ascent — you cannot recover a number from its two facets without more,
+#  so build_up() refuses and names what is owed.
+# ════════════════════════════════════════════════════════════════════════
+NAME = "oscilloscope"
+LINE = "decomposition"
+
+
+def descend(N: int):
+    """FREE: the Fermat N-shape (0..15) of N and its root-system pathway."""
+    n = int(N)
+    shape = n % 16
+    pathway, even = shape_category(shape)
+    return {"toolset": NAME, "N": n, "shape": shape, "pathway": pathway,
+            "even": even, "free": True, "cost": 0,
+            "note": "one mod-16 read plus the root-system lookup",
+            "svg_hint": "build_svg(N) renders both panels"}
+
+
+def build_up(target):
+    """WORK: refused. A shape + pathway names a residue class mod 16, not a
+    number — the ascent owes the caller the rest of the digits."""
+    from .lines import AscentNotFree
+    raise AscentNotFree("the number's other digits",
+                        "shape is N mod 16; recovering N needs the quotient too")
+
+
+def verify():
+    d = descend(360)
+    ok_d = d["shape"] == 360 % 16 and "pathway" in d
+    try:
+        build_up({"shape": 8})
+        ok_b = False
+    except Exception as e:                       # AscentNotFree
+        ok_b = e.__class__.__name__ == "AscentNotFree"
+    return {"ok": ok_d and ok_b, "descend": ok_d, "refuses_ascent": ok_b}

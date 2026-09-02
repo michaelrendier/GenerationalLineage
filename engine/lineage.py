@@ -1,5 +1,5 @@
 """
-SedenionFactoralRelativity.engine.lineage
+GenerationalLineage.engine.lineage
 ==========================================
 The Generational Lineage engine, as a **factoral decomposition tool**.
 
