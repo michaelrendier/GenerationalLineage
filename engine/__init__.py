@@ -89,6 +89,21 @@ from .valaquenta_calibration import (
     wiki_block as vq_wiki_block, decompose_h_rb_hat, shape_diff_navier_stokes, decompose_the_lineage_engine,
 )
 
+# ── the console-facing structure (2026-09-03): the operator-string keypad
+#    parser, the Operator Tree graph + ascii render, and the shape-completion
+#    ("find evidence for missing operators") diagnostic ──
+from .opstring import (
+    KEYPAD, OpNode, parse as opstring_parse, operators as opstring_operators,
+    to_sympy as opstring_to_sympy,
+)
+from .operator_tree import (
+    Tree as OperatorTree, Node as OperatorNode, build_tree as build_operator_tree,
+    fold_signature, render_ascii as render_operator_tree,
+    to_json as operator_tree_json, route_targets as operator_route_targets,
+    word_wrap,
+)
+from .shape import diagnose as shape_diagnose
+
 IMPORT_ERROR = None
 try:
     from .tools import (
@@ -158,4 +173,9 @@ __all__ = [
     'describe_lines', 'verify_toolsets', 'line_descend', 'line_build_up',
     'DECOMPOSITION_LINE', 'EMERGER_LINE', 'LINE_TOOLSETS', 'AscentNotFree',
     'toolsets',
+    # the console-facing structure — keypad parser, Operator Tree, shape check
+    'KEYPAD', 'OpNode', 'opstring_parse', 'opstring_operators', 'opstring_to_sympy',
+    'OperatorTree', 'OperatorNode', 'build_operator_tree', 'fold_signature',
+    'render_operator_tree', 'operator_tree_json', 'operator_route_targets',
+    'word_wrap', 'shape_diagnose',
 ]

@@ -1247,6 +1247,11 @@ wiki/
   Cipher.md — the classical-cryptanalysis toolset ported from
   Kryptos/analysis.py; which direction of each break serves factoral
   decomposition (cipher→analysis for almost all; Kasiski IS it).
+  The-Operator-Tree.md — set construction (Σ Π ∫ as iterated tier-0 folds
+  over an index set) up to the whole Operator Tree as a graph network /
+  Tree of Life: supernal triad = ADD/SCALE/SIGN, three pillars = the three
+  ROOT_OF classes, the origami folds (GR / Number Theory / Monster + 70
+  VOAs). How it's generated procedurally from every engine's manifest.
   The-Two-Charts-and-Jurisdiction.md — §2b in full: the Smith chart
   (continuous→discrete, Cayley) and the Apollonian gasket
   (discrete→continuous, Patterson–Sullivan) as one loop through PSL(2,ℂ);
