@@ -115,6 +115,17 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
         "work": "encrypt with a chosen key (the emerger choice), or recover the "
                 "key given the period (p·26 column trials — the period is the owed constraint)",
     },
+    "comma_sequence": {
+        "module": "engine.toolsets.comma_sequence", "line": "both",
+        "free": "the comma-group read — each gap a(n+1)−a(n) = b·L + R is lifted "
+                "straight off the two digits straddling the comma; one pass says "
+                "whether the walk is valid and whether it has hit a landmine. "
+                "Resolution is a RATIO (b²:2 = step alphabet : comma window), not "
+                "a bandwidth — the Flashlight, and mortality is its coarse end",
+        "work": "walk the lexicographically-earliest comma sequence forward one "
+                "term at a time (the forced successor is the earliest valid R); "
+                "cost = terms placed; base<634 dies, base≥634 is immortal",
+    },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
         "free": "stack the two facets (Fermat prompt / Riemann firing) of one number",
