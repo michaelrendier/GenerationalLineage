@@ -838,11 +838,97 @@ lines.build_up('scale', {'x': 2.0, 'y': 9.0},        # AscentNotFree('a second (
 | **inversion** (`J_N`) | both | apply `(r,θ) → (1/r, θ+π/2)` once | period to identity is 4 — the cost of a full round trip between the jurisdictions |
 | **t32_nilpotency** | both | decode a base-97 address to its path — one Horner sweep; trailing zeros ⇒ nilpotent | place digits one at a time to realise a target path |
 | **cipher** | both | break a classical cipher — the period is the GCD-vote of the repeat-distance gaps (Kasiski = factoral decomposition of the gap multiset); IoC is its continuous shadow, χ² classifies the facet | encrypt with a chosen key (the emerger choice), or recover the key given the period (`p·26` column trials — the period is the owed constraint) |
+| **hyper_linear** | both | `a*b` → one tier-0 SCALE op per digit of `b` (`L_d ∘ T^r`), the Toeplitz block/spill read, the DFT convolution-theorem reconstruction | which rows spilled an 11th digit, from the product **alone** — genuinely refused (exactly as hard as factoring `P`); one factor supplied makes it free again (one division) |
 | **oscilloscope** | decomposition | Fermat N-shape (0..15) + root-system pathway of one number | *refused* — a shape is `N mod 16`, recovering `N` owes the rest of the digits |
 
 `engine/lines.py` also carries `DECOMPOSITION_LINE` / `EMERGER_LINE` (the
 name lists), `TOOLSETS` (the descriptor dict), and `AscentNotFree` (the
 "rebirth requires work, here is the work you owe" exception).
+
+### 4.17 The hyper-linear algebra decomposition  `[TUTORIAL — multiplication as a regular representation]`
+
+`engine/toolsets/hyper_linear.py`. Notebook:
+[`notebooks/01_hyper_linear_algebra_decomposition.ipynb`](notebooks/01_hyper_linear_algebra_decomposition.ipynb)
+(executed, real captured output). Sedenion-side companion:
+`SedenionSpectralRelativity/hyper_linear_bridge.py`.
+
+`a*b` read as a regular-representation matrix: every row of the schoolbook
+addition matrix is exactly ONE tier-0 SCALE op (`L_d`, multiply by that
+digit of `b`) composed with a shift (`T^r` — also just SCALE, by the base).
+`ADD` enters exactly once, summing the rows. `TIERS['hyper-linear']` in
+`engine/lineage.py` records this: descends from SCALE alone, nothing above
+tier 0 is needed until the final sum.
+
+```python
+from engine.toolsets import hyper_linear as hl
+from engine.lines import AscentNotFree
+
+d = hl.descend(1546854629, 7283619945)
+d['rows']                  # one dict per digit: {row, digit, operator: "L_d o T^r", spills}
+d['n_spilling_rows']       # 4 — rows whose partial product ran to an 11th digit
+d['dft_reconstruction_exact']   # True — reuses engine.spectral.dft, the convolution theorem
+
+hl.build_up({'product': d['product']})              # raises AscentNotFree —
+                                                      # the bare product under-determines
+                                                      # which rows spilled; that recovery
+                                                      # is exactly as hard as factoring it
+hl.build_up({'product': d['product'], 'a': 1546854629})   # -> free again: one division
+                                                            # recovers b, then the spill
+                                                            # pattern reads straight off it
+```
+
+*Reading:* the DECOMPOSITION line is genuinely free here — no toolset in
+this engine needs less than `hyper_linear` does per row. The EMERGER line
+is the honest surprise: "which rows had 11 digits" looks like it should be
+readable off the 20-digit answer alone, and it provably is not — recovering
+it from the bare product is the same hardness class as factoring the
+product, and `build_up` refuses rather than pretend otherwise. Supplying
+either factor (not both) collapses the ascent back to free. Verified
+against `a=1546854629, b=7283619945` (this session's own worked example):
+product exact, DFT reconstruction exact, 4 spilling rows, refusal on the
+bare product, and full recovery from one factor — all checked live in
+`verify()`.
+
+### 4.18 The Equation Space Engine — steering by a collapse function's own gradient
+
+`engine/toolsets/equation_space.py`. Notebook:
+[`notebooks/02_equation_space.ipynb`](notebooks/02_equation_space.ipynb).
+Sedenion-side companion: `SedenionSpectralRelativity/equation_space_engine.py`.
+
+A `rho(s) >= 0` — a continuous "distance to the interesting locus"
+function — turns a discrete membership test ("is s special") into
+something you can take a gradient of. `descend()` reads `rho` and its
+gradient at one point, free. `build_up()` walks from a start point to
+`rho=0` by gradient descent, cost = steps, and genuinely refuses
+(`AscentNotFree`) if the walk stalls or the locus isn't reachable in
+budget — the same shape as every other toolset's ascent.
+
+Two diagnostics beyond the basic contract: `classify_singularity()` —
+is the locus a **fold** (`rho` falls off linearly on both sides, an A2
+caustic, a genuine structural collapse) or a **smooth minimum**
+(quadratic falloff, `rho` just happens to get small)? — and
+`steering_correlation()` — does an independent, cheap compass signal
+(computed with no reference to `rho` at all) predict `|grad(rho)|`, the
+actual expensive steering direction?
+
+```python
+from engine.toolsets import equation_space as eqs
+
+eqs.descend(0.5+0.1j)                    # rho and its gradient at one point — free
+eqs.build_up({'start': 0.5+0.1j})        # walk to rho=0 — cost=19 steps, converges
+eqs.classify_singularity(result['s'])    # is_fold_caustic: True
+eqs.steering_correlation(eqs._gamma_curvature)   # pearson ~0.97
+```
+
+*Reading:* the built-in `rho` is Smith's own `Gamma(s)=(s-1)/(s+1)`
+(`scale.py`, extended here to complex `s`), distance to the diagonal ray
+`{c(1+i)}`. Its zero locus, found here by pure gradient descent with no
+sedenion machinery at all, is `center=i, radius=sqrt(2)` — matching, to
+within tolerance, the same circle found independently this session via
+an actual sedenion zero-divisor construction
+(`SedenionSpectralRelativity/prime_gauge_sedenion.py`). Two unrelated
+methods, same answer — the closest thing this pass has to an
+independent cross-check of that earlier result.
 
 ---
 

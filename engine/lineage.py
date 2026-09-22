@@ -1640,6 +1640,11 @@ TIERS: Dict[str, Tuple[int, str, str]] = {
                      'remove rigidity and the fulcrum survives, leverage does not'),
     'gcd':          (0, 'SCALE (division)', 'the lowest common ancestor of two '
                      'lineages, reached in one division — see R8'),
+    'hyper-linear': (0, 'SCALE (n-fold, one L_d per digit)',
+                     'a*b IS n tier-0 SCALE ops (one L_d per digit of b), each '
+                     'composed with a shift T^r that is ALSO just SCALE (by the '
+                     'base) — ADD enters exactly once, summing the rows. See '
+                     'engine/toolsets/hyper_linear.py'),
     # ── ring-theory operations ──────────────────────────────────────────────
     'ideal':        (2, 'a fixed set closed under absorption R·I ⊆ I',
                      'a FIXED SET — DERIVED. the kernel of a quotient map'),

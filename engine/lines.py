@@ -126,6 +126,23 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
                 "term at a time (the forced successor is the earliest valid R); "
                 "cost = terms placed; base<634 dies, base≥634 is immortal",
     },
+    "hyper_linear": {
+        "module": "engine.toolsets.hyper_linear", "line": "both",
+        "free": "a*b -> one tier-0 SCALE op per digit of b (L_d o T^r), the "
+                "Toeplitz block/spill read, and the DFT convolution-theorem "
+                "reconstruction of the product — single pass, no search",
+        "work": "which rows spilled an 11th digit, from the product ALONE — "
+                "genuinely refused (as hard as factoring P); one factor "
+                "supplied makes it free again (one division)",
+    },
+    "equation_space": {
+        "module": "engine.toolsets.equation_space", "line": "both",
+        "free": "rho(s) and its local gradient at one point — one evaluation, "
+                "one finite difference, no search",
+        "work": "walk from a start point to rho=0 by gradient descent — cost "
+                "= steps; refuses if the walk stalls or the locus isn't "
+                "reachable in budget",
+    },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
         "free": "stack the two facets (Fermat prompt / Riemann firing) of one number",

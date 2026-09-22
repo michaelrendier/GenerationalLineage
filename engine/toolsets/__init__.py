@@ -21,7 +21,7 @@ Two older ports keep their historic filenames one level up:
 """
 from . import (                                                  # noqa: F401
     scale, units, box_kite, noether, archimedes_screw, inversion, t32_nilpotency,
-    cipher, comma_sequence, stencil,
+    cipher, comma_sequence, stencil, hyper_linear, equation_space,
 )
 
 MODULES = {
@@ -29,4 +29,5 @@ MODULES = {
     "archimedes_screw": archimedes_screw, "inversion": inversion,
     "t32_nilpotency": t32_nilpotency, "cipher": cipher,
     "comma_sequence": comma_sequence, "stencil": stencil,
+    "hyper_linear": hyper_linear, "equation_space": equation_space,
 }
