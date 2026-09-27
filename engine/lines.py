@@ -143,6 +143,13 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
                 "= steps; refuses if the walk stalls or the locus isn't "
                 "reachable in budget",
     },
+    "spectral_primes": {
+        "module": "engine.toolsets.spectral_primes", "line": "both",
+        "free": "theta'(t) at one height — the spin/carrier rate, no resonance, no search",
+        "work": "reconstruct psi(x) from n_zeros known zeros — cost = n_zeros; "
+                "the primes (Gibbs undershoot at prime jumps) only emerge as "
+                "more work (more zeros) is spent",
+    },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
         "free": "stack the two facets (Fermat prompt / Riemann firing) of one number",

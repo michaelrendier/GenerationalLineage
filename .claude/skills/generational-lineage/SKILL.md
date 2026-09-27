@@ -250,3 +250,61 @@ State, for each operation used:
 
 and end with either "no new generator required" or an explicit emergence flag
 naming which of the section-5 signatures fired.
+
+## 10. Worked example — spin/wobble (2026-09-26, `spectral_primes`)
+
+The theta(t)-rotation construction (`RiemannHypothesisProof/ADDENDUM_toroidal_
+theta_structure_2026-09-25.md`; engine: `engine/toolsets/spectral_primes.py`)
+run through the section-3 test, because it is a live example of the test
+actually separating two things that sound like one "spin/wobble" pair into
+different tiers — and of catching a wrong claim before it shipped.
+
+**Spin — `theta'(t) ~= (1/2)*ln(t/2*pi)`.** Section-3 walk: not a count or
+ratio (step 1, no) — not a fixed set (step 2, no) — does it change length?
+It is a scalar rate, not a transformation, so the reflect/dilate question
+(step 3) does not directly apply either. It resolves one level down: this
+is a **log-pitch reading**, the same generator `archimedes_screw` already
+owns ("read the log-pitch ln p off a step") — SCALE (the ratio `t/2*pi`)
+composed with the ADD-bridge (`ln`). **Tier 1, descends from SCALE via the
+log map. Not a new primitive** — it was already in the domain, just not
+previously named at this location.
+
+**Wobble — the `psi(x)` reconstruction, `build_up`'s oscillatory sum.**
+This is a **generation-count object** in the skill's own §"Generation =
+level/cohort" sense: `n_zeros` (the `cost` `build_up` reports) is exactly
+a lineage depth, the same reading `Omega(n)` gets elsewhere in this engine
+— the reconstruction only resolves the primes as more generations (more
+zeros) are spent, and the Gibbs undershoot at a prime jump is the visible
+signature of "not enough generations yet," not an error. **Tier 3,
+descends from ADD (the summation) of SCALE-rotated terms (`x^rho`, tier
+0/1) — a count of composed primitives, same family as `Omega(n)`.**
+
+**The tilt-vs-wobble claim — a live §6 MATHS fault, caught, not avoided.**
+Before this toolset existed, a "minimum information -> tilt = wobble"
+argument was made by parsimony alone (no new free quantity needed). Tested
+directly (`ValaQuenta/modules/spectral_primes/maths.py::
+tilt_vs_wobble_correlation`): correlation ~0.037, essentially zero. Both
+sides were measured; they disagree. Per §6, that is a **MATHS fault**, not
+a CODE fault (the check ran correctly) and not a METHOD error (the
+approach was sound, the specific alignment — pointwise tilt vs interval
+wobble, §8's "is the observable on the axis that governs the outcome"
+question — was not checked before the claim was made). Left OPEN, not
+re-argued back to true.
+
+**The crossing — a live §8 axis-check, done right.** "Does the Real-Tilt/
+Axis crossing move?" is exactly the §8 question ("is the observable on the
+axis that governs the outcome, or merely correlated with it in this
+regime?") asked of `sigma`. Tested, not assumed: scanned across 5 zero
+heights, the crossing sits at `sigma=0.500000` to machine precision at
+every one — pinned, not drifting. This is the section-8 discipline
+working as intended: the claim ("the crossing is fixed") was checked
+against the actual governing axis (`sigma`) rather than left as a
+plausible-sounding restatement of "the brim does not move."
+
+No new generator required by either spin or wobble — the emergence check
+(§5) does not fire for either. What tonight's example actually
+demonstrates is narrower and more useful: the SAME construction can
+contain one tier-1 restatement, one tier-3 generation-count object, one
+caught §6 MATHS fault, and one correctly-run §8 axis-check, and the only
+way to tell which is which is to run the test, not to trust how similar
+two things sound in prose.

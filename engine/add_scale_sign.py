@@ -165,6 +165,49 @@ class ASSWord:
     def additive(self) -> bool:        return abs(self.firing_defect()) < 1e-9
     def gamma(self) -> float:          return self.source.gamma()
 
+    # ── the Long Path's own memory — set-membership over the trajectory ──
+    # 2026-09-27, mirrored from ValaQuenta.modules.add_scale_sign (module-
+    # independence convention: same maths, ported not imported). Recaman's
+    # defining rule flips between its two branches on a SET-MEMBERSHIP
+    # test against its own prior history, not a fixed threshold -- this
+    # gives the ASS engine's own recorded step sequence (`record()`'s
+    # "the piece every roll-down terminates on") that same memory.
+    def trajectory(self, x0: float = 1.0) -> Tuple[float, ...]:
+        pos = [x0]
+        x = x0
+        for s in self.steps:
+            x = s(x)
+            pos.append(x)
+        return tuple(pos)
+
+    def visited(self, x0: float = 1.0, tol: float = 1e-9) -> Dict[float, List[int]]:
+        traj = self.trajectory(x0)
+        seen: Dict[float, List[int]] = {}
+        for i, x in enumerate(traj):
+            key = round(x / tol) * tol if tol else x
+            seen.setdefault(key, []).append(i)
+        return seen
+
+    def collisions(self, x0: float = 1.0, tol: float = 1e-9) -> List[Tuple[int, int, float]]:
+        seen = self.visited(x0, tol)
+        out = []
+        for pos, idxs in seen.items():
+            if len(idxs) > 1:
+                for a, b in zip(idxs, idxs[1:]):
+                    out.append((a, b, pos))
+        return sorted(out)
+
+    def would_collide(self, next_step: "ASS", x0: float = 1.0, tol: float = 1e-9) -> bool:
+        """The operator-level flip test: would firing `next_step` land the
+        Long Path on a position it has already visited? The direct
+        analogue of Recaman's own a(n-1)-n candidate check, run BEFORE
+        the step is committed."""
+        traj = self.trajectory(x0)
+        candidate = next_step(traj[-1])
+        visited_positions = {round(x / tol) * tol if tol else x for x in traj}
+        key = round(candidate / tol) * tol if tol else candidate
+        return key in visited_positions
+
     def as_equation(self) -> str:
         s = self.source                    # the resulting element — g·ln s + a
         terms = []
