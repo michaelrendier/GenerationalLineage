@@ -4,11 +4,18 @@ Release notes, newest first. The pre-1.0 development log follows the 1.0.0 entry
 
 ## Unreleased — after 1.0.0
 
-- **The README's code blocks are now self-contained and tested.** Auditing the README after the 1.0.0 release found that 10 of its 21
-  Python blocks were fragments that used names defined only in the surrounding prose (`plaintext`, `N`, `my_objects`, …), one called a
-  function without its required arguments, and one showed a deliberate `AscentNotFree` without catching it. All are fixed; a new test
-  (`test_every_python_block_in_the_readme_runs`) runs every block. Suite counts are now Core `151 passed, 2 skipped`, Extended
-  `153 passed` (1.0.0 shipped with 150 / 152).
+- **The README's older prose was audited against the engine and made consistent.** Stale and unverifiable claims were fixed (see §7 of
+  the README for the list); §4.8 now sits in its numeric place; two tutorials were added for the facets that had none (`17` the
+  pathway and tuning, `18` the factoral spiral) — 43 in all; the README has a contents list and its appendices are lettered; and every
+  design statement or sibling-repository pointer that a reader outside the author's working tree could not resolve now says where it lives.
+- **Generated, so it cannot drift:** §5's relation tables (all 44 relations, from the engine's own log — the hand-written table listed 40),
+  the Emerger report in §4.14, and Appendix A (the Clay output) are now produced by `devtools/build_docs.py`, and the tutorial index
+  computes its own count.
+- **The README's code blocks are self-contained and tested.** 10 of its 21 Python blocks were fragments that used names defined only in
+  the surrounding prose, one called a function without its required arguments, and one showed a deliberate `AscentNotFree` uncaught. All
+  fixed; `test_every_python_block_in_the_readme_runs` runs every block, and `test_readme_internal_links_and_relative_paths_resolve`
+  checks every README anchor and every relative link in the README and wiki.
+- Suite counts are now Core `156 passed, 2 skipped`, Extended `158 passed` (1.0.0 shipped with 150 / 152).
 
 ## 1.0.0 — 2026-09-28 — the first release
 

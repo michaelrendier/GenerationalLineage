@@ -23,7 +23,8 @@ What is generated (and therefore cannot drift from the engine):
                                   committed tutorial transcripts (examples/transcripts/)
     wiki/Tools-Reference.md       every registered toolset: definition, both directions, tutorial, page
     README.md  between markers    the Install section (from INSTALL.md), the quickstart transcript, the §4.16
-                                  toolset table, §4.19–4.28 (the ten moves), the tutorial index
+                                  toolset table, §4.19–4.28 (the ten moves), the tutorial index, §5 (the relation
+                                  tables, from the engine's own log), the Emerger report (§4.14) and Appendix A (Clay output)
 
 Everything else in README.md and wiki/ is hand-written and left alone.
 """
@@ -472,9 +473,58 @@ def quickstart_block() -> str:
     return "```text\n" + transcript("01_quickstart") + "\n```"
 
 
+def relations_block() -> str:
+    """§5 — every self-checked relation, straight from the engine's own log (its own `claim` sentences)."""
+    import engine
+    eng = engine.run_lineage(verbose=False)["engine"]
+    groups = [
+        ("R", ("sigma", "lineage"), "inherited from `engines/e10_generational_lineage.py` in the sibling VAPMIP repository (σ-in-∅_RB; carried over so this repo has its own copy of the discipline it runs on)"),
+        ("F", ("factoral",), "the factoral basics (the Two Trees domain, applied to integers)"),
+        ("G", ("ring",), "the ring-theory spine (fall ⟺ zero divisors, the same test on two rings)"),
+        ("FR", ("fractal",), "the fractal block (§4.7's tower, made concrete)"),
+        ("PW", ("pathway", "units"), "the pathway / tuning / instrument layer (§§4.4–4.11) — the newest and most actively growing block"),
+    ]
+    out = []
+    for code, prefixes, blurb in groups:
+        rows = [r for r in eng.log if r.name.split(".")[0] in prefixes]
+        out.append(f"**{code}1–{code}{len(rows)} — {blurb}**\n")
+        out.append("| id | relation | tier | status | claim |\n|---|---|---|---|---|")
+        for i, r in enumerate(rows, 1):
+            claim = r.claim.replace("|", "\\|").replace("\n", " ")
+            out.append(f"| {code}{i} | `{r.name}` | {r.tier} | {r.status.value} | {claim} |")
+        out.append("")
+    total = len(eng.log)
+    held = sum(1 for r in eng.log if r.status.value == "HOLDS")
+    out.append(f"*{held}/{total} HOLD.* Regenerated from the engine by `devtools/build_docs.py`; the ids are the relations' order in the engine's log.")
+    return "\n".join(out)
+
+
+def clay_output_block() -> str:
+    import subprocess
+    r = subprocess.run([sys.executable, "-W", "ignore", "-m", "engine.clay"], cwd=ROOT, capture_output=True, text=True, timeout=300)
+    if r.returncode != 0:
+        raise SystemExit("python3 -m engine.clay failed:\n" + r.stderr[-800:])
+    return "```text\n" + r.stdout.rstrip("\n") + "\n```"
+
+
+def emerger_report_block() -> str:
+    import contextlib
+    import io
+    import engine
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        engine.report_emergence("e1+e10")
+    return "```text\n" + buf.getvalue().strip("\n") + "\n```"
+
+
 def tutorial_index() -> str:
-    rows = ["| # | tutorial | what it shows |", "|---|---|---|"]
-    for p in sorted(glob.glob(os.path.join(ROOT, "examples", "[0-9][0-9]_*.py"))):
+    files = sorted(glob.glob(os.path.join(ROOT, "examples", "[0-9][0-9]_*.py")))
+    n = len(files)
+    intro = (f"{n} tutorials, each a runnable script in [`examples/`](examples/) with its generated transcript beside it in "
+             "[`examples/transcripts/`](examples/transcripts/). `01`–`18` are the core facets, `20`–`33` the toolsets that predate 1.0, "
+             "`40`–`49` the ten moves added in 1.0, and `90` the Extended layer.\n")
+    rows = [intro, "| # | tutorial | what it shows |", "|---|---|---|"]
+    for p in files:
         ex = os.path.splitext(os.path.basename(p))[0]
         rows.append(f"| {ex[:2]} | [`{ex}.py`](examples/{ex}.py) · [transcript](examples/transcripts/{ex}.txt) | {example_title(ex)} |")
     return "\n".join(rows)
@@ -556,6 +606,9 @@ def build() -> dict:
     readme = replace_block(readme, "quickstart", quickstart_block())
     readme = replace_block(readme, "toolset-table", toolset_table())
     readme = replace_block(readme, "new-moves", readme_move_block())
+    readme = replace_block(readme, "relations-table", relations_block())
+    readme = replace_block(readme, "clay-output", clay_output_block())
+    readme = replace_block(readme, "emerger-report", emerger_report_block())
     readme = replace_block(readme, "tutorial-index", tutorial_index())
     files["README.md"] = readme
     return files
