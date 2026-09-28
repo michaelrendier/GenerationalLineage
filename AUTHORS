@@ -1,0 +1,10 @@
+GenerationalLineage — authors and copyright holders
+
+Cody Michael Allison (Michael Rendier) <the.wandering.god@gmail.com>
+    Author of the engine, its mathematics and its documentation.
+    ORCID 0009-0007-7239-6760 — https://orcid.org/0009-0007-7239-6760
+    https://github.com/michaelrendier
+
+Development of the ten factor moves added in 1.0, the test suite, the tutorials and the release
+infrastructure was carried out with Claude (Anthropic) as a coding assistant, at the author's
+direction; the author reviewed and is responsible for the result.

@@ -1,7 +1,7 @@
 # ADD:SCALE:SIGN — the tier-0 datatype (engine + tool in the decomposer suite)
 
 **Formal spec:** `Ainulindale/wiki/107_add_scale_sign_datatype.md` (canonical).
-This page is the SFR-side view: the datatype as an **engine** and a **tool** in
+This page is the engine-side view: the datatype as an **engine** and a **tool** in
 the decomposer suite, and the fast inverse square root as its worked example.
 
 **Files:** `engine/add_scale_sign.py` (`ASS`, `ASSWord`, `compose`, `word`,

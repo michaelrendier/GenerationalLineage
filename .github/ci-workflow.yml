@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  core:
+    name: Core (numpy only)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]      # run-tested on 3.12; widen the matrix as other versions are tried
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -r requirements-dev.txt
+      - run: python3 -m engine --verify
+      - run: python3 -m pytest -q
+      - run: python3 devtools/transcript.py --check-all
+      - run: python3 devtools/build_docs.py --check
+
+  extended:
+    name: Extended (with the four sibling repositories)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ThePlace/GenerationalLineage
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Clone the sibling repositories beside this one
+        working-directory: ThePlace
+        run: |
+          for r in AbrikosovTree ValaQuenta TuringStack FourthAgePapers; do
+            git clone --depth 1 https://github.com/michaelrendier/$r.git
+          done
+      - working-directory: ThePlace/GenerationalLineage
+        run: |
+          pip install -r requirements-dev.txt
+          python3 -m engine --verify --strict
+          python3 -m pytest -q
