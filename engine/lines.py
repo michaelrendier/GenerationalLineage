@@ -156,6 +156,84 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
         "work": "rank several candidate callables against a shared reference "
                 "cost — cost = candidates scanned",
     },
+    "periodicity": {
+        "module": "engine.toolsets.periodicity", "line": "both",
+        "free": "every period of a string, EXACTLY — one linear prefix-function pass; "
+                "p is a period iff n−p is a border (cross-checked by the Z function). "
+                "Fine–Wilf says two overlapping periods force their gcd: the theorem "
+                "behind the Kasiski GCD-vote, as a guarantee rather than a vote",
+        "work": "write a periodic string from a chosen root, or build the Fine–Wilf "
+                "extremal word (length p+q−gcd−1) that witnesses the bound is tight",
+    },
+    "lyndon": {
+        "module": "engine.toolsets.lyndon", "line": "both",
+        "free": "Chen–Fox–Lyndon: the UNIQUE non-increasing factorisation of a word into "
+                "Lyndon words (the primes of the word monoid), Duval, one linear pass; "
+                "plus least rotation, primitive root and exponent",
+        "work": "enumerate the Lyndon words of a given length (count checked against the "
+                "Möbius formula), or reassemble a word from chosen Lyndon factors",
+    },
+    "berlekamp_massey": {
+        "module": "engine.toolsets.berlekamp_massey", "line": "both",
+        "free": "the shortest linear recurrence behind a sequence, and the period it forces "
+                "= order of x mod the minimal polynomial, read off its factorisation over "
+                "GF(2); flagged UNDERDETERMINED below 2L terms",
+        "work": "run an LFSR from a chosen polynomial, or search for a primitive polynomial "
+                "of degree L (cost = candidates tested) — the choice that buys period 2^L−1",
+    },
+    "logperiodic": {
+        "module": "engine.toolsets.logperiodic", "line": "both",
+        "free": "fit trend + one sinusoid in u = ln x — the spring's own coordinate: ω, the "
+                "scale ratio λ = e^{2π/ω} per turn, amplitude, phase; and the Mellin "
+                "transform (Fourier on the SCALE group). Same fit in linear x shows the "
+                "flattening artifact as a number",
+        "work": "synthesise a spring from a chosen (ω, A, φ, trend) — cost = samples",
+    },
+    "permutation": {
+        "module": "engine.toolsets.permutation", "line": "both",
+        "free": "cycle type (the conjugacy class), order = lcm, sign, reflection length, "
+                "inversions, Lehmer code and factoradic rank — one pass; modular affine "
+                "permutations x→ax+b (the ADD⋊SCALE group on ℤ/m) read by multiplicative order",
+        "work": "un-rank a factoradic address, build a permutation of a chosen cycle type, or "
+                "the cheapest permutation of order N (one cycle per prime power — its lineage)",
+    },
+    "rejewski": {
+        "module": "engine.toolsets.rejewski", "line": "both",
+        "free": "the Enigma characteristic — cycle types of S_i·S_{i+3} — of one setting, a "
+                "conjugacy-class invariant the plugboard cannot disturb (checked on 17,576 "
+                "states against a known-answer vector)",
+        "work": "the card catalogue: scan all 26³ start positions for those matching an "
+                "observed characteristic; the plugboard is never part of the search",
+    },
+    "jordan_chevalley": {
+        "module": "engine.toolsets.jordan_chevalley", "line": "both",
+        "free": "A = S + N exactly, in rational arithmetic: S semisimple (only scales), N "
+                "nilpotent (a finite chain of generations), both polynomials in A; nilpotency "
+                "index and Jordan block sizes from ranks; every property re-checked",
+        "work": "build a matrix with a chosen Jordan structure in a chosen basis — the basis "
+                "is the added constraint A alone does not return",
+    },
+    "re_pair": {
+        "module": "engine.toolsets.re_pair", "line": "both",
+        "free": "a sequence's own lineage tree: repeated pairing gives rules R→(x,y), "
+                "generation = 1+max(children), grammar size = its Ω-analogue; the round "
+                "trip is exact, minimality is reported as UNKNOWN (NP-hard)",
+        "work": "expand a grammar back to the sequence (refuses a cyclic grammar)",
+    },
+    "pohlig_hellman": {
+        "module": "engine.toolsets.pohlig_hellman", "line": "both",
+        "free": "the lineage of a group order and the largest prime factor: the predicted "
+                "cost of a discrete log, with no discrete log computed",
+        "work": "solve g^x=h per prime power by BSGS, glue by CRT, verify; REFUSES when the "
+                "largest prime factor is over budget — that residue is where the hardness lives",
+    },
+    "unicity": {
+        "module": "engine.toolsets.unicity", "line": "both",
+        "free": "Shannon's unicity distance U = H(K)/D for a cipher kind: a rigorous upper "
+                "bound from the computed order-0 redundancy, and the literature estimate "
+                "kept separate and labelled",
+        "work": "the ciphertext length owed so expected spurious keys ≤ ε — the work is data",
+    },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
         "free": "stack the two facets (Fermat prompt / Riemann firing) of one number",

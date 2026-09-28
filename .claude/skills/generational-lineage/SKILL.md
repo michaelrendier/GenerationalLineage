@@ -241,6 +241,33 @@ through — never collapsed to |z|^2, which is the one step with no adjoint.
   the underlying fact was never in doubt. If a known identity fails to verify,
   suspect your own parametrisation before the mathematics.
 
+## 8b. The factor moves in `GenerationalLineage/engine/toolsets/` (added 2026-09-28)
+
+A "factor" is whatever can be quotiented out while an invariant residual
+survives — a period, a key length, a cycle type, a nilpotent part, a bracketing.
+Each move follows the toolset contract (`descend` free · `build_up` paid or
+`AscentNotFree` · `verify`), is stdlib-only, and is checked exhaustively where
+the space allows. Reach for the move that matches the KIND of factor:
+
+| kind of factor | move | what it returns |
+|---|---|---|
+| period of a string, exact | `periodicity` | every period via border chain; Fine–Wilf (why the GCD-vote works) |
+| word "primes" | `lyndon` | unique non-increasing Lyndon factorisation; primitive root/exponent |
+| process behind a sequence | `berlekamp_massey` | shortest recurrence, period from factoring the minimal polynomial; UNDERDETERMINED below 2L terms |
+| spring / log-periodic | `logperiodic` | fit in u = ln x; λ = e^{2π/ω}; Mellin = Fourier on SCALE |
+| re-ordering | `permutation` | cycle type, order = lcm, sign, factoradic rank; x→ax+b on ℤ/m = ADD⋊SCALE |
+| conjugation-hidden invariant | `rejewski` | cycle type of S_i·S_{i+3}, plugboard-independent |
+| operator → scaling + finite chain | `jordan_chevalley` | A = S+N exact; nilpotency index; block sizes |
+| sequence's own lineage tree | `re_pair` | rules, generation depth; minimality reported UNKNOWN |
+| group order lineage | `pohlig_hellman` | cost from the largest prime factor; refuses over budget |
+| how much evidence is enough | `unicity` | U = H(K)/D; rigorous bound vs literature estimate kept apart |
+
+Rules the moves share (all already practised in this repo): exact round-trip,
+a control/null before the measurement, explicit refusal (`AscentNotFree`) over a
+confident approximation, and "UNKNOWN" reported as unknown. The full catalogue
+of ~110 candidate moves, tagged by where each already lives, is in
+`ContextPlease/claude/scratchpad/2026-09-28_gl_move_catalogue/README.md`.
+
 ## 9. Report format
 
 State, for each operation used:

@@ -55,3 +55,21 @@ Mantissa linearity → "good enough" (~3.4 % raw); one Newton step is the
 Added to `engine/__init__.py` and `engine/tools.py` 2026-08-28. `run_lineage`
 and the existing suite are unaffected (additive). The canonical maths reference
 carries the generalized equation `u = Σ_k [g_k·ln s_k + a_k]`, `Γ = tanh(u/2)`.
+
+## SIGN and the direction of the Noether currents (2026-09-28)
+
+SIGN is **necessary, not sufficient** for the `J_red` / `J_blue` direction.
+The `forced_sigma` forms give an exact identity (checked, max difference 0):
+
+    ln F − ln B = E(1 − 2σ) = ASS(add=0, scale=2E, sign=−1) applied to (σ − ½)
+
+so **SCALE (2E) sets how strongly, the ADD offset (σ − ½) sets which side of ½,
+SIGN sets the orientation** — the net direction is the product of SIGN's `g` and
+the sign of the offset. Measured on the datatype in this repo: SIGN and SCALE
+**commute**; SIGN and ADD do not (their commutator `[ADD(3), SIGN(−1)]` is the
+pure translation −6); and flipping SIGN changes the fold by `(g−1)·ln s`, so at
+`s = 1` it changes **nothing**. Caution kept with it: `backward = −forward` is a
+definition, and `F + B` is not conserved in σ (min at ½). Full account, tables,
+and the "up/down is a tower fact" reading:
+`ValaQuenta/wiki/add_scale_sign.md` § *SIGN and the direction of the Noether
+currents*. Script and log: `ContextPlease/claude/scratchpad/2026-09-28_sign_noether_direction/`.

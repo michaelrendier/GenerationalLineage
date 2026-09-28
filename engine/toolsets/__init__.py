@@ -23,6 +23,8 @@ from . import (                                                  # noqa: F401
     scale, units, box_kite, noether, archimedes_screw, inversion, t32_nilpotency,
     cipher, comma_sequence, stencil, hyper_linear, equation_space, spectral_primes,
     cs_benchmark,
+    periodicity, lyndon, berlekamp_massey, logperiodic, permutation, rejewski,
+    jordan_chevalley, re_pair, pohlig_hellman, unicity,
 )
 
 MODULES = {
@@ -32,4 +34,8 @@ MODULES = {
     "comma_sequence": comma_sequence, "stencil": stencil,
     "hyper_linear": hyper_linear, "equation_space": equation_space,
     "spectral_primes": spectral_primes, "cs_benchmark": cs_benchmark,
+    "periodicity": periodicity, "lyndon": lyndon, "berlekamp_massey": berlekamp_massey,
+    "logperiodic": logperiodic, "permutation": permutation, "rejewski": rejewski,
+    "jordan_chevalley": jordan_chevalley, "re_pair": re_pair,
+    "pohlig_hellman": pohlig_hellman, "unicity": unicity,
 }
