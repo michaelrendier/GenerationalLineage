@@ -555,7 +555,7 @@ Every toolset honours one **contract**:
 | `verify()` | a self-check returning `{"ok": bool, ...}` |
 | `AscentNotFree` | the exception `build_up` raises when the rebuild is genuinely undetermined; carries `.owed`, a short statement of the missing constraint. **The refusal is the result**, not a failure. |
 
-`lines.verify_all()` runs every toolset's `verify()` and never conflates three outcomes: **ran and passed**, **ran and failed**, and **did not run** (an *extended*-layer toolset whose sibling repositories are absent, reported as skipped, never as passed).
+`lines.verify_all()` runs every toolset's `verify()` and never conflates three outcomes: **ran and passed**, **ran and failed**, and **did not run** (an *extended*-layer toolset whose three sibling repositories are absent, reported as skipped, never as passed).
 
 Call them uniformly with `lines.descend(name, x, ...)` and `lines.build_up(name, target, ...)`, or import a toolset module directly.
 

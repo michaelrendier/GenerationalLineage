@@ -1,8 +1,10 @@
 # The Generational Lineage Engine
 
-Session origin: 2026-07-17, arising directly out of the SHA-1-first UDEO
-session (see `TuringStack`'s `.clauderc_context_1` entry) and Cody's own
-tree/root vocabulary for navigating the Cayley-Dickson tower.
+Session origin: 2026-07-17, arising directly out of a session testing this
+project's Cayley-Dickson/GF(2) machinery against SHA-1's published constants
+(a check case, part of a wider hypercomplex-maths exploration touching other
+projects not scoped here) and Cody's own tree/root vocabulary for navigating
+the Cayley-Dickson tower.
 
 ## The core move: factorization is relative to which facet you stand at
 
@@ -22,7 +24,7 @@ facet instead, should produce its own "extinction" mechanism — not a
 metric (already tried, at chance — see Method 3 below), but a genuine
 structural fall/survive condition, the way Fermat's facet has one.
 
-**Why "factoral," not "spectral":** `UDEO_RSA_DEMO.py`'s Method 3
+**Why "factoral," not "spectral":** a sibling RSA key-recovery experiment
 ("Sedenion Spectral Relativity") already exists and already has a
 result — a σ-face geodesic-distance metric, tested against RSA's (e,d),
 AT CHANCE. Naming this new work "spectral" would risk quietly reusing
@@ -424,14 +426,17 @@ curvature — the associator is the torsion a genuine ring does not have.
 
 ### A find, kept on the record (G5, OURS)
 
-Building G5 surfaced that the UDEO white paper's *"𝟏₃₂ is a global annihilator
-(x·𝟏 = 0 for every x)"* lemma is **false** and contradicts its own distance
-table — the round constants have `Δ(K) = 𝟏 ≠ 0` (distance 32). The correct,
-machine-verified statement is `Δ(w) = 0 ⟺ w² = 0` (nilpotency), exhaustive at
-dim 8 and over 20 000 random at dim 32. The theorem stands (IV nilpotency, null
-subalgebra — not "ideal", since the algebra is non-associative); the shortcut
-proof was retracted in `TuringStack` the same day. A MATHS-FAULT the harness was
-built to catch, caught.
+Building G5 — a test of this engine's own trace-Laplacian machinery, work
+touching other projects not scoped here — an early hand-derived guess that
+*"𝟏₃₂ is a global annihilator (x·𝟏 = 0 for every x)"* turned out **false** and
+to contradict its own distance table — the round constants have `Δ(K) = 𝟏 ≠ 0`
+(distance 32). The correct, machine-verified statement is `Δ(w) = 0 ⟺ w² = 0`
+(nilpotency), exhaustive at dim 8 and over 20 000 random at dim 32; SHA-1's
+five published IV constants (a real-world check case, chosen because they are
+public) turn out to form a null subalgebra under the test, at distance 0. The
+theorem stands (IV nilpotency, null subalgebra — not "ideal", since the
+algebra is non-associative); the guess was retracted the same day. A
+MATHS-FAULT the harness was built to catch, caught.
 
 ---
 

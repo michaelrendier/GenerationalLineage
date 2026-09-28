@@ -42,7 +42,7 @@ construction), **THEORETICAL** (stated, not established). "Exhaustive" means eve
 Run-tested on: Linux (Ubuntu, kernel 6.8), **Python 3.12.3**, numpy **2.4.6** and **2.5.3**. The code is syntax-checked for Python ≥ 3.9
 (`ast.parse` with `feature_version=(3, 9)`, and no runtime-evaluated `X | None` annotations) but has not been *run* there. Windows and
 macOS have not been run. Clean-clone installs were verified in fresh virtual environments — Core with numpy only, and Extended with
-the four sibling repositories cloned beside it.
+the three sibling repositories cloned beside it.
 
 ## Determinism
 

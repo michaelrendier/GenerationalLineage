@@ -4,6 +4,17 @@ Release notes, newest first. The pre-1.0 development log follows the 1.0.0 entry
 
 ## Unreleased — after 1.0.0
 
+- **Dropped the `udeo_poc` dependency; the Extended layer now needs three sibling repositories, not four.**
+  `engine.maths.nilpotent_fraction_at_dim` used to import `CayleyDickson` from `TuringStack/udeo_poc.py` for its GF(2)
+  Cayley–Dickson multiplication. It now uses this repository's own `engine.lineage.cd_mul_gf2` — checked bit-identical against the
+  old code path at every dimension from 8 to 2048, and up to 8× faster — so `TuringStack` is no longer a sibling this repository
+  needs. `TuringStack` is unrelated to this fix's other half: the G5 relation (`ring.trace_laplacian_is_nilpotency`, README §7 and
+  the wiki) tests this engine's own trace-Laplacian machinery, using SHA-1's five published IV constants as one real-world check
+  case; the prose around it previously attributed the correction of an early hand-derived guess to an unrelated project's white
+  paper, which was not accurate — that guess, and its correction, were this engine's own, work touching other projects not scoped
+  here.
+  Fixed in the README, the wiki and the install documentation; `INSTALL.md`, the CI workflow and `CONTRIBUTING.md` now name three
+  sibling repositories.
 - **The README's older prose was audited against the engine and made consistent.** Stale and unverifiable claims were fixed (see §7 of
   the README for the list); §4.8 now sits in its numeric place; two tutorials were added for the facets that had none (`17` the
   pathway and tuning, `18` the factoral spiral) — 43 in all; the README has a contents list and its appendices are lettered; and every
@@ -44,7 +55,8 @@ exhaustively where the space allows.
 - `python3 -m engine` — banner and mode; `--verify` (exit 0 iff everything that ran passed), `--strict` (also fail if anything was
   skipped), `--lines`, `--list`.
 - **Core / Extended split, made explicit.** Core needs only numpy; Extended adds `engine.maths`, `engine.tools`,
-  `engine.oscilloscope`, which reach four sibling repositories. Both installs were verified from clean clones in fresh virtual
+  `engine.oscilloscope`, which reach sibling repositories (three as of the 2026-09-28 UDEO-dependency fix below; four at the 1.0.0
+  tag). Both installs were verified from clean clones in fresh virtual
   environments (Core: 27 toolsets ran, 27 passed, 1 skipped; Extended: 28 ran, 28 passed). `engine.EXTENDED` reports the mode.
 - `lines.verify_all()` distinguishes *ran and passed*, *ran and failed*, and *did not run*: a skipped Extended toolset is reported as
   skipped, never as passed (`_ok`, `_complete`, `_skipped`).

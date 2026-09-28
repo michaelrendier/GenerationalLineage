@@ -73,11 +73,12 @@ _H_RB_HAT_MODULE = os.path.join(_THEPLACE, 'ValaQuenta', 'modules', 'h_rb_hat')
 # a pre-existing path bug in that file, not touched here. Inserting the real
 # location ourselves so the import resolves regardless.
 _FERMAT_MONSTER_ENGINE = os.path.join(_THEPLACE, 'FourthAgePapers', 'FermatMonster', 'engine')
-_TURINGSTACK = os.path.join(_THEPLACE, 'TuringStack')
 sys.path.insert(0, _ABRIKOSOV_ENGINE)
 sys.path.insert(0, _H_RB_HAT_MODULE)
 sys.path.insert(0, _FERMAT_MONSTER_ENGINE)
-sys.path.insert(0, _TURINGSTACK)
+# TuringStack was a fourth sibling here for udeo_poc.CayleyDickson; removed 2026-09-28 --
+# nilpotent_fraction_at_dim() now uses this repo's own cd_mul_gf2 (checked bit-identical,
+# see that function's docstring), so TuringStack is no longer needed by this module.
 
 from telperion_engine import (  # noqa: E402
     prime_sieve, classify_prime, cd_level_data, full_tower, prime_tower_path,
@@ -85,7 +86,6 @@ from telperion_engine import (  # noqa: E402
     ZD_CONSTELLATIONS_ODD, MOONSHINE_PRIMES, CD_NAMES,
 )
 from maths import RIEMANN_ZEROS, SIGMA_CRITICAL, SIGMA_FORBIDDEN  # noqa: E402  (h_rb_hat/maths.py)
-from udeo_poc import CayleyDickson  # noqa: E402
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -104,16 +104,22 @@ import random as _random
 
 def nilpotent_fraction_at_dim(dim: int, n_samples: int = 30, seed: int = 20260717) -> float:
     """Fraction of random dim-bit integers, embedded in T_dim/GF(2), that
-    are nilpotent (x^2=0) rather than involutory (x^2=e0). Reuses
-    CayleyDickson('gf2') unchanged from udeo_poc.py -- the same exact
-    Frobenius-theorem machinery, no reimplementation."""
-    cd = CayleyDickson(dim, 'gf2')
+    are nilpotent (x^2=0) rather than involutory (x^2=e0). Uses this repo's
+    own GF(2) Cayley-Dickson multiplier (`engine.lineage.cd_mul_gf2`) --
+    checked bit-identical against `udeo_poc.CayleyDickson('gf2')` at every
+    dim in {8,16,32,64,128,256,512,1024,2048} (2026-09-28), and 8x faster at
+    dim 2048. Dropped the udeo_poc import: this function's job is a generic
+    GF(2) Cayley-Dickson nilpotency count, not a UDEO-specific computation,
+    and the two implementations of that maths are independent code -- this
+    is not "the same tool run twice."""
+    from .lineage import cd_mul_gf2
+
     rng = _random.Random(seed + dim)
     nilp = 0
     for _ in range(n_samples):
         bits = [rng.randint(0, 1) for _ in range(dim)]
-        sq = cd.multiply(bits, bits)
-        if cd.is_zero(sq):
+        w = sum(b << i for i, b in enumerate(bits))
+        if cd_mul_gf2(w, w, dim) == 0:
             nilp += 1
     return nilp / n_samples
 

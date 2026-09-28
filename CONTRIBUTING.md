@@ -19,7 +19,7 @@ pip install -r requirements-dev.txt
 python3 -m pytest -q                       # must pass before and after your change
 ```
 
-Core is enough for almost everything. The Extended layer needs four sibling repositories cloned beside this one — see
+Core is enough for almost everything. The Extended layer needs three sibling repositories cloned beside this one — see
 [`INSTALL.md`](INSTALL.md).
 
 ## Adding a move (a toolset)

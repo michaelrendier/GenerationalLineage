@@ -121,7 +121,7 @@ from .shape import diagnose as shape_diagnose
 __version__ = "1.0.0"
 
 # EXTENDED = the Fermat-facet layer (engine.maths, engine.tools, engine.oscilloscope)
-# reached its four sibling repos. CORE (everything else) needs only numpy.
+# reached its three sibling repos. CORE (everything else) needs only numpy.
 # IMPORT_ERROR records why the extended layer is absent; it is None when present.
 IMPORT_ERROR = None
 try:

@@ -52,7 +52,7 @@ There are two ways to install it. Almost everything is in the **Core**; the **Ex
 | | Core | Extended |
 |---|---|---|
 | what you get | the whole engine: 27 toolsets, the lineage/emerger/ping engines, all tutorials except `90_`, all wiki pages | Core **plus** `engine.maths`, `engine.tools`, `engine.oscilloscope` (the Fermat-facet inventory, the control test, the two-panel SVG) |
-| needs | this repository + numpy | this repository + numpy + four sibling repositories cloned beside it |
+| needs | this repository + numpy | this repository + numpy + three sibling repositories cloned beside it |
 | `python3 -m engine --verify` | `27 toolsets ran, 27 passed, 1 skipped` | `28 toolsets ran, 28 passed, 0 skipped` |
 
 ### Core install
@@ -111,11 +111,11 @@ The importable package is called `engine` (see *Known limitations* in the README
 
 ### Extended install
 
-The Extended layer finds its four sibling repositories **in the same parent directory** as this one (`../AbrikosovTree`, and so on). Clone them side by side:
+The Extended layer finds its three sibling repositories **in the same parent directory** as this one (`../AbrikosovTree`, and so on). Clone them side by side:
 
 ```bash
 mkdir ThePlace && cd ThePlace
-for r in GenerationalLineage AbrikosovTree ValaQuenta TuringStack FourthAgePapers; do
+for r in GenerationalLineage AbrikosovTree ValaQuenta FourthAgePapers; do
     git clone https://github.com/michaelrendier/$r.git
 done
 cd GenerationalLineage
@@ -134,14 +134,14 @@ RESULT: PASS
 
 and `python3 -m engine` reports `mode: EXTENDED`.
 
-The four siblings are separate projects with their own licences; the Extended layer imports their code at run time and nothing from them is copied into this repository. What each one supplies: `AbrikosovTree` (`telperion_engine`, the 9-level Cayley–Dickson walk), `ValaQuenta` (the `h_rb_hat` maths and the box-kite maths), `TuringStack` (`udeo_poc.CayleyDickson`, used as a GF(2) Cayley–Dickson multiplier), `FourthAgePapers` (`FermatMonster/engine`, which `telperion_engine` needs on its path).
+The three siblings are separate projects with their own licences; the Extended layer imports their code at run time and nothing from them is copied into this repository. What each one supplies: `AbrikosovTree` (`telperion_engine`, the 9-level Cayley–Dickson walk), `ValaQuenta` (the `h_rb_hat` maths and the box-kite maths), `FourthAgePapers` (`FermatMonster/engine`, which `telperion_engine` needs on its path). (A fourth sibling, `TuringStack`, was needed through 1.0.0 for a GF(2) Cayley–Dickson multiplier; that dependency was replaced 2026-09-28 with this repository's own `engine.lineage.cd_mul_gf2` — checked bit-identical and faster — so `TuringStack` is no longer required here.)
 
 ### Troubleshooting
 
 | you see | it means | do this |
 |---|---|---|
 | `ModuleNotFoundError: No module named 'numpy'` | the virtual environment is not active, or `pip install -r requirements.txt` was skipped | activate `.venv`, reinstall |
-| `mode: CORE` and `extended layer absent` | the four sibling repositories are not beside this one | expected on a plain clone; do the Extended install if you want them |
+| `mode: CORE` and `extended layer absent` | the three sibling repositories are not beside this one | expected on a plain clone; do the Extended install if you want them |
 | `--strict` exits with status 2 | something was skipped | you are on a Core install; that is the honest answer |
 | a tutorial or test cannot `import engine` | not run from the repository root | `cd` to the repository root first |
 | `--verify` prints `FAIL` for a toolset | a real failure — please open an issue with the full output | include `python3 -m engine` output and your Python and numpy versions |
@@ -283,7 +283,7 @@ A check that did not run is never reported as passed.
 | 47 | [`47_re_pair.py`](examples/47_re_pair.py) · [transcript](examples/transcripts/47_re_pair.txt) | Re-Pair — a sequence's own lineage tree, built by repeated pairing. |
 | 48 | [`48_pohlig_hellman.py`](examples/48_pohlig_hellman.py) · [transcript](examples/transcripts/48_pohlig_hellman.txt) | Pohlig–Hellman — a discrete log is only as hard as the largest prime factor of the group order. |
 | 49 | [`49_unicity.py`](examples/49_unicity.py) · [transcript](examples/transcripts/49_unicity.txt) | Unicity — how much ciphertext makes the decomposition unique (Shannon). |
-| 90 | [`90_extended_fermat_facet.py`](examples/90_extended_fermat_facet.py) · [transcript](examples/transcripts/90_extended_fermat_facet.txt) | EXTENDED layer — the Fermat-facet inventory and the control test (needs the four sibling repos). |
+| 90 | [`90_extended_fermat_facet.py`](examples/90_extended_fermat_facet.py) · [transcript](examples/transcripts/90_extended_fermat_facet.txt) | EXTENDED layer — the Fermat-facet inventory and the control test (needs the three sibling repos). |
 <!-- END: tutorial-index -->
 
 ## Responsible use
@@ -299,7 +299,7 @@ Stated up front, because a release that hid them would be claiming more than it 
 
 1. **The import name is `engine`.** It is generic. Renaming the package would change every line of every tutorial, so 1.0 keeps
    it; use a virtual environment and do not install it beside another top-level package called `engine`.
-2. **The Extended layer edits `sys.path`.** `engine.maths` puts four sibling-repository directories at the front of the import
+2. **The Extended layer edits `sys.path`.** `engine.maths` puts three sibling-repository directories at the front of the import
    path when it loads. That is how it reaches them, and it can shadow a module of the same name elsewhere (it did during
    development: a top-level `tools` was shadowed, which is why the developer scripts live in `devtools/`). Core does not do this.
 3. **Tested on one interpreter.** Run-tested on Python 3.12.3, Linux, numpy 2.4.6 and 2.5.3. The code is syntax-checked for
@@ -574,7 +574,7 @@ No free parameters. No renormalisation.
 ## 4. How to use it — the tools
 
 All examples assume you're in the repository root with `import engine` working (see [Install](#install)).
-`engine.EXTENDED` is `True` when the four sibling repositories were found; sections tagged `[EXTENDED]` need it, everything else
+`engine.EXTENDED` is `True` when the three sibling repositories were found; sections tagged `[EXTENDED]` need it, everything else
 runs on a Core install. Each subsection names its runnable tutorial in [`examples/`](examples/) (the
 [tutorial index](#tutorial-index) lists them all).
 
@@ -1894,13 +1894,13 @@ the record" is a standing rule here, not a slogan:
   now tests what's actually structural (Laurelin dominates forever after the
   *last* crossing, verified to `N=100,000`) and records the `e²` proximity
   without treating it as a pass condition.
-- **G5, the "global annihilator" lemma.** Building the trace-Laplacian
-  relation surfaced that the UDEO white paper's "`𝟏₃₂` is a global
-  annihilator" lemma is **false** — it contradicts its own distance table
-  (round constants have `Δ=𝟏≠0`). The true statement, machine-verified
-  exhaustively at dim 8 and over 20,000 random samples at dim 32, is
-  `Δ(w)=0 ⟺ w²=0`. The underlying theorem (IV nilpotency) stands; the
-  shortcut proof was retracted the same day.
+- **G5, the "global annihilator" guess.** Building the trace-Laplacian relation, an early hand-derived guess — that `𝟏₃₂` (the
+  all-ones element) is a global annihilator, `x·𝟏=0` for every `x` — turned out to be **false**: it contradicts its own distance
+  table (round constants have `Δ=𝟏≠0`). The true statement, machine-verified exhaustively at dim 8 and over 20,000 random samples
+  at dim 32, is `Δ(w)=0 ⟺ w²=0`. This was a test of this engine's own trace-Laplacian machinery — work touching other projects not
+  scoped here — using SHA-1's five published IV constants as one real-world check case among others (they turn out to
+  form a null subalgebra under the test; the four round constants sit at maximum distance instead). The underlying theorem (IV
+  nilpotency) stands; the guess was retracted the same day.
 - **The README's older prose, audited after 1.0.0.** Checked line by line against the engine, the hand-written text had drifted in
   these ways, all fixed: §5's table listed 40 of the engine's 44 relations (PW13–PW16 were missing — every name it did list was
   correct); `fermat_path(3233)` was documented with excursion 8 (it is 0); `pathway_residues(N, mult=1)` was described as "often
@@ -2089,7 +2089,7 @@ engine/
                   comma_sequence hyper_linear equation_space spectral_primes cs_benchmark stencil  +  the ten added in 1.0:
                   periodicity lyndon berlekamp_massey logperiodic permutation rejewski jordan_chevalley re_pair pohlig_hellman unicity
   maths.py tools.py oscilloscope.py   the EXTENDED layer (Fermat-facet inventory, control test, reports, two-panel SVG);
-                  reaches four sibling repositories, see Install
+                  reaches three sibling repositories, see Install
 wiki/             hand-written theory pages + generated Tools-Reference.md and the ten move pages
 examples/         43 tutorials + transcripts/        tests/   pytest suite        devtools/   transcript.py, build_docs.py
 ```
