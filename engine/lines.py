@@ -150,6 +150,12 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
                 "the primes (Gibbs undershoot at prime jumps) only emerge as "
                 "more work (more zeros) is spent",
     },
+    "cs_benchmark": {
+        "module": "engine.toolsets.cs_benchmark", "line": "both",
+        "free": "benchmark one callable directly, real wall-clock time, one pass",
+        "work": "rank several candidate callables against a shared reference "
+                "cost — cost = candidates scanned",
+    },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
         "free": "stack the two facets (Fermat prompt / Riemann firing) of one number",

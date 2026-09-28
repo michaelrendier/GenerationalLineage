@@ -22,6 +22,7 @@ Two older ports keep their historic filenames one level up:
 from . import (                                                  # noqa: F401
     scale, units, box_kite, noether, archimedes_screw, inversion, t32_nilpotency,
     cipher, comma_sequence, stencil, hyper_linear, equation_space, spectral_primes,
+    cs_benchmark,
 )
 
 MODULES = {
@@ -30,5 +31,5 @@ MODULES = {
     "t32_nilpotency": t32_nilpotency, "cipher": cipher,
     "comma_sequence": comma_sequence, "stencil": stencil,
     "hyper_linear": hyper_linear, "equation_space": equation_space,
-    "spectral_primes": spectral_primes,
+    "spectral_primes": spectral_primes, "cs_benchmark": cs_benchmark,
 }
