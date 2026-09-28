@@ -7,6 +7,8 @@
 *Formerly "Sedenion Factoral Relativity" / "FactoralDecomposition" — the engine
 is the same; the name now says what it does.*
 
+*License: GNU General Public License v3.0 — see [`LICENSE`](LICENSE).*
+
 ---
 
 ## 0. What this document is
