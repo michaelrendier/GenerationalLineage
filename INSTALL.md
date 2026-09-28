@@ -52,7 +52,7 @@ pip install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-Expected on a Core install: `150 passed, 2 skipped` (the two skips are extended-only checks). On an Extended install: `152 passed`.
+Expected on a Core install: `151 passed, 2 skipped` (the two skips are extended-only checks). On an Extended install: `153 passed`.
 
 `requirements-dev.txt` adds `pytest`, plus `sympy` (the operator-string parser's SymPy output) and `matplotlib` (optional PNG rendering), plus `nbformat`, `nbconvert` and `ipykernel` to execute the two notebooks in `notebooks/`.
 

@@ -54,3 +54,30 @@ def test_every_source_file_carries_the_gpl_notice():
 def test_license_is_the_canonical_gpl3():
     text = open(os.path.join(ROOT, "LICENSE"), encoding="utf-8").read()
     assert "GNU GENERAL PUBLIC LICENSE" in text and "Version 3, 29 June 2007" in text
+
+
+def test_every_python_block_in_the_readme_runs(tmp_path, monkeypatch):
+    """The README's code is held to the same bar as the tutorials: each block is complete and runnable.
+    Blocks tagged [EXTENDED ...] need the sibling repositories (and matplotlib, for the two chart writers)."""
+    import re
+    text = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+    text = re.sub(r"<!-- BEGIN: (\w[\w-]*).*?<!-- END: \1 -->", "", text, flags=re.S)   # generated blocks have their own tests
+    blocks = re.findall(r"```python\n(.*?)```", text, re.S)
+    assert len(blocks) >= 20, "the README lost its code blocks?"
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        have_mpl = True
+    except ImportError:
+        have_mpl = False
+    monkeypatch.chdir(tmp_path)                     # chart writers drop PNGs here, not in the repository
+    ran = 0
+    for i, b in enumerate(blocks):
+        if b.lstrip().startswith("# [EXTENDED") and not (engine.EXTENDED and have_mpl):
+            continue
+        try:
+            exec(compile(b, f"<README python block {i}>", "exec"), {})
+        except Exception as e:                      # noqa: BLE001
+            raise AssertionError(f"README python block {i} failed: {type(e).__name__}: {e}\n---\n{b[:400]}") from e
+        ran += 1
+    assert ran >= 18

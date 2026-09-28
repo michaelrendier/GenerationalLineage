@@ -2,6 +2,14 @@
 
 Release notes, newest first. The pre-1.0 development log follows the 1.0.0 entry unchanged.
 
+## Unreleased — after 1.0.0
+
+- **The README's code blocks are now self-contained and tested.** Auditing the README after the 1.0.0 release found that 10 of its 21
+  Python blocks were fragments that used names defined only in the surrounding prose (`plaintext`, `N`, `my_objects`, …), one called a
+  function without its required arguments, and one showed a deliberate `AscentNotFree` without catching it. All are fixed; a new test
+  (`test_every_python_block_in_the_readme_runs`) runs every block. Suite counts are now Core `151 passed, 2 skipped`, Extended
+  `153 passed` (1.0.0 shipped with 150 / 152).
+
 ## 1.0.0 — 2026-09-28 — the first release
 
 GenerationalLineage is licensed under the **GNU General Public License v3.0**, with a notice on every source file.
