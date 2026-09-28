@@ -1,0 +1,24 @@
+>>> from engine.toolsets import re_pair
+>>> # 64 copies of one letter need only five rules: a lineage of depth 5.
+>>> r = re_pair.descend("a" * 64)
+>>> r["rules"]
+{'R1': ('a', 'a'), 'R2': ('R1', 'R1'), 'R3': ('R2', 'R2'), 'R4': ('R3', 'R3'), 'R5': ('R4', 'R4')}
+>>> r["start"], r["n_rules"], r["depth"]
+(['R5', 'R5'], 5, 5)
+>>> # The round trip is exact:
+>>> r["round_trip_exact"]
+True
+>>> # Repeated structure collapses; the grammar is far smaller than the text.
+>>> p = re_pair.descend("abracadabra" * 3)
+>>> p["n"], p["grammar_size"], p["depth"]
+(33, 17, 7)
+>>> # Symbols with no repeated pair do not descend at all.
+>>> u = re_pair.descend(list(range(50)))
+>>> u["n_rules"], u["depth"]
+(0, 0)
+>>> # Honesty: the smallest grammar is NP-hard to find, so minimality is reported as unknown, not assumed.
+>>> r["minimal"] is None
+True
+>>> # build_up() expands a grammar back to the sequence.
+>>> "".join(re_pair.build_up({"grammar": r["_grammar"]})["sequence"]) == "a" * 64
+True

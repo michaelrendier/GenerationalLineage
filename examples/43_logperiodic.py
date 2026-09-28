@@ -1,0 +1,30 @@
+# This file is part of GenerationalLineage.
+# Copyright (C) 2026 Cody Michael Allison
+# SPDX-License-Identifier: GPL-3.0-only
+"""Log-periodic + Mellin — the spring, read in its own coordinate u = ln x.
+
+Established maths (Mellin transform; discrete scale invariance, Sornette 1998) — wiki/References.md.
+Run:  python3 examples/43_logperiodic.py
+"""
+import math
+from engine.toolsets import logperiodic
+
+# The Mellin transform of e^(-x) is the Gamma function: M(s) = Gamma(s).
+logperiodic.mellin(lambda x: math.exp(-x), 3.5), math.gamma(3.5)
+
+# Plant a spring: y = 0.4 + 0.25*ln x + 1.3*cos(6*ln x + 0.7), sampled UNIFORMLY in x (the hard case).
+sig = logperiodic.build_up({"omega": 6.0, "amp": 1.3, "phase": 0.7, "const": 0.4, "trend": 0.25,
+                            "x_lo": 1.0, "x_hi": 2000.0, "n": 700})
+len(sig["x"]), sig["cost"]
+
+# descend() recovers it. One turn of the spring is x multiplied by lambda = e^(2*pi/omega).
+r = logperiodic.descend((sig["x"], sig["y"]), compare_flat=True)
+round(r["omega"], 6), round(r["scale_ratio_lambda"], 4), round(r["amplitude"], 4)
+round(r["trend_per_ln_x"], 4), round(r["r_squared"], 6)
+
+# The SAME model in linear x (a generous window of frequencies) cannot see it: the flattening artifact.
+round(r["flat_x_r_squared"], 3)
+
+# Control: a signal periodic in x, not in ln x, is correctly rejected as log-periodic.
+xs = [1.0 + 1999.0 * i / 699 for i in range(700)]
+round(logperiodic.descend((xs, [math.sin(0.37 * x) for x in xs]))["r_squared"], 3)

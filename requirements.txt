@@ -1,0 +1,6 @@
+# GenerationalLineage 1.0.0 — runtime requirements for the CORE install.
+# Everything else the engine imports is the Python standard library.
+#
+# Tested with numpy 2.4.6 on Python 3.12.3 (no minimum numpy version has been
+# established; if you run an older one and it works or breaks, please report it).
+numpy

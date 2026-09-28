@@ -1,0 +1,22 @@
+>>> from engine.toolsets import unicity
+>>> # U = H(K) / D : key entropy over the plaintext's redundancy. For a general substitution cipher on English:
+>>> r = unicity.descend("substitution")
+>>> round(r["key_entropy_bits"], 3)
+88.382
+>>> round(r["U_shannon_estimate"], 1)
+27.6
+>>> # The literature estimate (Shannon's D = 3.2 bits/char) and a rigorous bound are kept apart.
+>>> # The order-0 letter table gives D0 exactly; since true redundancy can only be higher, U <= H(K)/D0.
+>>> round(r["D0_order0"], 4), round(r["U_upper_bound_rigorous"], 1)
+(0.5248, 168.4)
+>>> # Other ciphers, same call:
+>>> for spec in ({"kind": "caesar"}, {"kind": "vigenere", "period": 7}, {"kind": "enigma"}):
+...     x = unicity.descend(spec)
+...     print(spec["kind"], round(x["key_entropy_bits"], 1), "bits ->", round(x["U_shannon_estimate"], 1), "chars (estimate)")
+caesar 4.7 bits -> 1.5 chars (estimate)
+vigenere 32.9 bits -> 10.3 chars (estimate)
+enigma 67.1 bits -> 21.0 chars (estimate)
+>>> # build_up(): the ciphertext you must PAY FOR so the expected number of spurious keys is at most epsilon.
+>>> b = unicity.build_up({"kind": "substitution", "max_spurious": 1e-3})
+>>> b["characters_needed"], round(b["expected_spurious_at_n"], 6)
+(28, 0.0)

@@ -1,0 +1,9 @@
+>>> from engine.toolsets import archimedes_screw as screw
+>>> # descend(): the log-pitch of a step, read with one logarithm.
+>>> r = screw.descend((2, 6))
+>>> round(r["pitch"], 6), round(r["rungs_equiv"], 6)
+(1.098612, 1.584963)
+>>> # build_up(): climb to a target height in rungs of ln 2; whatever is left is the work the ladder cannot do.
+>>> b = screw.build_up(5.0)
+>>> b["rungs"], round(b["climbed"], 6), round(b["remainder_by_hand"], 6)
+(7, 4.85203, 0.14797)

@@ -1,0 +1,25 @@
+>>> from engine import emerge_brackets, legal_orders, bracketings_for, cd_is_zero_divisor
+>>> # A sedenion e1 + e10 — a classic zero-divisor pair member. Is it a zero divisor?
+>>> e = [0] * 16
+>>> e[1], e[10] = 1, 1
+>>> cd_is_zero_divisor(e)
+True
+>>> # The Emerger brackets it five ways and walks them in a firing order. Firing order is load-bearing:
+>>> # of 120 possible orders, only 4 respect the dependencies.
+>>> len(legal_orders())
+4
+>>> r = emerge_brackets(e)
+>>> r["input_norm"]
+1.4142135623730951
+>>> fo = r["firing_order"]
+>>> fo["canonical"]
+['{1:15}', '{2:14}', '{8:8}', '{4:4:4:4}', '{4:8:4}']
+>>> fo["sigma_rb_phased"]
+['{2:14}', '{8:8}', '{4:4:4:4}', '{4:8:4}', '{1:15}']
+>>> fo["phased_is_legal"]
+False
+>>> # Each step names the bracket, its tier label, and what it emerges:
+>>> [(s["bracket"], s["tier"]) for s in r["steps"][:3]]
+[('{2:14}', 'THEORETICAL'), ('{8:8}', 'DERIVED'), ('{4:4:4:4}', 'DERIVED')]
+>>> r["steps"][0]["emerges"]
+'the pointer z = x0 + i x8; |z|; |z| - Omega_ZS -- read head'

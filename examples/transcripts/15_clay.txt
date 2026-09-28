@@ -1,0 +1,12 @@
+>>> from engine import CLAY, generational_lineage_of, clay_lineage_report
+>>> list(CLAY)
+['poincare', 'riemann', 'yang_mills', 'navier_stokes', 'p_vs_np', 'hodge', 'bsd']
+>>> # Each problem's central operation is rolled down to the tier-0 floor:
+>>> r = generational_lineage_of("poincare")
+>>> r["status"], r["tier"], r["root"]
+('SOLVED', 1, 'SCALE')
+>>> r["central_operation"]
+'Ricci flow with surgery  (∂g/∂t = −2 Ric, cut at singularities)'
+>>> # Only the solved problem is purely definitional; every open problem imports exactly one piece.
+>>> generational_lineage_of("riemann")["status"]
+'OPEN'

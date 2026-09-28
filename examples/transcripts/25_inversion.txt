@@ -1,0 +1,9 @@
+>>> from engine.toolsets import inversion
+>>> # descend(): one application.
+>>> r = inversion.descend((2.0, 0.0))
+>>> r["image"]
+(0.5, 1.5707963267948966)
+>>> # build_up(): the orbit. Period 4 — and half of it (J_N squared) is a point inversion, NOT home.
+>>> b = inversion.build_up((2.0, 0.0))
+>>> b["period"], b["half_way_is_home"]
+(4, False)

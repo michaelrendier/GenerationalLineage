@@ -1,0 +1,32 @@
+>>> from engine.toolsets import berlekamp_massey as bm
+>>> from engine.lines import AscentNotFree
+>>> # A sequence produced by a 5-bit LFSR whose characteristic polynomial is x^5 + x^2 + 1 (binary 100101):
+>>> seq = bm.lfsr(0b100101, [1, 0, 0, 0, 1], 40)
+>>> seq[:16]
+[1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0]
+>>> # descend() recovers the generator from the output alone.
+>>> r = bm.descend(seq)
+>>> r["linear_complexity"], r["determined"], r["terms_needed"]
+(5, True, 10)
+>>> r["char_poly_int"] == 0b100101
+True
+>>> r["period"], r["primitive"]
+(31, True)
+>>> # The period is read off the FACTORISATION of the minimal polynomial:
+>>> # a primitive polynomial of degree 5 gives the maximal period 2^5 - 1.
+>>> r["factors"]
+{'0x25': 1}
+>>> # Honesty: with fewer than 2L terms the recurrence is only a fit, and it says so.
+>>> short = bm.descend(seq[:7])
+>>> short["determined"], short["linear_complexity"], short["terms_needed"]
+(False, 4, 8)
+>>> # build_up() pays for a choice: search for a primitive polynomial of degree 16.
+>>> b = bm.build_up({"degree": 16})
+>>> b["poly"], b["period"], b["cost"]
+(65581, 65535, 23)
+>>> # ...and the ascent refuses if it is given nothing to build from.
+>>> try:
+...     bm.build_up({})
+... except AscentNotFree as e:
+...     e.owed
+"{'poly','n'} to run, or {'degree'} to find a primitive polynomial"

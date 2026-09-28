@@ -1,0 +1,32 @@
+>>> from engine.toolsets import periodicity
+>>> # descend(): every period of the string, read off one linear pass. Nothing is voted.
+>>> r = periodicity.descend("abcabcabca")
+>>> r["periods"]
+[3, 6, 9, 10]
+>>> r["min_period"], r["borders"]
+(3, [7, 4, 1])
+>>> # A string made by repeating a root has the root as its primitive period;
+>>> # the exponent counts the copies — the string's "generation length".
+>>> r = periodicity.descend("ab" * 32)
+>>> r["min_period"], r["primitive_root"], r["exponent"]
+(2, 'ab', 32)
+>>> # Two independent routes (prefix function, Z function) must agree:
+>>> r["agrees_with_z_function"]
+True
+>>> # Fine–Wilf: a string of length ≥ p + q − gcd(p, q) with periods p and q also has period gcd(p, q).
+>>> # build_up() constructs the extremal word ONE LETTER SHORT of that bound, with both periods but not the gcd:
+>>> w = periodicity.build_up({"p": 5, "q": 8})["string"]
+>>> w, len(w)
+('abaababaaba', 11)
+>>> periodicity.periods(w)
+[5, 8, 10, 11]
+>>> # It cannot be extended by even one letter and keep both periods:
+>>> # the next letter would have to equal both w[-5] and w[-8], and they differ.
+>>> w[-5], w[-8]
+('b', 'a')
+>>> # The ascent is a choice; asked for nothing, it refuses and names what it is owed.
+>>> try:
+...     periodicity.build_up({})
+... except Exception as e:
+...     type(e).__name__, e.owed
+('AscentNotFree', "a root word and length, or a period pair {'p','q'}")

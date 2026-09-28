@@ -1,0 +1,18 @@
+>>> from engine import escape_survives, lyapunov_exponent, feigenbaum_delta, newton_basins, MANDELBROT
+>>> # escape_survives: True = the orbit stays bounded (it SURVIVES); False = it escapes (it FALLS) —
+>>> # the dynamical version of "fall or survive".
+>>> escape_survives(complex(-0.5, 0.5), MANDELBROT, maxiter=200)
+True
+>>> escape_survives(complex(1.0, 1.0), MANDELBROT, maxiter=200)
+False
+>>> # The Lyapunov exponent of the logistic map: negative = order, positive = chaos.
+>>> round(lyapunov_exponent(3.2), 4)
+-0.9163
+>>> round(lyapunov_exponent(3.9), 4)
+0.4951
+>>> # The Feigenbaum constant, estimated from the bifurcation cascade:
+>>> round(feigenbaum_delta()["feigenbaum"], 6)
+4.669202
+>>> # Newton basins of z^5 - 1 split the plane into exactly 5 basins, one per linear factor:
+>>> newton_basins(5, N=48)["n_basins"]
+5

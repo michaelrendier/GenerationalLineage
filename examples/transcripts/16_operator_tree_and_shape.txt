@@ -1,0 +1,20 @@
+>>> from engine import opstring_parse, opstring_operators, shape_diagnose, KEYPAD
+>>> # The keypad is the alphabet: glyph, the ASCII skeleton it inserts, and its name.
+>>> len(KEYPAD)
+15
+>>> KEYPAD[0][:2]
+('∫', 'I^│_ f dx')
+>>> # Parse a definite integral: its variable and bounds come out as fields.
+>>> n = opstring_parse("I^1_0 x dx")
+>>> n.kind, n.var, n.lo, n.hi
+('Integral', 'x', '0', '1')
+>>> # Nested operators are all listed, outermost first:
+>>> opstring_operators(opstring_parse("I^b_a D_x f dx"))
+['integral', 'derivative']
+>>> # The shape diagnostic reads those operators and reports which of ADD / SCALE / SIGN the equation
+>>> # shows evidence of, and which are missing (with the adjoint requirement for a self-adjoint claim).
+>>> r = shape_diagnose("I^b_a D_x f dx", self_adjoint=True)
+>>> r["roots_present"]
+['ADD']
+>>> r["headline"]
+'INCOMPLETE — MISSING_OPERATOR:SCALE; MISSING_OPERATOR:SIGN'

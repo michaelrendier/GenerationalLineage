@@ -1,0 +1,9 @@
+>>> from engine.toolsets import t32_nilpotency as t32
+>>> # descend(): decode an address to its path — one Horner sweep.
+>>> r = t32.descend(123456)
+>>> r["path"], r["nilpotent"], r["trailing_zeros"]
+([13, 11, 72], False, 0)
+>>> # build_up(): place digits one at a time to realise a chosen path, and confirm it round-trips.
+>>> b = t32.build_up([1, 2, 3])
+>>> b["address"], b["round_trips"]
+(9606, True)

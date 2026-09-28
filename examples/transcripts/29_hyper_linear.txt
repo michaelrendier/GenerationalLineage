@@ -1,0 +1,18 @@
+>>> from engine.toolsets import hyper_linear as hl
+>>> # descend(): a*b read as a regular representation — one tier-0 SCALE op per digit of b.
+>>> d = hl.descend(1546854629, 7283619945)
+>>> d["product"]
+11266701227799975405
+>>> d["n_spilling_rows"], d["dft_reconstruction_exact"]
+(4, True)
+>>> d["rows"][0]["operator"]
+'L_5 o T^0'
+>>> # From the bare product, "which rows spilled" is as hard as factoring it: the ascent refuses.
+>>> try:
+...     hl.build_up({"product": d["product"]})
+... except Exception as e:
+...     e.owed
+'at least one factor (a or b)'
+>>> # One factor supplied makes it free again — one division.
+>>> hl.build_up({"product": d["product"], "a": 1546854629})["b"]
+7283619945

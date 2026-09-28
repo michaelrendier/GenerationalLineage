@@ -1,0 +1,9 @@
+>>> from engine.toolsets import box_kite
+>>> # descend(): an index pair becomes its edge — one XOR. (1, 10) -> edge 1 XOR 10 = 11.
+>>> r = box_kite.descend((1, 10))
+>>> r["edge"], r["is_edge"]
+(11, True)
+>>> # build_up(): an edge has 7 pencils — the seven ways to factor the relation into two others.
+>>> b = box_kite.build_up(11)
+>>> b["n_pencils"], b["cost"]
+(7, 105)

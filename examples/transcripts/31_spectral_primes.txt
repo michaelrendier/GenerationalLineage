@@ -1,0 +1,14 @@
+>>> from engine.toolsets import spectral_primes as sp
+>>> # descend(): the spin rate theta'(t) at one height — smooth and monotonic, no peaks by construction.
+>>> r = sp.descend(100.0)
+>>> round(r["spin_rate"], 6), r["resonant"]
+(1.383647, False)
+>>> # build_up(): rebuild psi(x) from n zeros. The primes emerge only as work (more zeros) is spent.
+>>> b10 = sp.build_up(30.0, n_zeros=10)
+>>> b25 = sp.build_up(30.0, n_zeros=25)
+>>> round(b10["exact"], 4)
+28.4765
+>>> abs(b25["difference"]) < abs(b10["difference"])
+True
+>>> b10["cost"], b25["cost"]
+(10, 25)

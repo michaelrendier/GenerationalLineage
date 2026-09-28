@@ -1,3 +1,17 @@
+# This file is part of GenerationalLineage.
+# Copyright (C) 2026 Cody Michael Allison
+#
+# GenerationalLineage is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# GenerationalLineage is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details. You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+# SPDX-License-Identifier: GPL-3.0-only
 """
 GenerationalLineage.engine.lines
 =================================
@@ -156,6 +170,14 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
         "work": "rank several candidate callables against a shared reference "
                 "cost — cost = candidates scanned",
     },
+    "stencil": {
+        "module": "engine.toolsets.stencil", "line": "both",
+        "free": "N = p·q — one multiplication, no search (the hand-worked long-multiplication "
+                "pathway, carries and all, walked forward)",
+        "work": "given only N, build candidate factor pairs digit by digit; slide 1 run to full "
+                "depth is exhaustive and exact — every divisor pair is found, and a prime N "
+                "raises AscentNotFree (the refusal is the result)",
+    },
     "periodicity": {
         "module": "engine.toolsets.periodicity", "line": "both",
         "free": "every period of a string, EXACTLY — one linear prefix-function pass; "
@@ -236,6 +258,7 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
     },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
+        "requires": "sibling-repos",      # EXTENDED layer: needs AbrikosovTree, ValaQuenta, TuringStack, FourthAgePapers
         "free": "stack the two facets (Fermat prompt / Riemann firing) of one number",
         "work": "—",
     },
@@ -267,11 +290,13 @@ def toolset(name: str):
     return _load(name)
 
 
-def descend(name: str, x: Any, **k) -> Dict[str, Any]:
-    """Run the FREE (descent) reading of a toolset. Adds free=True, cost=0."""
+def descend(name: str, x: Any, *more: Any, **k) -> Dict[str, Any]:
+    """Run the FREE (descent) reading of a toolset. Adds free=True, cost=0.
+    Extra positional arguments are forwarded, for toolsets that read two
+    things at once (`stencil`: p, q; `hyper_linear`: a, b)."""
     m = _load(name)
     fn: Callable = getattr(m, "descend")
-    out = dict(fn(x, **k))
+    out = dict(fn(x, *more, **k))
     out.setdefault("free", True)
     out.setdefault("cost", 0)
     out["line"] = "decomposition"
@@ -291,20 +316,38 @@ def build_up(name: str, target: Any, **k) -> Dict[str, Any]:
 
 
 def verify_all() -> Dict[str, Any]:
-    """Self-check every toolset that exposes verify()."""
+    """Self-check every toolset that exposes verify().
+
+    Three outcomes per toolset, never conflated (the engine's own rule: a check
+    that did not run is UNJUDGED, not confirmed):
+        ok=True              ran, passed
+        ok=False             ran and failed, or failed to import
+        ok=None, skipped     an EXTENDED-layer toolset whose sibling repos are
+                             absent — it did not run
+    `_ok`        every toolset that ran passed
+    `_complete`  `_ok` AND nothing was skipped
+    `_skipped`   names of the toolsets that did not run
+    """
     res: Dict[str, Any] = {}
     for name, d in TOOLSETS.items():
         try:
             m = _load(name)
         except Exception as e:                                    # noqa: BLE001
-            res[name] = {"ok": False, "error": f"import: {e}"}
+            if d.get("requires") == "sibling-repos" and isinstance(e, ImportError):
+                res[name] = {"ok": None, "skipped": True,
+                             "reason": f"EXTENDED layer not installed ({e}); see README, 'Extended install'"}
+            else:
+                res[name] = {"ok": False, "error": f"import: {e}"}
             continue
         v = getattr(m, "verify", None)
         r = v() if callable(v) else {"ok": True, "note": "no verify()"}
         if "ok" not in r:                       # emerger.verify uses `all_pass`
             r = {**r, "ok": bool(r.get("all_pass", False))}
         res[name] = r
-    res["_ok"] = all(r.get("ok", False) for k, r in res.items() if not k.startswith("_"))
+    ran = [r for k, r in res.items() if not r.get("skipped")]
+    res["_ok"] = all(r.get("ok", False) for r in ran)
+    res["_skipped"] = [k for k, r in res.items() if not k.startswith("_") and r.get("skipped")]
+    res["_complete"] = res["_ok"] and not res["_skipped"]
     return res
 
 
@@ -330,5 +373,7 @@ if __name__ == "__main__":
     v = verify_all()
     for k, r in v.items():
         if not k.startswith("_"):
-            print(f"  {'ok ' if r.get('ok') else 'FAIL'} {k}: {r}")
-    print("\nALL OK" if v["_ok"] else "\nFAILURES ABOVE")
+            tag = "SKIP" if r.get("skipped") else ("ok  " if r.get("ok") else "FAIL")
+            print(f"  {tag} {k}: {r}" if tag != "ok  " else f"  {tag} {k}")
+    print("\nALL OK" if v["_ok"] else "\nFAILURES ABOVE",
+          "(complete)" if v["_complete"] else f"(skipped: {', '.join(v['_skipped']) or 'none'})")

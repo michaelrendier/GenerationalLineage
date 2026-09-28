@@ -1,0 +1,22 @@
+>>> from engine import decompose_number, factor_lineage, primary_decomposition, fall_test, arith_deriv
+>>> # A prime is generation 0 (a leaf: it cannot be decomposed). A composite is an internal node.
+>>> # 3233 = 53 * 61:
+>>> r = decompose_number(3233)
+>>> r["ring_fall_survive"]["verdict"], r["ring_fall_survive"]["quotient"]
+('FALL', 'ℤ/(3233) has zero divisors')
+>>> r["cepstral_primary"], r["Omega_lineage_length"]
+({53: 1, 61: 1}, 2)
+>>> # The lineage tree of a number with repeated factors: 360 = 2^3 * 3^2 * 5
+>>> t = factor_lineage(360)
+>>> t["omega"], t["generations"], t["leaves_telperion"]
+(6, 5, [2, 2, 2, 3, 3, 5])
+>>> primary_decomposition(360)
+{2: 3, 3: 2, 5: 1}
+>>> # "Fall or survive": Z/(n) has zero divisors exactly when n is composite; a prime survives as a field.
+>>> fall_test(15)["verdict"], fall_test(15)["n_zero_divisors"]
+('FALL', 6)
+>>> fall_test(13)["verdict"], fall_test(13)["quotient"]
+('SURVIVE', 'ℤ/(13) is a field')
+>>> # The arithmetic derivative reads the same lineage: n' = n * sum(e_i / p_i).
+>>> arith_deriv(12)
+16

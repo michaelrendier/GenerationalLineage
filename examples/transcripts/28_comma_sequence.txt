@@ -1,0 +1,9 @@
+>>> from engine.toolsets import comma_sequence as cs
+>>> # build_up(): walk the earliest valid comma sequence forward; the cost is the number of terms placed.
+>>> b = cs.build_up(12)
+>>> b["sequence"], b["cost"], b["died_at"]
+([1, 12, 35, 94, 135, 186, 248, 331, 344, 387, 461, 475], 12, None)
+>>> # descend(): read a sequence back — is it a valid comma walk, and does the base survive?
+>>> r = cs.descend(b["sequence"])
+>>> r["valid_comma_walk"], r["mortal_base"], r["resolution_ratio"]
+(True, True, '100:2')

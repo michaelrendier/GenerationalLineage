@@ -1,0 +1,10 @@
+>>> import engine
+>>> if not engine.EXTENDED:
+...     print("EXTENDED layer not installed — skipping (see README, 'Extended install').")
+... else:
+...     p = engine.quantized_pieces()
+...     p["cd_tower_levels"], p["leaf_level"]
+...     # The control: real prime counts by residue class mod 16, against Dirichlet equidistribution.
+...     engine.pathway_root_system_class(13)
+(9, 0)
+{'p': 13, 'nshape': 13, 'classification': 'niemeier_odd', 'in_prime_sector': True, 'is_moonshine': True, 'voa_source': 'Niemeier root system (odd h, A-type)', 'fermat_survives': True, 'root_pathway': 'dendritic'}

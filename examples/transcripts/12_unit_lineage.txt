@@ -1,0 +1,15 @@
+>>> from engine import unit_vector, unit_mul, unit_div, SI_BASE
+>>> # The seven SI base dimensions are the leaves:
+>>> SI_BASE
+('kg', 'm', 's', 'A', 'K', 'mol', 'cd')
+>>> # A unit is an exponent vector. mol/L, then multiplying back by L, cancels EXACTLY to mol:
+>>> MOL = unit_vector((0, 0, 0, 0, 0, 1, 0), name="mol")
+>>> LITER = unit_vector((0, 3, 0, 0, 0, 0, 0), name="L")
+>>> conc = unit_div(MOL, LITER)
+>>> conc["exponents"]
+(0, -3, 0, 0, 0, 1, 0)
+>>> unit_mul(conc, LITER)["exponents"] == MOL["exponents"]
+True
+>>> # Newton = kg * m / s^2 as a vector:
+>>> unit_vector((1, 1, -2, 0, 0, 0, 0), name="N")["exponents"]
+(1, 1, -2, 0, 0, 0, 0)

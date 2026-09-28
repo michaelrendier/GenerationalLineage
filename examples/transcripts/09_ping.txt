@@ -1,0 +1,14 @@
+>>> from engine import ping
+>>> # 3233 = 53 * 61: q is small, so trial division reaches it.
+>>> r = ping(3233)
+>>> r["factored"], r["factors"], r["regime"]
+(True, (53, 61), 'q small (trial-divisible)')
+>>> [(s["op"], s["fired"]) for s in r["path"]]
+[('trial_division', True)]
+>>> # 1000003 * 1000033: the two factors are close (|p - q| = 30). Trial division fails, and Fermat's method
+>>> # — which reaches factors near sqrt(N) — fires. The path records which operator reached it.
+>>> r = ping(1000003 * 1000033)
+>>> r["factored"], r["regime"]
+(True, 'p ~ q (Fermat: |p-q| small)')
+>>> [(s["op"], s["fired"]) for s in r["path"]]
+[('trial_division', False), ('fermat', True)]

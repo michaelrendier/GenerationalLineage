@@ -1,0 +1,29 @@
+>>> from engine import lines
+>>> # The registry: which toolsets serve which line.
+>>> lines.DECOMPOSITION_LINE[:4]
+['add_scale_sign', 'scale', 'units', 'box_kite']
+>>> lines.EMERGER_LINE[-4:]
+['re_pair', 'pohlig_hellman', 'unicity', 'emerger']
+>>> # descend() always sets free=True, cost=0 — it is a single forward pass with no stored tape.
+>>> d = lines.descend("noether", [(0.3, 0.7), (0.5, 0.5), (0.1, 0.9)])
+>>> d["free"], d["cost"], d["conserved"]
+(True, 0, True)
+>>> # build_up() sets free=False and reports the work it did: here, scanning candidate orders.
+>>> b = lines.build_up("noether", [[0.5, 0.3, 0.2], [0.9, 0.5, -0.4], [0.5, 0.6]], total=1.0)
+>>> b["free"], b["cost"], b["legal"]
+(False, 3, [0])
+>>> # The registry text for any toolset says in one line what each direction does:
+>>> lines.TOOLSETS["hyper_linear"]["free"]
+'a*b -> one tier-0 SCALE op per digit of b (L_d o T^r), the Toeplitz block/spill read, and the DFT convolution-theorem reconstruction of the product — single pass, no search'
+>>> lines.TOOLSETS["hyper_linear"]["work"]
+'which rows spilled an 11th digit, from the product ALONE — genuinely refused (as hard as factoring P); one factor supplied makes it free again (one division)'
+>>> # hyper_linear's ascent is REFUSED from the bare product — recovering it is as hard as factoring —
+>>> # and becomes free again the moment one factor is supplied:
+>>> p = lines.descend("hyper_linear", 1546854629, 7283619945)["product"]
+>>> try:
+...     lines.build_up("hyper_linear", {"product": p})
+... except lines.AscentNotFree as e:
+...     e.owed
+'at least one factor (a or b)'
+>>> lines.build_up("hyper_linear", {"product": p, "a": 1546854629})["b"]
+7283619945

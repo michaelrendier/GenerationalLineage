@@ -1,0 +1,14 @@
+>>> from engine.toolsets import units
+>>> # descend(): a unit name (or dict) becomes its exponent vector — exact vector arithmetic.
+>>> r = units.descend("N")
+>>> r["vector"], r["trace"]
+((1, 1, -2, 0, 0, 0, 0), 'kg^1 · m^1 · s^-2')
+>>> units.descend({"kg": 1, "m": 1, "s": -2})["vector"] == r["vector"]
+True
+>>> # build_up(): the reverse question — which named unit and which laws have this dimension signature?
+>>> b = units.build_up("N")
+>>> b["named_unit"], b["candidate_laws"]
+(['N'], ['F = m a', 'F = dp/dt', 'F = -k x (Hooke)'])
+>>> # Any unit reads the same way — the joule is kg * m^2 / s^2:
+>>> units.descend("J")["vector"]
+(1, 2, -2, 0, 0, 0, 0)

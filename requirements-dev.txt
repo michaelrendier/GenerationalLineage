@@ -1,0 +1,12 @@
+# GenerationalLineage — development / tutorial requirements.
+# Adds what is needed to run the test suite, the optional features, and the notebooks.
+-r requirements.txt
+
+pytest        # tests/            (tested: 7.4.4)
+sympy         # engine.opstring.to_sympy — the operator-string parser's SymPy output   (tested: 1.14.0)
+matplotlib    # engine.tools — optional PNG rendering of the chart figures             (tested: 3.11.0)
+
+# notebooks/ — execute the two tutorial notebooks
+nbformat      # (tested: 5.9.1)
+nbconvert     # (tested: 6.5.3)
+ipykernel     # (tested: 6.29.3)

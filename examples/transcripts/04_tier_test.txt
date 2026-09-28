@@ -1,0 +1,17 @@
+>>> from engine import decompose, root_irreducible, TIERS
+>>> # 'leverage' needs rigidity to exist — remove rigidity and the fulcrum survives, leverage does not.
+>>> d = decompose("leverage")
+>>> d["tier"], d["status"], d["descends_from"]
+(3, 'DERIVED', 'fulcrum + RIGIDITY')
+>>> d["note"]
+'a COROLLARY, not a geometry — remove rigidity and the fulcrum survives, leverage does not'
+>>> # 'fulcrum' is a fixed set: tier 2, derived.
+>>> decompose("fulcrum")["tier"]
+2
+>>> # 'scale' is irreducible: tier 0, a primitive.
+>>> r = root_irreducible("scale")
+>>> r["tier"], r["status"], r["root"]
+(0, 'PRIMITIVE', 'SCALE')
+>>> # Every operation rolls down to one of exactly three roots — ADD, SCALE or SIGN:
+>>> {op: decompose(op)["root"] for op in ("leverage", "reflect", "dilate", "rotate", "gcd", "sign")}
+{'leverage': 'SIGN', 'reflect': 'SIGN', 'dilate': 'SCALE', 'rotate': 'SIGN', 'gcd': 'SCALE', 'sign': 'SIGN'}

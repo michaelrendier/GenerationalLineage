@@ -1,0 +1,7 @@
+>>> from engine.toolsets import cs_benchmark
+>>> # descend(): time one callable directly (real wall-clock, one pass).
+>>> r = cs_benchmark.descend(sum, args=([1, 2, 3],), n=200)
+>>> r["n_calls"], r["s_per_call"] > 0
+(200, True)
+>>> r["citation"]
+'Patterson et al. (2021), "Carbon Emissions and Large Neural Network Training", arXiv:2104.10350'

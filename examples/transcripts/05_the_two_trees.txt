@@ -1,0 +1,17 @@
+>>> from engine import two_trees, sieve_lineage, un_sieve
+>>> # 2 + 168 + 831 = 1001: every integer in [0, 1000] lands in exactly one class. Exact, not statistical.
+>>> t = two_trees(1000)
+>>> t["telperion_prime"], t["laurelin_composite"], t["mingling_0_and_1"], t["total"], t["exact"]
+(168, 831, 2, 1001, True)
+>>> # The sieve of Eratosthenes as a lineage: each composite dies on the pass of its smallest prime factor.
+>>> s = sieve_lineage(1000)
+>>> s["working_passes"], s["pi_sqrt_N"], s["generation_matches_pi_spf"]
+(11, 11, True)
+>>> # The un-sieve is its mirror: switch primes ON one at a time and watch each composite ARRIVE.
+>>> u = un_sieve(1000)
+>>> u["D_equals_reverse_A"]
+True
+>>> u["extinction_boundary_prime"], u["birth_boundary_prime"]
+(31, 499)
+>>> round(u["H_C_minus_H_A"], 3)
+3.646

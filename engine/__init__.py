@@ -1,3 +1,17 @@
+# This file is part of GenerationalLineage.
+# Copyright (C) 2026 Cody Michael Allison
+#
+# GenerationalLineage is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# GenerationalLineage is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details. You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+# SPDX-License-Identifier: GPL-3.0-only
 """GenerationalLineage.engine
 
 The FACTORAL DECOMPOSITION TOOL (`lineage`) is imported FIRST and
@@ -13,7 +27,7 @@ from .lineage import (
     FactoralLineageEngine, GenerationalLineageEngine, Relation, Status,
     run as run_lineage, decompose, factor_lineage, two_trees, TIERS,
     root_irreducible, ROOT_OF, AFF1,
-    sieve_lineage, sieve_recurrence,
+    sieve_lineage, sieve_recurrence, un_sieve,
     cd_mul, unit, sigma_self, sigma_rb, sigma_rb_independent,
     # ring-theory machinery (2026-08-22)
     cd_mul_gf2, all_ones, trace_laplacian_gf2, is_nilpotent_gf2,
@@ -104,6 +118,11 @@ from .operator_tree import (
 )
 from .shape import diagnose as shape_diagnose
 
+__version__ = "1.0.0"
+
+# EXTENDED = the Fermat-facet layer (engine.maths, engine.tools, engine.oscilloscope)
+# reached its four sibling repos. CORE (everything else) needs only numpy.
+# IMPORT_ERROR records why the extended layer is absent; it is None when present.
 IMPORT_ERROR = None
 try:
     from .tools import (
@@ -116,9 +135,10 @@ try:
     )
 except ImportError as _exc:                       # pragma: no cover
     IMPORT_ERROR = _exc
+EXTENDED = IMPORT_ERROR is None
 
 __all__ = [
-    'IMPORT_ERROR',
+    '__version__', 'EXTENDED', 'IMPORT_ERROR',
     # reports
     'report_pieces_and_pathways', 'report_control_test',
     'report_factoral_lineage', 'report_strut_pair_chart',
@@ -129,7 +149,7 @@ __all__ = [
     'FactoralLineageEngine', 'GenerationalLineageEngine', 'Relation', 'Status',
     'run_lineage', 'decompose', 'factor_lineage', 'two_trees', 'TIERS',
     'root_irreducible', 'ROOT_OF', 'AFF1',
-    'sieve_lineage', 'sieve_recurrence',
+    'sieve_lineage', 'sieve_recurrence', 'un_sieve',
     # the biological factoral tower (STUB — structural only, no medical inference)
     'TOWER_LEVELS', 'tower', 'molecular_decomposition', 'dna_decomposition',
     'protein_folding_decomposition', 'genome_decomposition',
@@ -179,3 +199,7 @@ __all__ = [
     'render_operator_tree', 'operator_tree_json', 'operator_route_targets',
     'word_wrap', 'shape_diagnose',
 ]
+
+# On a Core install the extended-layer names above do not exist; keep
+# `from engine import *` working by exporting only what is really present.
+__all__ = [_n for _n in __all__ if _n in globals()]

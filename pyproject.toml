@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "generational-lineage"
+version = "1.0.0"
+description = "The Generational Lineage Engine: exact factoral decomposition of numbers, operators, words, sequences and processes, on two lines — descent (free) and ascent (paid, or refused)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Cody Michael Allison (Michael Rendier)", email = "the.wandering.god@gmail.com" }]
+keywords = ["factorization", "decomposition", "number theory", "cryptanalysis", "string periodicity", "Lyndon words", "Berlekamp-Massey", "Mellin transform"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["numpy"]
+
+[project.optional-dependencies]
+plots = ["sympy", "matplotlib"]
+dev = ["pytest", "sympy", "matplotlib", "nbformat", "nbconvert", "ipykernel"]
+
+[project.urls]
+Repository = "https://github.com/michaelrendier/GenerationalLineage"
+
+# NOTE: the import name is `engine` (see README, 'Known limitations'). Install into a
+# virtual environment; do not install it beside another top-level package called `engine`.
+[tool.setuptools.packages.find]
+include = ["engine*"]
