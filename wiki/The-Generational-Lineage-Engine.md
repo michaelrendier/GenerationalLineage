@@ -545,6 +545,7 @@ per-pixel data a **visualiser** paints.
   fall/survive drift: λ(3.2) = −0.92 (survive), λ(3.9) = +0.50 (fall),
   λ(3.5699) ≈ 0 (the Feigenbaum edge — the σ=½ of the interval map). Same sign
   law as the Collatz per-step drift `log(√3/2) < 0`. KNOWN.
+  (The Collatz map was the engine's first real test, in August 2026; it was re-run against 1.0.0 in *A Bit Shift Wearing A Disguise*, `FourthAgePapers/CollatzShift/paper/`, which also corrects one statement: the engine's SIGN occurs in neither Collatz branch.)
 
 The library serves as **control set** (each generator a known dimension) and
 **instruction manual** (each `.ucl` a decomposition method). Engine now 26/26.
