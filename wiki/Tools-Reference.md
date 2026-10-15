@@ -253,6 +253,15 @@ Shannon's unicity distance — how much ciphertext makes a decomposition unique 
 - **build_up (work):** the ciphertext length owed so expected spurious keys ≤ ε — the work is data
 - tutorial [`examples/49_unicity.py`](../examples/49_unicity.py) · page [`Unicity.md`](Unicity.md)
 
+### `circle`
+
+Every unit circle by constant and role, the imaginary circle and its laws of sines and cosines, the six drawings of a circle and the seventh (the ℓ_p norm).
+
+- **line:** both · **module:** `engine.toolsets.circle`
+- **descend (free):** a number plus the role it plays (radius / diameter / circumference / area) -> the whole circle row (r, d, C, A), its π-unit reading, π-lattice membership, imaginary counterpart and ℓ_p dual; the six drawings (orbit / unfold / cut / fold / project / shuffle) and the seventh (ℓ_p norm)
+- **build_up (work):** a target measure -> every catalogued constant, in every role, whose circle produces it; cost = candidates tried
+- tutorial [`examples/50_circle.py`](../examples/50_circle.py) · page [`Circle.md`](Circle.md)
+
 ### `oscilloscope`  *(EXTENDED layer — needs the sibling repositories)*
 
 **EXTENDED layer.** A two-panel SVG: the Fermat N-shape (0…15) and root-system pathway of one number, over the Riemann-facet equidistribution reading. Its ascent is refused: a shape is N mod 16, and recovering N owes the remaining digits.

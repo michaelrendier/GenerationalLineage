@@ -4,6 +4,16 @@ Release notes, newest first. The pre-1.0 development log follows the 1.0.0 entry
 
 ## Unreleased — after 1.0.0
 
+- **New toolset: `circle` (the 29th, `LINE = "both"`), one file, `engine/toolsets/circle.py`.** A cataloguing and relating move: any
+  number plus the role it plays (radius / diameter / circumference / area) gives the whole circle row, its π-unit reading, π-lattice
+  membership (`2^a·π^b`, the first-line test for "coincidence or algebra"), its imaginary counterpart (radius iρ: d = 2iρ, C = 2πiρ,
+  A = −πρ², C² = 4πA exactly) and its ℓ_p dual. It also carries the six drawings of a circle (`orbit`, `unfold`, `cut`, `fold`,
+  `project`, `shuffle`), the seventh circle (the ℓ_p norm: π_p, the p↔q duality, the Cayley–Klein elliptic / parabolic / hyperbolic
+  triple with an SL(2,ℝ) trace classifier), the laws of sines and cosines on flat, spherical, imaginary-sided and hyperbolic
+  triangles (a sphere of radius iρ is the hyperbolic plane; Heron's square-root branch is the Sign), and `sigma_reading` (any
+  catalogued value used as a Σ_RB coupling). 27 self-checks. Recorded limit: the cosine form of the spherical law cancels
+  catastrophically for R ≳ 1e5 (kept as a check, not hidden). Tutorial `50_circle`, generated page `wiki/Circle.md`, hand-written
+  catalogue `wiki/Circle-Catalogue.md`. Registered in `lines.TOOLSETS` and `devtools/build_docs.py`.
 - **Dropped the `udeo_poc` dependency; the Extended layer now needs three sibling repositories, not four.**
   `engine.maths.nilpotent_fraction_at_dim` used to import `CayleyDickson` from `TuringStack/udeo_poc.py` for its GF(2)
   Cayley–Dickson multiplication. It now uses this repository's own `engine.lineage.cd_mul_gf2` — checked bit-identical against the

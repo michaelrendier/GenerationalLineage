@@ -289,6 +289,36 @@ MOVES = [
         refs=["Shannon1949"],
         src="engine/toolsets/unicity.py",
     ),
+    dict(
+        name="circle", page="Circle", ex="50_circle", sec="4.29",
+        title="Circle — every unit circle, and the seven ways to draw one",
+        kind="the circle as the Add:Scale:Sign floor read geometrically — a cataloguing and relating move",
+        what=("A circle is three things: a centre (Add), a radius (Scale) and an orientation (Sign). Give the move a number **and the role it plays** — "
+              "radius, diameter, circumference or area — and it returns the whole row (r, d, C, A), the reading in units of π, whether the number lies "
+              "in the exact lattice {2^a·π^b}, its imaginary counterpart (radius iρ: d = 2iρ, C = 2πiρ, A = −πρ²) and its ℓ_p dual. A circle drawn six ways "
+              "(orbit, unfold, cut, fold, project, shuffle) is the same circle plus a transform that leaves one pathway; the seventh circle changes the "
+              "NORM instead of the drawing: the ℓ_p unit circle with its own π_p and the p↔q duality."),
+        why=("It is the first-line test for 'is this coincidence structure or just π-algebra': the constants 1/2, 1, 2, π, 2π, 1/π and √2 all lie in {2^a·π^b}, "
+             "so every near-equality between them is exact algebra; φ, e, ln 10, Ω, d* and the gap lie outside it and produced no cross-constant hit. "
+             "And it relates equations: the law of sines and the law of cosines keep their form for imaginary sides (they are homogeneous); only the sign of every "
+             "area flips, which is the Sign component, and a sphere of radius iρ is the hyperbolic plane — area ρ²(π − A − B − C)."),
+        residual="the Sign: which branch of the square root an area takes",
+        descend="the circle row for any (number, role), the π-unit circles, the six drawings, the ℓ_p circle, and any catalogued value read as a Σ_RB coupling",
+        ascend="a target measure -> every catalogued constant, in every role, whose circle produces it; cost = candidates tried",
+        guarantee="27 self-checks, run exactly. r = 1/2 gives d = 1, C = π, A = π/4; C(r = 1/2) = A(r = 1) = π. An imaginary circle has A = −π and C² = 4πA exactly. "
+                  "Under a, b → ia, ib the law of cosines keeps its form (c → ic), the area flips sign, and Heron's 16A² is unchanged. A spherical triangle has angle excess and "
+                  "the same triangle on radius i has the angle deficit, with Gauss–Bonnet area equal to each. The ℓ_p circle gives π₂ = π, π₁ = π_∞ = 4 and π_p = π_q to 1e-5; "
+                  "the SL(2,ℝ) trace test separates elliptic, parabolic and hyperbolic.",
+        limits="The cosine form of the spherical law cancels catastrophically for radius ≳ 1e5 (the excess is area/R², below double rounding); the check records this limit instead of hiding it. "
+               "The Add/Scale/Sign placement of π (C → Add, A → Scale, d → Sign) is a proposal, not a theorem; the three circles are computed either way.",
+        prov=[("circle measures; Gauss–Bonnet area of a spherical triangle; the sphere of imaginary radius as the hyperbolic plane", "ESTABLISHED", "Gauss 1827; Lambert 1766"),
+              ("π_p and the p↔q duality; the minimum at p = 2", "ESTABLISHED", "Gołąb 1932; Adler & Tanton 2000"),
+              ("von Mises distribution as the Boltzmann weight of a planar dipole; Langevin function", "ESTABLISHED", "von Mises 1918; Langevin 1905"),
+              ("elliptic / parabolic / hyperbolic as the signature of the unit conic", "ESTABLISHED", "Klein 1871; Yaglom 1979"),
+              ("the catalogue of constants × roles, the π-lattice test, the six-drawings framing and the Add:Scale:Sign reading of a circle", "OURS", "—")],
+        refs=["Gauss1827", "Lambert1766", "Golab1932", "AdlerTanton2000", "vonMises1918", "Langevin1905", "Klein1871", "Yaglom1979"],
+        src="engine/toolsets/circle.py",
+    ),
 ]
 
 REFS = {
@@ -313,6 +343,14 @@ REFS = {
     "Shanks1971": "Shanks, D. (1971). Class number, a theory of factorization, and genera. *Proceedings of Symposia in Pure Mathematics* 20, 415–440.",
     "Pollard1975": "Pollard, J. M. (1975). A Monte Carlo method for factorization. *BIT Numerical Mathematics* 15(3), 331–334.",
     "SorensonWebster2015": "Sorenson, J., Webster, J. (2017). Strong pseudoprimes to twelve prime bases. *Mathematics of Computation* 86(304), 985–1003. (Deterministic Miller–Rabin for n < 3.3×10²⁴.)",
+    "Gauss1827": "Gauss, C. F. (1827). *Disquisitiones generales circa superficies curvas.* Göttingen.",
+    "Lambert1766": "Lambert, J. H. (written 1766, published 1786). Theorie der Parallellinien. *Magazin für die reine und angewandte Mathematik.*",
+    "Golab1932": "Gołąb, S. (1932). Quelques problèmes métriques de la géométrie de Minkowski. *Travaux de l'Académie des Mines de Cracovie* 6, 1–79.",
+    "AdlerTanton2000": "Adler, C. L., Tanton, J. (2000). π is the minimum value for pi. *The College Mathematics Journal* 31(2), 102–106.",
+    "vonMises1918": "von Mises, R. (1918). Über die „Ganzzahligkeit“ der Atomgewichte und verwandte Fragen. *Physikalische Zeitschrift* 19, 490–500.",
+    "Langevin1905": "Langevin, P. (1905). Magnétisme et théorie des électrons. *Annales de Chimie et de Physique* 5, 70–127.",
+    "Klein1871": "Klein, F. (1871). Über die sogenannte Nicht-Euklidische Geometrie. *Mathematische Annalen* 4, 573–625.",
+    "Yaglom1979": "Yaglom, I. M. (1979). *A Simple Non-Euclidean Geometry and its Physical Basis.* Springer.",
     "Shannon1949": "Shannon, C. E. (1949). Communication theory of secrecy systems. *Bell System Technical Journal* 28(4), 656–715.",
 }
 
@@ -342,6 +380,7 @@ DEFINITIONS = {
     "jordan_chevalley": "A = S + N exactly, in rational arithmetic: a semisimple part that only scales and a nilpotent part that dies after a finite number of generations.",
     "re_pair": "A sequence's own lineage tree by repeated pairing: rule depth is generation count; exact round trip; minimality reported as unknown.",
     "pohlig_hellman": "Discrete log via the lineage of the group order: predicted cost from the largest prime factor, a solve by BSGS + CRT, and a refusal over budget.",
+    "circle": "Every unit circle by constant and role, the imaginary circle and its laws of sines and cosines, the six drawings of a circle and the seventh (the ℓ_p norm).",
     "unicity": "Shannon's unicity distance — how much ciphertext makes a decomposition unique — with a rigorous order-0 bound kept apart from the literature estimate.",
     "oscilloscope": "**EXTENDED layer.** A two-panel SVG: the Fermat N-shape (0…15) and root-system pathway of one number, over the Riemann-facet equidistribution reading. Its ascent is refused: a shape is N mod 16, and recovering N owes the remaining digits.",
     "emerger": "The ascent dual of the lineage engine: the bracketing and firing order of emergence of a 16-vector, with e₀ as the fixed anchor and exact zero-divisor tests over rational arithmetic.",

@@ -256,6 +256,14 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
                 "kept separate and labelled",
         "work": "the ciphertext length owed so expected spurious keys ≤ ε — the work is data",
     },
+    "circle": {
+        "module": "engine.toolsets.circle", "line": "both",
+        "free": "a number plus the role it plays (radius / diameter / circumference / area) -> the whole circle row "
+                "(r, d, C, A), its π-unit reading, π-lattice membership, imaginary counterpart and ℓ_p dual; "
+                "the six drawings (orbit / unfold / cut / fold / project / shuffle) and the seventh (ℓ_p norm)",
+        "work": "a target measure -> every catalogued constant, in every role, whose circle produces it; "
+                "cost = candidates tried",
+    },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
         "requires": "sibling-repos",      # EXTENDED layer: needs AbrikosovTree, ValaQuenta, TuringStack, FourthAgePapers

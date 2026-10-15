@@ -38,7 +38,7 @@ from . import (                                                  # noqa: F401
     cipher, comma_sequence, stencil, hyper_linear, equation_space, spectral_primes,
     cs_benchmark,
     periodicity, lyndon, berlekamp_massey, logperiodic, permutation, rejewski,
-    jordan_chevalley, re_pair, pohlig_hellman, unicity,
+    jordan_chevalley, re_pair, pohlig_hellman, unicity, circle,
 )
 
 MODULES = {
@@ -51,5 +51,5 @@ MODULES = {
     "periodicity": periodicity, "lyndon": lyndon, "berlekamp_massey": berlekamp_massey,
     "logperiodic": logperiodic, "permutation": permutation, "rejewski": rejewski,
     "jordan_chevalley": jordan_chevalley, "re_pair": re_pair,
-    "pohlig_hellman": pohlig_hellman, "unicity": unicity,
+    "pohlig_hellman": pohlig_hellman, "unicity": unicity, "circle": circle,
 }

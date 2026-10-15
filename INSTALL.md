@@ -8,7 +8,7 @@ There are two ways to install it. Almost everything is in the **Core**; the **Ex
 |---|---|---|
 | what you get | the whole engine: 27 toolsets, the lineage/emerger/ping engines, all tutorials except `90_`, all wiki pages | Core **plus** `engine.maths`, `engine.tools`, `engine.oscilloscope` (the Fermat-facet inventory, the control test, the two-panel SVG) |
 | needs | this repository + numpy | this repository + numpy + three sibling repositories cloned beside it |
-| `python3 -m engine --verify` | `27 toolsets ran, 27 passed, 1 skipped` | `28 toolsets ran, 28 passed, 0 skipped` |
+| `python3 -m engine --verify` | `28 toolsets ran, 28 passed, 1 skipped` | `29 toolsets ran, 29 passed, 0 skipped` |
 
 ## Core install
 
@@ -52,7 +52,7 @@ pip install -r requirements-dev.txt
 python3 -m pytest
 ```
 
-Expected on a Core install: `156 passed, 2 skipped` (the two skips are extended-only checks). On an Extended install: `158 passed`.
+Expected on a Core install: `160 passed, 2 skipped` (the two skips are extended-only checks). On an Extended install: `162 passed`.
 
 `requirements-dev.txt` adds `pytest`, plus `sympy` (the operator-string parser's SymPy output) and `matplotlib` (optional PNG rendering), plus `nbformat`, `nbconvert` and `ipykernel` to execute the two notebooks in `notebooks/`.
 
@@ -83,7 +83,7 @@ python3 -m engine --verify --strict       # --strict: exit 0 only if NOTHING was
 Expected — the last lines:
 
 ```text
-28 toolsets ran, 28 passed, 0 skipped
+29 toolsets ran, 29 passed, 0 skipped
 RESULT: PASS
 ```
 

@@ -3,7 +3,7 @@
 >>> lines.DECOMPOSITION_LINE[:4]
 ['add_scale_sign', 'scale', 'units', 'box_kite']
 >>> lines.EMERGER_LINE[-4:]
-['re_pair', 'pohlig_hellman', 'unicity', 'emerger']
+['pohlig_hellman', 'unicity', 'circle', 'emerger']
 >>> # descend() always sets free=True, cost=0 — it is a single forward pass with no stored tape.
 >>> d = lines.descend("noether", [(0.3, 0.7), (0.5, 0.5), (0.1, 0.9)])
 >>> d["free"], d["cost"], d["conserved"]

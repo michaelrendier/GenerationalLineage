@@ -1,0 +1,66 @@
+>>> import math
+>>> from engine.toolsets import circle
+>>> # A circle is Add (centre) : Scale (radius) : Sign (orientation). Give a number AND the role it plays.
+>>> r = circle.descend(0.5, "radius")
+>>> r["diameter"], round(r["circumference"], 6), round(r["area"], 6)
+(1.0, 3.141593, 0.785398)
+>>> # The same constant in every role — "radius = 1/2" and "diameter = 1" are the same circle; "area = 1" is not.
+>>> for role in circle.ROLES:
+...     row = circle.descend(1.0, role)
+...     print(role, "= 1 ->", "r =", round(row["radius"], 6), " C =", round(row["circumference"], 6), " A =", round(row["area"], 6))
+radius = 1 -> r = 1.0  C = 6.283185  A = 3.141593
+diameter = 1 -> r = 0.5  C = 3.141593  A = 0.785398
+circumference = 1 -> r = 0.159155  C = 1.0  A = 0.079577
+area = 1 -> r = 0.56419  C = 3.544908  A = 1.0
+>>> # π as the UNIT, placed at three different measures:
+>>> for slot, c in circle.pi_unit_circles().items():
+...     print(slot, c["role"], "= π ->", {k: round(v, 5) for k, v in c.items() if k != "role"})
+Add circumference = π -> {'radius': 0.5, 'diameter': 1.0, 'circumference': 3.14159, 'area': 0.7854}
+Scale area = π -> {'radius': 1.0, 'diameter': 2.0, 'circumference': 6.28319, 'area': 3.14159}
+Sign diameter = π -> {'radius': 1.5708, 'diameter': 3.14159, 'circumference': 9.8696, 'area': 7.75157}
+>>> # Is a coincidence between two constants structure, or just {2^a·π^b} algebra? (first-line test)
+>>> circle.pi_lattice(2 * math.pi), circle.pi_lattice(1 / math.pi), circle.pi_lattice(circle.PHI)
+((1.0, 1), (0.0, -1), None)
+>>> # The emerger direction: which catalogued circle has area exactly π?
+>>> b = circle.build_up(math.pi, "area")
+>>> [(h["constant"], h["as"]) for h in b["hits"]], b["cost"]
+([('1', 'radius'), ('2', 'diameter'), ('pi', 'area'), ('2pi', 'circumference')], 60)
+>>> # The imaginary circle: radius i. d = 2i, C = 2πi, A = −π — and C² = 4πA still holds exactly.
+>>> im = circle.imaginary_circle(1.0)
+>>> im["diameter"], im["circumference"], round(im["area"].real, 6), abs(im["C2_minus_4piA"]) < 1e-9
+(2j, 6.283185307179586j, -3.141593, True)
+>>> # Law of cosines / sines with imaginary sides (a, b -> ia, ib): the law keeps its FORM, the sides stay imaginary,
+>>> # and the area (degree 2) flips sign. Heron's 16A² (degree 4) is unchanged — the sign is the Sign component.
+>>> real, imag = circle.flat_laws(3.0, 4.0, 1.1), circle.flat_laws(3j, 4j, 1.1)
+>>> round(abs(imag["c"]) - abs(real["c"]), 12), round(real["area"], 6), round(imag["area"].real, 6)
+(0.0, 5.347244, -5.347244)
+>>> circle.heron_squared(3, 4, 5), circle.heron_squared(3j, 4j, 5j).real
+(576, 576.0)
+>>> # A sphere of radius R has angle EXCESS; a sphere of radius iρ is the hyperbolic plane and has angle DEFICIT:
+>>> sph = circle.triangle(0.5, 0.6, 0.7, 1.0)
+>>> hyp = circle.triangle(0.5, 0.6, 0.7, 1j)
+>>> round(sph["angle_sum"].real - math.pi, 6), round(math.pi - hyp["angle_sum"].real, 6)
+(0.15406, 0.140551)
+>>> round(sph["area"].real, 6), round(hyp["area"].real, 6)
+(0.15406, 0.140551)
+>>> # The six drawings of one circle, and the seventh (change the NORM, not the drawing):
+>>> circle.fold(0.5)["image_radius"], round(circle.fold(0.5)["profile"], 6)
+(2.0, 0.5)
+>>> round(circle.shuffle(1e-3, 2)["mean_cos"] / 1e-3, 4), round(circle.shuffle(1e-3, 3)["mean_cos"] / 1e-3, 4)
+(0.5, 0.3333)
+>>> for p in (1.0, 1.5, 2.0, 3.0, math.inf):
+...     c = circle.lp_circle(p)
+...     print("p =", p, " pi_p =", round(c["pi_p"], 5), " area =", round(c["area"], 5), " dual q =", c["q_dual"])
+p = 1.0  pi_p = 4.0  area = 2.0  dual q = inf
+p = 1.5  pi_p = 3.25977  area = 2.73785  dual q = 3.0
+p = 2.0  pi_p = 3.14159  area = 3.14159  dual q = 2.0
+p = 3.0  pi_p = 3.25977  area = 3.53328  dual q = 1.5
+p = inf  pi_p = 4.0  area = 4.0  dual q = 1.0
+>>> # Any catalogued value as a Σ_RB coupling σ (G_p = p^−σ over the first primes):
+>>> for name in ("1/2", "d*", "1", "i"):
+...     s = circle.sigma_reading(circle.CONSTANTS[name])
+...     print("sigma =", name, "->", s["regime"], " |sum G_p| =", round(abs(s["coupling_sum"]), 5))
+sigma = 1/2 -> critical (σ≈½)  |sum G_p| = 4.98963
+sigma = d* -> forbidden/Fermat zone (0<σ<½)  |sum G_p| = 9.69846
+sigma = 1 -> Yang–Mills-like (σ≈1)  |sum G_p| = 1.74287
+sigma = i -> trivial (σ≤0)  |sum G_p| = 11.80439

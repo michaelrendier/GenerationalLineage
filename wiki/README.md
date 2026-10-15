@@ -27,6 +27,13 @@ idea each. Pages marked *(generated)* are produced by `devtools/build_docs.py` f
 | [Pohlig-Hellman](Pohlig-Hellman.md) | factor the group, solve per prime, glue by CRT |
 | [Unicity](Unicity.md) | how much ciphertext makes the decomposition unique |
 
+## The eleventh move *(generated page + hand-written catalogue)*
+
+| page | move |
+|---|---|
+| [Circle](Circle.md) *(generated)* | every unit circle, the six drawings, the seventh (ℓ_p) |
+| [Circle-Catalogue](Circle-Catalogue.md) | the full catalogue: constants × roles, π-unit circles, each value as σ_RB, the imaginary circle's laws of sines and cosines |
+
 ## Theory and the earlier toolsets
 
 | page | what it covers |
