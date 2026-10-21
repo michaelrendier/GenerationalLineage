@@ -2172,7 +2172,7 @@ engine/
   emerger.py      §4.14 — the ascent dual: sedenion / any-2^k Cayley–Dickson bracketing and firing order of emergence
   ping.py         §4.15 — the Emerger–Lineage unification: classify an RSA modulus by the counter-operator that reaches it
   add_scale_sign.py  the ADD:SCALE:SIGN datatype (the tier-0 floor as a value type) and the fast inverse square root
-  bracketing_firing_order.py  Bell numbers, set partitions, firing orders, collisions, jurisdiction violations
+  bracketing_firing_order.py  Bell numbers, set partitions, firing orders, collisions, jurisdiction violations; firing plans (brackets that carry firing orders)
   spectral.py     §4.13 — general spectral decomposition of any signal
   opstring.py operator_tree.py shape.py   §4.16–  the operator-string parser, the Operator Tree, the shape diagnostic
   clay.py         §4.12 — the generational lineage of the seven Clay problems (a structural reading, not a solution)

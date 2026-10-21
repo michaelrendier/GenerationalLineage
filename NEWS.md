@@ -4,6 +4,7 @@ Release notes, newest first. The pre-1.0 development log follows the 1.0.0 entry
 
 ## Unreleased — after 1.0.0
 
+- **`bracketing_firing_order` tool 4: firing plans.** A bracket now carries a firing order written beside it: `(R I | 2 1)` fires the second child (the imaginary octonion of the two-octonion sedenion) first, the real octonion second; a bracket runs as one operation in its own order inside its parent, so `((A B | 2 1) C | 2 1)` fires `C B A`. Two readings: operator (composition, associative: only the order changes the result) and element (the sedenion product: the bracketing changes it too). Counts (`count_plans`), enumeration (`binary_plans`, `flat_plans`, `permuted_shapes`), a parser, `verify_plans()`; written-order binary plans reach 6, 22, 90 of 3!, 4!, 5! orders. Ported from `SedenionSpectralRelativity/firing_plan.py`; `wiki/Firing-Plans.md`, `notebooks/03_firing_plans.ipynb`, `tests/test_firing_plans.py`. Existing tools 1–3 unchanged.
 - **New toolset: `circle` (the 29th, `LINE = "both"`), one file, `engine/toolsets/circle.py`.** A cataloguing and relating move: any
   number plus the role it plays (radius / diameter / circumference / area) gives the whole circle row, its π-unit reading, π-lattice
   membership (`2^a·π^b`, the first-line test for "coincidence or algebra"), its imaginary counterpart (radius iρ: d = 2iρ, C = 2πiρ,

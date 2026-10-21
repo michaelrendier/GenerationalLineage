@@ -42,6 +42,7 @@ idea each. Pages marked *(generated)* are produced by `devtools/build_docs.py` f
 | [Two-Lines-and-Jurisdiction](Two-Lines-and-Jurisdiction.md) | descent free, ascent work, the adjoint is the one that costs |
 | [The-Two-Charts-and-Jurisdiction](The-Two-Charts-and-Jurisdiction.md) | the Smith chart and the Apollonian gasket as one loop through PSL(2, ℂ) |
 | [The-Emerger-Ascent-Dual](The-Emerger-Ascent-Dual.md) | the ascent dual of the lineage engine |
+| [Firing-Plans](Firing-Plans.md) | brackets that carry firing orders; tool 4 of `bracketing_firing_order` |
 | [Ping-and-the-Counter-Operator-Laplacian](Ping-and-the-Counter-Operator-Laplacian.md) | classifying an RSA modulus by the counter-operator that reaches it |
 | [ADD-SCALE-SIGN-Datatype](ADD-SCALE-SIGN-Datatype.md) | the tier-0 floor as a datatype; what SIGN does and does not decide about the Noether direction |
 | [The-Operator-Tree](The-Operator-Tree.md) | the shapes of mathematics as folds of three generators |
