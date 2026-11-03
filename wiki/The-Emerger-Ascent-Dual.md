@@ -1,5 +1,7 @@
 # The Emerger — the ascent dual of Generational Lineage
 
+> **EXPERIMENTAL.** Its bracketing and firing-order layer is unfinished (see bracketing_firing_order); the ascent dual is not complete. It is documented and self-checked, but do not treat it as a working tool yet.
+
 **Engine:** `engine/emerger.py` (`report_emergence`, `emerge_brackets`,
 `bracket_firing_order`, `emerger_verify`). Pure stdlib, `Fraction` throughout,
 float only at the output boundary. 14/14 exact self-checks.

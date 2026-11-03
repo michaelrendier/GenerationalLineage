@@ -1,5 +1,7 @@
 # 4.14 The Emerger — the ascent dual  `[TUTORIAL — sedenion / CD bracketing]`
 
+> **EXPERIMENTAL.** Its bracketing and firing-order layer is unfinished (see bracketing_firing_order); the ascent dual is not complete. It is documented and self-checked, but do not treat it as a working tool yet.
+
 `engine/emerger.py` · *Tutorial:* [`08_emerger`](../examples/08_emerger.py). Full write-up: [`wiki/The-Emerger-Ascent-Dual.md`](The-Emerger-Ascent-Dual.md).
 
 Everything above this section runs **descent**: given an operator or a number,

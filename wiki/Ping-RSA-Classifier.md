@@ -1,5 +1,7 @@
 # 4.15 The Emerger–Lineage unification — ping 0 from a modulus  `[TUTORIAL — RSA regime classifier]`
 
+> **EXPERIMENTAL.** Classifies an RSA modulus by the counter-operator that reaches it and sketches a path to 0; it has not succeeded as a factoring method, and its Coppersmith/LLL hop is a note-only stub. It is documented and self-checked, but do not treat it as a working tool yet.
+
 `engine/ping.py` · *Tutorial:* [`09_ping`](../examples/09_ping.py). Full write-up:
 [`wiki/Ping-and-the-Counter-Operator-Laplacian.md`](Ping-and-the-Counter-Operator-Laplacian.md).
 

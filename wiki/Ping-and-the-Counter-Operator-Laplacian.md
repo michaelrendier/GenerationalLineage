@@ -1,5 +1,7 @@
 # ping — the Emerger–Lineage unification
 
+> **EXPERIMENTAL.** Classifies an RSA modulus by the counter-operator that reaches it and sketches a path to 0; it has not succeeded as a factoring method, and its Coppersmith/LLL hop is a note-only stub. It is documented and self-checked, but do not treat it as a working tool yet.
+
 **Engine:** `engine/ping.py` (`ping`, `counter_operator_laplacian`,
 `emerger_lineage_unify`, `report_ping`, `flat_diagram_depth_note`).
 stdlib + numpy. Every number CALCULATED and reproducible.

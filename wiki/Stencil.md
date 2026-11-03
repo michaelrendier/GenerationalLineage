@@ -13,6 +13,8 @@ The digit-by-digit decomposition machine: `descend` is N = p·q; `build_up` cons
 | **`descend`** (free, `cost = 0`) | N = p·q — one multiplication, no search (the hand-worked long-multiplication pathway, carries and all, walked forward) |
 | **`build_up`** (work, or refused) | given only N, build candidate factor pairs digit by digit; slide 1 run to full depth is exhaustive and exact — every divisor pair is found, and a prime N raises AscentNotFree (the refusal is the result) |
 
+> **EXPERIMENTAL.** Slide 1 is exact and exhaustive at teaching scale, but combining the two slides (a meet-in-the-middle overlap check) is open design work that is not built. It is documented and self-checked, but do not treat it as a working tool yet.
+
 ## API
 
 `engine.toolsets.stencil` · registry name `stencil` · line **both** · every call below is made as `lines.<direction>("stencil", ...)` (`from engine import lines`) or directly on the module.

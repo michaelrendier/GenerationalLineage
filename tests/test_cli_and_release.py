@@ -159,3 +159,16 @@ def test_every_manual_page_is_in_the_manual_index():
     index = open(os.path.join(ROOT, "wiki", "README.md"), encoding="utf-8").read()
     orphans = [f for f in os.listdir(os.path.join(ROOT, "wiki")) if f.endswith(".md") and f != "README.md" and f"{f}" not in index]
     assert not orphans, orphans
+
+
+def test_every_experimental_tool_is_marked_in_the_readme_and_on_its_page():
+    from devtools import build_docs
+    readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+    for name in build_docs.EXPERIMENTAL:
+        assert f"| {name}" in readme or f"[{name}]" in readme or f"**{name}**" in readme, name
+        assert "experimental" in readme.lower()
+    for name in build_docs.EXPERIMENTAL:
+        page = build_docs.WIKI_OF.get(name) or build_docs.MATURITY_PAGE.get(name)
+        if page and name != "bio":
+            text = open(os.path.join(ROOT, "wiki", page + ".md"), encoding="utf-8").read()
+            assert "EXPERIMENTAL" in text, f"{name}: page {page} has no experimental banner"

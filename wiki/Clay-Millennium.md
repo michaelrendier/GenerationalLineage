@@ -1,5 +1,7 @@
 # 4.12 The generational lineage of a Clay Millennium Problem  `[TUTORIAL — new factoring methods]`
 
+> **EXPERIMENTAL.** Structural readings of the seven problems; the consistency checker passing is not a derivation, and no problem is solved. It is documented and self-checked, but do not treat it as a working tool yet.
+
 `engine/clay.py` · *Tutorial:* [`15_clay`](../examples/15_clay.py). The same decomposition discipline this file runs on numbers,
 processes and units, applied to the **seven Clay Millennium Problems** — each
 read as a *decomposed object* / structural mapping, with **Poincaré as the

@@ -13,6 +13,8 @@ The comma sequence (Angelini, Guy & Sloane): each term's step is read off the di
 | **`descend`** (free, `cost = 0`) | the comma-group read — each gap a(n+1)−a(n) = b·L + R is lifted straight off the two digits straddling the comma; one pass says whether the walk is valid and whether it has hit a landmine. Resolution is a RATIO (b²:2 = step alphabet : comma window), not a bandwidth — the Flashlight, and mortality is its coarse end |
 | **`build_up`** (work, or refused) | walk the lexicographically-earliest comma sequence forward one term at a time (the forced successor is the earliest valid R); cost = terms placed; base<634 dies, base≥634 is immortal |
 
+> **EXPERIMENTAL.** Marked experimental by the author: the comma-group read and its resolution-as-ratio framing have not yet been shown to succeed at what they are for. It is documented and self-checked, but do not treat it as a working tool yet.
+
 ## API
 
 `engine.toolsets.comma_sequence` · registry name `comma_sequence` · line **both** · every call below is made as `lines.<direction>("comma_sequence", ...)` (`from engine import lines`) or directly on the module.

@@ -1,5 +1,7 @@
 # Firing Plans — brackets that carry firing orders (tool 4 of `bracketing_firing_order`)
 
+> **EXPERIMENTAL.** Unfinished: the groupings (bracketing) of firing orders, and a recursive layered structure over them — the way a sedenion splits into two octonions, and so on — are not built. It is documented and self-checked, but do not treat it as a working tool yet.
+
 **Updated 2026-10-21.** Code: `engine/bracketing_firing_order.py` (tool 4, ported from `SedenionSpectralRelativity/firing_plan.py`). Notebook: `notebooks/03_firing_plans.ipynb` (executed). Source: `SedenionSpectralRelativity/firing_plan.py`, with the 31-node tree rule `plan_of_tree`. Everything below is `:CALCULATED` (exact `Fraction`, `engine.emerger.cd_mul`), and `python3 -c "from engine import bracketing_firing_order as b; print(b.verify())"` and `tests/test_firing_plans.py` re-run the checks.
 
 ## What changed

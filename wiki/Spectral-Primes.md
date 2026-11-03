@@ -13,6 +13,8 @@ The spin/wobble split read as decomposition versus emerger: the spin rate θ′(
 | **`descend`** (free, `cost = 0`) | theta'(t) at one height — the spin/carrier rate, no resonance, no search |
 | **`build_up`** (work, or refused) | reconstruct psi(x) from n_zeros known zeros — cost = n_zeros; the primes (Gibbs undershoot at prime jumps) only emerge as more work (more zeros) is spent |
 
+> **EXPERIMENTAL.** Only the spin and the wobble are built here; the tilt-versus-wobble correlation and the Real-Tilt/Axis check live in the sibling ValaQuenta repository, not in this one. It is documented and self-checked, but do not treat it as a working tool yet.
+
 ## API
 
 `engine.toolsets.spectral_primes` · registry name `spectral_primes` · line **both** · every call below is made as `lines.<direction>("spectral_primes", ...)` (`from engine import lines`) or directly on the module.

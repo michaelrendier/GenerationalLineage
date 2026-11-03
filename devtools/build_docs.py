@@ -567,10 +567,22 @@ def _sig(fn) -> str:
     return ", ".join(out)
 
 
+def maturity_block() -> str:
+    rows = ["| tool | status | what is not finished |", "|---|---|---|"]
+    for n, why in EXPERIMENTAL.items():
+        page = WIKI_OF.get(n) or MATURITY_PAGE.get(n)
+        link = f"[{n}](wiki/{page}.md)" if page else f"`{n}`"
+        rows.append(f"| {link} | **experimental** | {why[0].upper() + why[1:]}. |")
+    return "\n".join(rows)
+
+
+MATURITY_PAGE = {"ping": "Ping-RSA-Classifier", "clay": "Clay-Millennium", "bracketing_firing_order": "Firing-Plans", "bio": "Whats-Next"}
+
+
 def api_reference() -> str:
     """A generated signature table: one row per registered toolset, descend and build_up, linked to the Manual page."""
     import importlib
-    rows = ["| toolset | `descend(...)` — free | `build_up(...)` — work | line | page |", "|---|---|---|---|---|"]
+    rows = ["| toolset | `descend(...)` — free | `build_up(...)` — work | line | status | page |", "|---|---|---|---|---|---|"]
     for n, d in lines.TOOLSETS.items():
         page = WIKI_OF.get(n)
         link = f"[{page}](wiki/{page}.md)" if page else ""
@@ -581,8 +593,27 @@ def api_reference() -> str:
             m = importlib.import_module(d["module"])
             de, bu = f"`descend({_sig(m.descend)})`", f"`build_up({_sig(m.build_up)})`"
         ext = " *(extended)*" if d.get("requires") else ""
-        rows.append(f"| **{n}**{ext} | {de} | {bu} | {d['line']} | {link} |")
+        rows.append(f"| **{n}**{ext} | {de} | {bu} | {d['line']} | {'**experimental**' if n in EXPERIMENTAL else '—'} | {link} |")
     return "\n".join(rows)
+
+
+# Maturity: tools the author marks EXPERIMENTAL — built and self-checking, but not yet shown to succeed at what they are for.
+# (Marked 2026-11-03 by the author. A self-check passing means the code does what it says, not that the idea has worked.)
+EXPERIMENTAL = {
+    "ping": "classifies an RSA modulus by the counter-operator that reaches it and sketches a path to 0; it has not succeeded as a factoring method, and its Coppersmith/LLL hop is a note-only stub",
+    "stencil": "slide 1 is exact and exhaustive at teaching scale, but combining the two slides (a meet-in-the-middle overlap check) is open design work that is not built",
+    "spectral_primes": "only the spin and the wobble are built here; the tilt-versus-wobble correlation and the Real-Tilt/Axis check live in the sibling ValaQuenta repository, not in this one",
+    "clay": "structural readings of the seven problems; the consistency checker passing is not a derivation, and no problem is solved",
+    "bracketing_firing_order": "unfinished: the groupings (bracketing) of firing orders, and a recursive layered structure over them — the way a sedenion splits into two octonions, and so on — are not built",
+    "emerger": "its bracketing and firing-order layer is unfinished (see bracketing_firing_order); the ascent dual is not complete",
+    "equation_space": "marked experimental by the author: steering by a collapse function's gradient has not yet been shown to succeed at what it is for",
+    "comma_sequence": "marked experimental by the author: the comma-group read and its resolution-as-ratio framing have not yet been shown to succeed at what they are for",
+    "bio": "a STUB — structural only; it makes no medical or biological inference",
+}
+
+
+def experimental_banner(name: str) -> str:
+    return f"> **EXPERIMENTAL.** {EXPERIMENTAL[name][0].upper() + EXPERIMENTAL[name][1:]}. It is documented and self-checked, but do not treat it as a working tool yet.\n\n" if name in EXPERIMENTAL else ""
 
 
 # ── API reference blocks (Convention A signatures + D transcript + B extracted listings) ───────────────────────
@@ -638,7 +669,7 @@ def api_block(name: str) -> str:
     d = lines.TOOLSETS[name]
     mod = importlib.import_module(d["module"])
     da, dk, ba, bk = SAMPLES[name]
-    out = [f"## API\n\n`{d['module']}` · registry name `{name}` · line **{d['line']}** · every call below is made as `lines.<direction>(\"{name}\", ...)` "
+    out = [experimental_banner(name) + f"## API\n\n`{d['module']}` · registry name `{name}` · line **{d['line']}** · every call below is made as `lines.<direction>(\"{name}\", ...)` "
            f"(`from engine import lines`) or directly on the module.\n"]
     for fn_name, label, a, k, cost in (("descend", "free — `cost = 0`", da, dk, "0"), ("build_up", "work — reports `cost`, may refuse", ba, bk, "")):
         fn = getattr(mod, fn_name)
@@ -957,7 +988,7 @@ def build() -> dict:
     files[os.path.join("wiki", "Tools-Reference.md")] = tools_reference()
     files[os.path.join("wiki", "Tutorial-Index.md")] = tutorial_index_page()
     files[os.path.join("wiki", "Engine-API.md")] = engine_api()
-    files["README.md"] = fill("README.md", {"install": install_block(), "quickstart": quickstart_block(), "api-reference": api_reference()})
+    files["README.md"] = fill("README.md", {"install": install_block(), "quickstart": quickstart_block(), "api-reference": api_reference(), "maturity": maturity_block()})
     hand = {n: WIKI_OF[n] for n in API_TOOLSETS if n in WIKI_OF and WIKI_OF[n] not in GENERATED_TOOLSET_PAGES.values()
             and WIKI_OF[n] not in {m["page"] for m in MOVES}}
     for n, page in hand.items():
