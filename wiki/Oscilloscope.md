@@ -15,11 +15,6 @@
 | **`descend`** (free, `cost = 0`) | stack the two facets (Fermat prompt / Riemann firing) of one number |
 | **`build_up`** (work, or refused) | — |
 
-Call it through the registry — `lines.descend("oscilloscope", ...)`, `lines.build_up("oscilloscope", ...)` — or import `engine.oscilloscope` directly. `build_up` raises `AscentNotFree` (with `.owed`) when the rebuild is undetermined; the refusal is the result.
-
-## How it is checked
-
-`engine.oscilloscope.verify()` returns `{"ok": bool, ...}`; `python3 -m engine --verify` runs it with every other toolset, and the tutorial transcript below is regenerated from the tutorial script by `python3 devtools/transcript.py` and compared by the test suite.
 
 ## A worked session
 

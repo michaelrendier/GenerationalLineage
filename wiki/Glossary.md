@@ -59,7 +59,7 @@ is *unjudged*, not confirmed.
 cited. *Ours*: this project's own contract, framing or construction. *Theoretical*: stated in the framework, not established.
 
 **Core / Extended** — Core is everything that needs only numpy. Extended adds `engine.maths`, `engine.tools`, `engine.oscilloscope`,
-which reach four sibling repositories. `engine.EXTENDED` reports which you have.
+which reach three sibling repositories. `engine.EXTENDED` reports which you have.
 
 **guarantee-first** — the engine's working rule: prefer an exact or exhaustive check to a sampled one; prefer an explicit refusal to
 a confident approximation; report an unknown as unknown; provide a fallback where no hard guarantee exists.

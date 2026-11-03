@@ -13,11 +13,44 @@ The spin/wobble split read as decomposition versus emerger: the spin rate θ′(
 | **`descend`** (free, `cost = 0`) | theta'(t) at one height — the spin/carrier rate, no resonance, no search |
 | **`build_up`** (work, or refused) | reconstruct psi(x) from n_zeros known zeros — cost = n_zeros; the primes (Gibbs undershoot at prime jumps) only emerge as more work (more zeros) is spent |
 
-Call it through the registry — `lines.descend("spectral_primes", ...)`, `lines.build_up("spectral_primes", ...)` — or import `engine.toolsets.spectral_primes` directly. `build_up` raises `AscentNotFree` (with `.owed`) when the rebuild is undetermined; the refusal is the result.
+## API
 
-## How it is checked
+`engine.toolsets.spectral_primes` · registry name `spectral_primes` · line **both** · every call below is made as `lines.<direction>("spectral_primes", ...)` (`from engine import lines`) or directly on the module.
 
-`engine.toolsets.spectral_primes.verify()` returns `{"ok": bool, ...}`; `python3 -m engine --verify` runs it with every other toolset, and the tutorial transcript below is regenerated from the tutorial script by `python3 devtools/transcript.py` and compared by the test suite.
+### `descend` — free — `cost = 0`
+
+```python
+descend(t)
+```
+
+SPIN, free: theta'(t) at height t -- one evaluation, no search. No prime content lives here; that is the point being read off.
+
+| parameter | default | type |
+|---|---|---|
+| `t` | *required* | `float` |
+
+**Returns** a dict with keys: `toolset` (str), `t` (float), `spin_rate` (float), `resonant` (bool), `note` (str).
+Example call: `lines.descend("spectral_primes", 100.0)`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(x, n_zeros=25)
+```
+
+WOBBLE, work: reconstruct psi(x) from the oscillatory term of the von Mangoldt explicit formula, summing n_zeros known zeros. cost = n_zeros (the terms actually summed) -- this IS the emerger reading: the primes only emerge as you spend the work of including more zeros.
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | `float` |
+| `n_zeros` | `25` | `int` |
+
+**Returns** a dict with keys: `toolset` (str), `x` (float), `n_zeros_used` (int), `cost` (int), `reconstructed` (float), `exact` (float), `difference` (float), `note` (str).
+Example call: `lines.build_up("spectral_primes", 10.0, n_zeros=10)`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. Self-check: (1) spin is monotonic (no resonance) across the embedded `lines.verify_all()` runs this for every toolset.
 
 ## A worked session
 

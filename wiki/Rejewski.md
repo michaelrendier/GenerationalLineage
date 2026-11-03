@@ -27,6 +27,42 @@ The implementation is validated against the standard known-answer vector (Enigma
 
 **Limits, stated plainly:** Scope is Enigma I with rotors I·II·III in that order, reflector UKW-B and ring settings AAA, with full stepping including the middle-rotor double step. Other rotor orders, ring settings and machines are not covered. This is a demonstration of the mathematical invariant on a toy-scale model, not a tool for breaking any real traffic.
 
+## API
+
+`engine.toolsets.rejewski` · registry name `rejewski` · line **both** · every call below is made as `lines.<direction>("rejewski", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x, plugboard='')
+```
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+| `plugboard` | `''` | `str` |
+
+**Returns** a dict with keys: `toolset` (str), `start` (str), `plugboard` (str), `characteristic` (tuple), `plugboard_independent` (bool), `even_multiplicities` (bool), `note` (str).
+Example call: `lines.descend("rejewski", 'QEV')`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `matches` (list), `n_matches` (int), `cost` (int), `distinct_characteristics` (int), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("rejewski", {'characteristic': [(3, 2, 1, 1), (2, 2, 1, 1)]})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
 ## Provenance
 
 | component | label | source |

@@ -27,6 +27,81 @@ BM is exact only when the sequence supplies at least 2L terms. `descend` reports
 
 **Limits, stated plainly:** The period computation is over GF(2) only (BM itself runs over any prime field). The trial-division factoriser bounds the period computation at degree 32.
 
+## API
+
+`engine.toolsets.berlekamp_massey` · registry name `berlekamp_massey` · line **both** · every call below is made as `lines.<direction>("berlekamp_massey", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x, p=2)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+| `p` | `2` | `int` |
+
+**Returns** a dict with keys: `toolset` (str), `n` (int), `field` (str), `linear_complexity` (int), `connection` (list), `determined` (bool), `terms_needed` (int), `char_poly_int` (int), `preperiod` (int), `period` (int), `factors` (dict), `primitive` (bool).
+Example call: `lines.descend("berlekamp_massey", [1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1])`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict (see the worked session).
+**Refuses** this sample call: `AscentNotFree`, `.owed` = `{'poly','n'} to run, or {'degree'} to find a primitive polynomial`.
+
+Example call: `lines.build_up("berlekamp_massey", {'taps': [1, 0, 1], 'init': [1, 0, 0], 'length': 12})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
+### Listing 1 — `bm` (extracted verbatim from `engine/toolsets/berlekamp_massey.py`)
+
+The mechanism itself, 26 lines, copied from the source by `devtools/build_docs.py` and executed cold in an empty namespace; `tests/test_listings.py` re-runs the extraction, so this block stops existing if it stops running.
+
+```python
+from typing import List, Sequence, Tuple
+
+def bm(s: Sequence[int], p: int = 2) -> Tuple[int, List[int]]:
+    """Return (L, C) with C = [1, c1, .., cL]:  Σ_i C[i]·s[n−i] ≡ 0 (mod p) for n ≥ L."""
+    C, B = [1], [1]
+    L, m, b = 0, 1, 1
+    for n in range(len(s)):
+        d = s[n] % p
+        for i in range(1, L + 1):
+            if i < len(C):
+                d = (d + C[i] * s[n - i]) % p
+        if d == 0:
+            m += 1
+            continue
+        coef = d * pow(b, -1, p) % p
+        T = C[:]
+        if len(C) < len(B) + m:
+            C = C + [0] * (len(B) + m - len(C))
+        for i, bi in enumerate(B):
+            C[i + m] = (C[i + m] - coef * bi) % p
+        if 2 * L <= n:
+            L, B, b, m = n + 1 - L, T, d, 1
+        else:
+            m += 1
+    C = C[:L + 1] + [0] * max(0, L + 1 - len(C))
+    return L, C
+```
+
+```text
+>>> bm([1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1], 2)
+(3, [1, 0, 1, 1])
+```
+
 ## Provenance
 
 | component | label | source |

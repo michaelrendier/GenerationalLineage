@@ -27,6 +27,44 @@ This one is a numerical fit, not an exact decomposition, and the page says so. C
 
 **Limits, stated plainly:** Noise robustness has not been characterised — the checks use noise-free data plus a control. One log-frequency plus a linear trend only; the default ω window is [0.5, 30]; the sampling must span several turns of the spring.
 
+## API
+
+`engine.toolsets.logperiodic` · registry name `logperiodic` · line **both** · every call below is made as `lines.<direction>("logperiodic", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(data, w_range=(0.5, 30.0), steps=240, compare_flat=False)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `data` | *required* | — |
+| `w_range` | `(0.5, 30.0)` | `Tuple[float, float]` |
+| `steps` | `240` | `int` |
+| `compare_flat` | `False` | `bool` |
+
+**Returns** a dict with keys: `toolset` (str), `n` (int), `omega` (float), `period_in_u` (float), `scale_ratio_lambda` (float), `amplitude` (float), `phase` (float), `constant` (float), `trend_per_ln_x` (float), `sse` (float), `r_squared` (float), `coordinate` (str), `note` (str).
+Example call: `lines.descend("logperiodic", ([1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0,…)`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `x` (list), `y` (list), `cost` (int), `scale_ratio_lambda` (float), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("logperiodic", {'omega': 6.0, 'amp': 1.0, 'phase': 0.0, 'const': 0.0, 'trend': 0.0})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
 ## Provenance
 
 | component | label | source |

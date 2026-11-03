@@ -30,6 +30,7 @@ What is generated (and therefore cannot drift from the engine):
 
 Everything else in README.md and wiki/ is hand-written and left alone.
 """
+import ast
 import glob
 import importlib
 import os
@@ -456,6 +457,7 @@ def move_page(m: dict) -> str:
 
 **Limits, stated plainly:** {m['limits']}
 
+{api_block(m['name'])}
 ## Provenance
 
 | component | label | source |
@@ -525,12 +527,7 @@ def toolset_page(name: str) -> str:
 | **`descend`** (free, `cost = 0`) | {d['free']} |
 | **`build_up`** (work, or refused) | {d['work']} |
 
-Call it through the registry — `lines.descend("{name}", ...)`, `lines.build_up("{name}", ...)` — or import `{d['module']}` directly. `build_up` raises `AscentNotFree` (with `.owed`) when the rebuild is undetermined; the refusal is the result.
-
-## How it is checked
-
-`{d['module']}.verify()` returns `{{"ok": bool, ...}}`; `python3 -m engine --verify` runs it with every other toolset, and the tutorial transcript below is regenerated from the tutorial script by `python3 devtools/transcript.py` and compared by the test suite.
-
+{api_block(name) if name in API_TOOLSETS else ''}
 ## A worked session
 
 Every line below is the literal output of the tutorial script, which starts from its own imports, so it can be read cold.
@@ -586,6 +583,213 @@ def api_reference() -> str:
         ext = " *(extended)*" if d.get("requires") else ""
         rows.append(f"| **{n}**{ext} | {de} | {bu} | {d['line']} | {link} |")
     return "\n".join(rows)
+
+
+# ── API reference blocks (Convention A signatures + D transcript + B extracted listings) ───────────────────────
+LISTINGS = {   # toolset -> [(function, a cold call to run it with)]
+    "periodicity": [("prefix_function", 'prefix_function("abcabcabca")')],
+    "lyndon": [("duval", 'duval("banana")')],
+    "berlekamp_massey": [("bm", "bm([1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1], 2)")],
+    "permutation": [("cycles", "cycles([2, 0, 1, 4, 3, 5])")],
+    "pohlig_hellman": [("element_order", "element_order(2, 101, {2: 2, 5: 2})")],
+    "unicity": [("unicity_distance", "unicity_distance(61.0, 3.2)")],
+    "circle": [("pi_lattice", "pi_lattice(2 * math.pi)")],
+}
+
+
+def _show(v, limit=88) -> str:
+    if callable(v) and hasattr(v, "__name__"):
+        return v.__name__
+    t = repr(v)
+    return t if len(t) <= limit else t[: limit - 2] + "…"
+
+
+def _call_text(name: str, fn: str, args, kwargs) -> str:
+    parts = [_show(a) for a in args] + [f"{k}={_show(v)}" for k, v in kwargs.items()]
+    return f'lines.{fn}("{name}", {", ".join(parts)})'
+
+
+def _params(fn) -> str:
+    import inspect
+    rows = ["| parameter | default | type |", "|---|---|---|"]
+    n = 0
+    for p in inspect.signature(fn).parameters.values():
+        if p.kind is p.VAR_KEYWORD:
+            continue
+        d = "*required*" if p.default is p.empty else f"`{p.default!r}`".replace("|", "\\|")
+        t = "—" if p.annotation is p.empty else f"`{p.annotation}`".replace("'", "").replace("|", "\\|")
+        rows.append(f"| `{p.name}` | {d} | {t} |")
+        n += 1
+    return "\n".join(rows) if n else "*(no parameters)*"
+
+
+def _returns(r) -> str:
+    if not isinstance(r, dict):
+        return f"returns `{type(r).__name__}`"
+    ks = [f"`{k}` ({type(v).__name__})" for k, v in r.items() if not str(k).startswith("_")]
+    return ", ".join(ks)
+
+
+def api_block(name: str) -> str:
+    """The API section of a toolset page: signatures, parameters, returned keys, refusal, a cold call. Read off the code."""
+    import importlib
+    import inspect
+    from devtools.api_samples import SAMPLES
+    d = lines.TOOLSETS[name]
+    mod = importlib.import_module(d["module"])
+    da, dk, ba, bk = SAMPLES[name]
+    out = [f"## API\n\n`{d['module']}` · registry name `{name}` · line **{d['line']}** · every call below is made as `lines.<direction>(\"{name}\", ...)` "
+           f"(`from engine import lines`) or directly on the module.\n"]
+    for fn_name, label, a, k, cost in (("descend", "free — `cost = 0`", da, dk, "0"), ("build_up", "work — reports `cost`, may refuse", ba, bk, "")):
+        fn = getattr(mod, fn_name)
+        doc = inspect.cleandoc(fn.__doc__ or "").split("\n\n")[0].replace("\n", " ")
+        try:
+            r = fn(*a, **k)
+            ret = f"**Returns** a dict with keys: {_returns(r)}."
+            refuse = ""
+        except lines.AscentNotFree as e:
+            ret = "**Returns** a dict (see the worked session)."
+            refuse = f"\n**Refuses** this sample call: `AscentNotFree`, `.owed` = `{e.owed}`.\n"
+        raises = "\n**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined." if "AscentNotFree" in inspect.getsource(fn) and not refuse else ""
+        out.append(f"### `{fn_name}` — {label}\n\n```python\n{fn_name}({_sig(fn)})\n```\n\n{(doc + chr(10) + chr(10)) if doc else ""}{_params(fn)}\n\n{ret}{raises}{refuse}\n"
+                   f"Example call: `{_call_text(name, fn_name, a, k)}`\n")
+    vdoc = inspect.cleandoc(getattr(mod.verify, "__doc__", "") or "").split("\n")[0]
+    out.append(f"### `verify()`\n\n`verify() -> {{\"ok\": bool, ...}}` — the toolset checks itself.{(' ' + vdoc) if vdoc else ''} `lines.verify_all()` runs this for every toolset.\n")
+    out.append(listing_block(name))
+    return "\n".join(x for x in out if x)
+
+
+API_TOOLSETS = [n for n in lines.TOOLSETS if n in __import__("devtools.api_samples", fromlist=["SAMPLES"]).SAMPLES]
+
+
+def extract_listing(name: str, fn_name: str):
+    """(source, imports) of a closed top-level function of the toolset: verbatim source plus exactly the imports it names."""
+    import importlib
+    import inspect
+    import types
+    mod = importlib.import_module(lines.TOOLSETS[name]["module"])
+    fn = getattr(mod, fn_name)
+    src = inspect.getsource(fn)
+    names = {n.id for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Name)} | {n.value.id for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name)}
+    imps, typ = [], []
+    for n in sorted(names):
+        v = getattr(mod, n, None)
+        if isinstance(v, types.ModuleType):
+            imps.append(f"import {v.__name__}")
+        elif getattr(v, "__module__", None) == "typing" or n in ("Any", "Dict", "List", "Optional", "Sequence", "Tuple"):
+            typ.append(n)
+    if typ:
+        imps.insert(0, "from typing import " + ", ".join(typ))
+    return src.rstrip("\n"), imps
+
+
+def run_cold(src: str, imps, call: str):
+    ns: dict = {}
+    exec("\n".join(imps) + "\n\n" + src, ns)
+    return eval(call, ns)
+
+
+def listing_block(name: str) -> str:
+    out = []
+    for i, (fn_name, call) in enumerate(LISTINGS.get(name, []), 1):
+        src, imps = extract_listing(name, fn_name)
+        val = run_cold(src, imps, call)
+        body = ("\n".join(imps) + "\n\n" if imps else "") + src
+        nlines = body.count("\n") + 1
+        out.append(f"""### Listing {i} — `{fn_name}` (extracted verbatim from `{lines.TOOLSETS[name]['module'].replace('.', '/')}.py`)
+
+The mechanism itself, {nlines} lines, copied from the source by `devtools/build_docs.py` and executed cold in an empty namespace; `tests/test_listings.py` re-runs the extraction, so this block stops existing if it stops running.
+
+```python
+{body}
+```
+
+```text
+>>> {call}
+{val!r}
+```
+""")
+    return "\n".join(out)
+
+
+# ── the engine's own public functions (everything exported by `import engine`), grouped by defining module ─────
+MODULE_PAGE = {
+    "engine.lineage": ("Relations", "the 44 self-checked relations; the lineage tree, tiers, the sieve and its mirror, the fractal block, pathway and tuning"),
+    "engine.emerger": ("The-Emerger-Tutorial", "the ascent dual: bracketing and firing order of emergence"),
+    "engine.ping": ("Ping-RSA-Classifier", "the Emerger–Lineage unification: classify an RSA modulus"),
+    "engine.add_scale_sign": ("ADD-SCALE-SIGN-Datatype", "the tier-0 floor as a value type"),
+    "engine.spectral": ("Spectral-Decomposition", "factoring a signal into wavelengths"),
+    "engine.clay": ("Clay-Millennium", "the seven Clay problems as lineage readings"),
+    "engine.opstring": ("The-Operator-Tree", "the operator-string parser"),
+    "engine.operator_tree": ("The-Operator-Tree", "the Operator Tree"),
+    "engine.shape": ("The-Operator-Tree", "the shape diagnostic"),
+    "engine.bracketing_firing_order": ("Firing-Plans", "Bell numbers, set partitions, firing orders and firing plans"),
+    "engine.lines": ("The-Toolsets", "the registry, the contract, `AscentNotFree`, `verify_all`"),
+    "engine.valaquenta_calibration": ("ValaQuenta-Calibration", "the decomposition run on every ValaQuenta engine"),
+    "engine.bio": ("Whats-Next", "STUB — structural only"),
+    "engine.maths": ("Where-the-Factorial-Lives", "EXTENDED layer: Fermat-facet inventory and control test"),
+    "engine.tools": ("Reports", "EXTENDED layer: the printed reports"),
+}
+
+
+def engine_api() -> str:
+    import inspect
+    import engine
+    groups: dict = {}
+    for n in sorted(dir(engine)):
+        if n.startswith("_"):
+            continue
+        v = getattr(engine, n)
+        if inspect.ismodule(v):
+            continue
+        mod = getattr(v, "__module__", None)
+        if not mod or not mod.startswith("engine"):
+            continue
+        groups.setdefault(mod, []).append((n, v))
+    out = ["""# Engine API — every public name exported by `import engine`
+
+*Generated by `devtools/build_docs.py` from the live package, so it lists exactly what `import engine` exposes and cannot drift. For the toolsets (`engine/toolsets/`) see the per-tool pages and the [API quick reference](../README.md#api-quick-reference); this page is the engine's own functions, constants and classes, grouped by the module that defines them.*
+
+A name is shown as `name(signature)` for a callable and `name = value-type` for a constant. The first line of its docstring follows when it has one. Behaviour, guarantees and worked sessions are on the linked Manual page for the module.
+"""]
+    for mod in sorted(groups):
+        page, blurb = MODULE_PAGE.get(mod, (None, ""))
+        head = f"## `{mod}`" + (f" — [{page}]({page}.md)" if page else "")
+        out.append(f"{head}\n\n{blurb}\n\n| name | what it is |\n|---|---|")
+        for n, v in groups[mod]:
+            if inspect.isclass(v):
+                try:
+                    sg = str(inspect.signature(v))
+                except (TypeError, ValueError):
+                    sg = "(...)"
+                label = f"class {n}{sg}"
+            elif callable(v):
+                try:
+                    sg = str(inspect.signature(v))
+                except (TypeError, ValueError):
+                    sg = "(...)"
+                label = f"{n}{sg}"
+            else:
+                label = f"{n} = {type(v).__name__}"
+            label = label.replace("|", "\\|").replace("'", "")
+            doc = inspect.cleandoc(getattr(v, "__doc__", "") or "").split("\n")[0] if callable(v) else ""
+            if doc.startswith(n + "("):
+                doc = ""
+            out.append(f"| `{label[:160]}` | {doc.replace('|', chr(92) + '|')} |")
+        out.append("")
+    # constants and data that have no __module__ of their own
+    consts = []
+    for n in sorted(dir(engine)):
+        if n.startswith("_"):
+            continue
+        v = getattr(engine, n)
+        if inspect.ismodule(v) or callable(v) or getattr(v, "__module__", None):
+            continue
+        consts.append(f"`{n}` ({type(v).__name__})")
+    if consts:
+        out.append("## Constants and data\n\n" + " · ".join(consts) + "\n")
+    out.append("*Back to the [Manual](README.md).*\n")
+    return "\n".join(out)
 
 
 def toolset_table() -> str:
@@ -752,7 +956,21 @@ def build() -> dict:
         files[os.path.join("wiki", page + ".md")] = toolset_page(n)
     files[os.path.join("wiki", "Tools-Reference.md")] = tools_reference()
     files[os.path.join("wiki", "Tutorial-Index.md")] = tutorial_index_page()
+    files[os.path.join("wiki", "Engine-API.md")] = engine_api()
     files["README.md"] = fill("README.md", {"install": install_block(), "quickstart": quickstart_block(), "api-reference": api_reference()})
+    hand = {n: WIKI_OF[n] for n in API_TOOLSETS if n in WIKI_OF and WIKI_OF[n] not in GENERATED_TOOLSET_PAGES.values()
+            and WIKI_OF[n] not in {m["page"] for m in MOVES}}
+    for n, page in hand.items():
+        path = os.path.join("wiki", page + ".md")
+        text = open(os.path.join(ROOT, path), encoding="utf-8").read()
+        mk = BEGIN.format("api")
+        if mk not in text:                                   # first build: put the block before the first "## " section
+            lines_ = text.split("\n")
+            at = next((i for i, l in enumerate(lines_) if l.startswith("## ")), len(lines_))
+            lines_[at:at] = [mk, END.format("api"), ""]
+            text = "\n".join(lines_)
+            open(os.path.join(ROOT, path), "w", encoding="utf-8").write(text)
+        files[path] = replace_block(text, "api", api_block(n))
     for page, blocks in {
         "The-Toolsets": {"toolset-table": toolset_table().replace("](examples/", "](../examples/")},
         "Relations": {"relations-table": relations_block()},

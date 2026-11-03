@@ -3,7 +3,7 @@
 *Tutorial:* [`02_the_two_lines`](../examples/02_the_two_lines.py); every toolset has its own in `20`–`49`.
 
 The engines the Generational Lineage map (`wiki/generational_lineage_map.md` in the sibling ValaQuenta repository) identified as feeding a part of the
-decomposition, ported standalone into `engine/toolsets/` (24 modules), plus four anchors that live one level up
+decomposition, ported standalone into `engine/toolsets/` (25 modules), plus four anchors that live one level up
 (`engine/add_scale_sign.py`, `engine/oscilloscope.py`, `engine/emerger.py`, `engine/lineage.py`) — 29 registered toolsets in all.
 Each follows one contract — `descend()` (free), `build_up()` (work), `verify()` — and is tagged to a line in `engine/lines.py`;
 the [Tools Reference](Tools-Reference.md) defines each one. `python3 -m engine --list` prints the registry.

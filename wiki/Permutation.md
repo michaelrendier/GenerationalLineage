@@ -27,6 +27,66 @@ Exhaustive over S₁–S₇ (5,913 permutations): sign equals inversion parity, 
 
 **Limits, stated plainly:** Permutations are given as explicit lists; nothing here works on implicitly-defined permutations of huge sets.
 
+## API
+
+`engine.toolsets.permutation` · registry name `permutation` · line **both** · every call below is made as `lines.<direction>("permutation", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `n` (int), `cycles` (list), `cycle_type` (tuple), `order` (int), `sign` (int), `sign_agrees_with_inversions` (bool), `reflection_length` (int), `inversions` (int), `fixed_points` (int), `derangement` (bool), `lehmer` (list), `factoradic_rank` (int), `note` (str).
+Example call: `lines.descend("permutation", [2, 0, 1, 4, 3, 5])`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `perm` (list), `degree` (int), `cycle_type` (tuple), `cost` (int), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("permutation", {'order': 60})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
+### Listing 1 — `cycles` (extracted verbatim from `engine/toolsets/permutation.py`)
+
+The mechanism itself, 13 lines, copied from the source by `devtools/build_docs.py` and executed cold in an empty namespace; `tests/test_listings.py` re-runs the extraction, so this block stops existing if it stops running.
+
+```python
+from typing import List, Sequence
+
+def cycles(perm: Sequence[int]) -> List[List[int]]:
+    seen, out = [False] * len(perm), []
+    for i in range(len(perm)):
+        if not seen[i]:
+            c, j = [], i
+            while not seen[j]:
+                seen[j] = True
+                c.append(j)
+                j = perm[j]
+            out.append(c)
+    return out
+```
+
+```text
+>>> cycles([2, 0, 1, 4, 3, 5])
+[[0, 2, 1], [3, 4], [5]]
+```
+
 ## Provenance
 
 | component | label | source |

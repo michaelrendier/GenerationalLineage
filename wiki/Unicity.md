@@ -27,6 +27,55 @@ Reproduces Shannon's published figure: a general substitution cipher on English,
 
 **Limits, stated plainly:** The bound holds within Shannon's random-cipher model. U is necessary, not sufficient: reaching it says a unique key exists, not that it is cheap to find.
 
+## API
+
+`engine.toolsets.unicity` · registry name `unicity` · line **both** · every call below is made as `lines.<direction>("unicity", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `kind` (str), `key_entropy_bits` (float), `H0_order0_bits_per_char` (float), `D0_order0` (float), `D_shannon_estimate` (float), `U_upper_bound_rigorous` (float), `U_shannon_estimate` (float), `guarantee` (str), `note` (str).
+Example call: `lines.descend("unicity", 'substitution')`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `characters_needed` (int), `expected_spurious_at_n` (float), `max_spurious` (float), `redundancy_used` (str), `cost` (int), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("unicity", {'kind': 'substitution', 'max_spurious': 0.001})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
+### Listing 1 — `unicity_distance` (extracted verbatim from `engine/toolsets/unicity.py`)
+
+The mechanism itself, 2 lines, copied from the source by `devtools/build_docs.py` and executed cold in an empty namespace; `tests/test_listings.py` re-runs the extraction, so this block stops existing if it stops running.
+
+```python
+def unicity_distance(h_k: float, d: float) -> float:
+    return h_k / d
+```
+
+```text
+>>> unicity_distance(61.0, 3.2)
+19.0625
+```
+
 ## Provenance
 
 | component | label | source |

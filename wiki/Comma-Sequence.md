@@ -13,11 +13,42 @@ The comma sequence (Angelini, Guy & Sloane): each term's step is read off the di
 | **`descend`** (free, `cost = 0`) | the comma-group read — each gap a(n+1)−a(n) = b·L + R is lifted straight off the two digits straddling the comma; one pass says whether the walk is valid and whether it has hit a landmine. Resolution is a RATIO (b²:2 = step alphabet : comma window), not a bandwidth — the Flashlight, and mortality is its coarse end |
 | **`build_up`** (work, or refused) | walk the lexicographically-earliest comma sequence forward one term at a time (the forced successor is the earliest valid R); cost = terms placed; base<634 dies, base≥634 is immortal |
 
-Call it through the registry — `lines.descend("comma_sequence", ...)`, `lines.build_up("comma_sequence", ...)` — or import `engine.toolsets.comma_sequence` directly. `build_up` raises `AscentNotFree` (with `.owed`) when the rebuild is undetermined; the refusal is the result.
+## API
 
-## How it is checked
+`engine.toolsets.comma_sequence` · registry name `comma_sequence` · line **both** · every call below is made as `lines.<direction>("comma_sequence", ...)` (`from engine import lines`) or directly on the module.
 
-`engine.toolsets.comma_sequence.verify()` returns `{"ok": bool, ...}`; `python3 -m engine --verify` runs it with every other toolset, and the tutorial transcript below is regenerated from the tutorial script by `python3 devtools/transcript.py` and compared by the test suite.
+### `descend` — free — `cost = 0`
+
+```python
+descend(seq, base=10)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `seq` | *required* | `Sequence[int]` |
+| `base` | `10` | `int` |
+
+**Returns** a dict with keys: `toolset` (str), `line` (str), `base` (int), `n_terms` (int), `valid_comma_walk` (bool), `first_break` (int), `steps` (list), `at_landmine` (NoneType), `resolution_ratio` (str), `step_alphabet` (int), `mortal_base` (bool), `note` (str).
+Example call: `lines.descend("comma_sequence", [1, 12, 24, 36])`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(n_terms, base=10, start=1)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `n_terms` | *required* | `int` |
+| `base` | `10` | `int` |
+| `start` | `1` | `int` |
+
+**Returns** a dict with keys: `toolset` (str), `line` (str), `base` (int), `start` (int), `sequence` (list), `length` (int), `cost` (int), `reached_target` (bool), `died_at` (NoneType), `immortal_base` (bool), `note` (str).
+Example call: `lines.build_up("comma_sequence", 12)`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
 
 ## A worked session
 

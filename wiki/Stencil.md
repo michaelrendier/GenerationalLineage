@@ -13,11 +13,46 @@ The digit-by-digit decomposition machine: `descend` is N = p·q; `build_up` cons
 | **`descend`** (free, `cost = 0`) | N = p·q — one multiplication, no search (the hand-worked long-multiplication pathway, carries and all, walked forward) |
 | **`build_up`** (work, or refused) | given only N, build candidate factor pairs digit by digit; slide 1 run to full depth is exhaustive and exact — every divisor pair is found, and a prime N raises AscentNotFree (the refusal is the result) |
 
-Call it through the registry — `lines.descend("stencil", ...)`, `lines.build_up("stencil", ...)` — or import `engine.toolsets.stencil` directly. `build_up` raises `AscentNotFree` (with `.owed`) when the rebuild is undetermined; the refusal is the result.
+## API
 
-## How it is checked
+`engine.toolsets.stencil` · registry name `stencil` · line **both** · every call below is made as `lines.<direction>("stencil", ...)` (`from engine import lines`) or directly on the module.
 
-`engine.toolsets.stencil.verify()` returns `{"ok": bool, ...}`; `python3 -m engine --verify` runs it with every other toolset, and the tutorial transcript below is regenerated from the tutorial script by `python3 devtools/transcript.py` and compared by the test suite.
+### `descend` — free — `cost = 0`
+
+```python
+descend(p, q)
+```
+
+FREE: multiply. One pass, cost 0 — the same pathway the hand-worked long multiplication walks explicitly, carry by carry.
+
+| parameter | default | type |
+|---|---|---|
+| `p` | *required* | `int` |
+| `q` | *required* | `int` |
+
+**Returns** a dict with keys: `toolset` (str), `p` (int), `q` (int), `N` (int), `cost` (int).
+Example call: `lines.descend("stencil", 53, 61)`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(N, run_slide2=False)
+```
+
+WORK: construct N's factor pairs digit by digit (slide 1, exact, exhaustive). Reports `cost` honestly. Raises AscentNotFree if N is prime — no nontrivial (p,q) exists, and that is the correct answer, not a search failure. Pass run_slide2=True to also run the top-down construction (over one factor's own digit length) and report its surviving leading-digit prefixes alongside — the two slides are NOT combined here (see the module docstring's meet-in-the-middle note).
+
+| parameter | default | type |
+|---|---|---|
+| `N` | *required* | `int` |
+| `run_slide2` | `False` | `bool` |
+
+**Returns** a dict with keys: `toolset` (str), `N` (int), `pairs` (list), `cost` (int), `slide1_final_prefixes` (int).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("stencil", 91)`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
 
 ## A worked session
 

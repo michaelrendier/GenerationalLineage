@@ -4,7 +4,7 @@
 |---|---|
 | `ISSUE_TEMPLATE/` | bug report, move proposal, and the security contact link |
 | `PULL_REQUEST_TEMPLATE.md` | the checklist a change is expected to meet |
-| `workflows/ci.yml` | the continuous-integration definition: a **Core** job (numpy only), an **Extended** job (with the four sibling repositories cloned beside), and the two staleness checks |
+| `workflows/ci.yml` | the continuous-integration definition: a **Core** job (numpy only), an **Extended** job (with the three sibling repositories cloned beside), and the two staleness checks |
 
 ## CI
 

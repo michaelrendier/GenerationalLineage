@@ -13,11 +13,50 @@ Measure a callable's real wall-clock cost, once, honestly; every result carries 
 | **`descend`** (free, `cost = 0`) | benchmark one callable directly, real wall-clock time, one pass |
 | **`build_up`** (work, or refused) | rank several candidate callables against a shared reference cost — cost = candidates scanned |
 
-Call it through the registry — `lines.descend("cs_benchmark", ...)`, `lines.build_up("cs_benchmark", ...)` — or import `engine.toolsets.cs_benchmark` directly. `build_up` raises `AscentNotFree` (with `.owed`) when the rebuild is undetermined; the refusal is the result.
+## API
 
-## How it is checked
+`engine.toolsets.cs_benchmark` · registry name `cs_benchmark` · line **both** · every call below is made as `lines.<direction>("cs_benchmark", ...)` (`from engine import lines`) or directly on the module.
 
-`engine.toolsets.cs_benchmark.verify()` returns `{"ok": bool, ...}`; `python3 -m engine --verify` runs it with every other toolset, and the tutorial transcript below is regenerated from the tutorial script by `python3 devtools/transcript.py` and compared by the test suite.
+### `descend` — free — `cost = 0`
+
+```python
+descend(fn, args=(), kwargs=None, n=1000)
+```
+
+The FREE reading: benchmark ONE callable, directly, n calls, no comparison and no search. Returns real measured seconds/call and calls/sec -- the honest minimum a cost claim needs.
+
+| parameter | default | type |
+|---|---|---|
+| `fn` | *required* | `Callable` |
+| `args` | `()` | `Tuple` |
+| `kwargs` | `None` | `Optional[Dict]` |
+| `n` | `1000` | `int` |
+
+**Returns** a dict with keys: `toolset` (str), `n_calls` (int), `total_s` (float), `s_per_call` (float), `calls_per_s` (float), `citation` (str), `note` (str).
+Example call: `lines.descend("cs_benchmark", sum, args=([1, 2, 3],), n=200)`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(candidates, reference_s_per_call, args=(), kwargs=None, n=1000)
+```
+
+The WORK: benchmark every candidate in `candidates`, rank them against a shared `reference_s_per_call` (e.g. a known baseline cost), report each one's speedup. `cost` = candidates scanned.
+
+| parameter | default | type |
+|---|---|---|
+| `candidates` | *required* | `Dict[str, Callable]` |
+| `reference_s_per_call` | *required* | `float` |
+| `args` | `()` | `Tuple` |
+| `kwargs` | `None` | `Optional[Dict]` |
+| `n` | `1000` | `int` |
+
+**Returns** a dict with keys: `toolset` (str), `n_candidates` (int), `reference_s_per_call` (float), `ranked` (list), `fastest` (str), `cost` (int), `citation` (str), `note` (str).
+Example call: `lines.build_up("cs_benchmark", {'sum': <built-in function sum>}, 1e-06, args=([1, 2, 3],), n=200)`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
 
 ## A worked session
 

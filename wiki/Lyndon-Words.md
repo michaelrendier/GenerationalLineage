@@ -27,6 +27,67 @@ Uniqueness is checked exhaustively: every binary string of length ≤ 10 (2,046 
 
 **Limits, stated plainly:** Alphabet order is fixed by the symbols' natural order; a different alphabet order gives a different (equally unique) factorisation.
 
+## API
+
+`engine.toolsets.lyndon` · registry name `lyndon` · line **both** · every call below is made as `lines.<direction>("lyndon", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `n` (int), `factors` (list), `omega` (int), `all_lyndon` (bool), `nonincreasing` (bool), `reassembles` (bool), `least_rotation_index` (int), `necklace_representative` (str), `primitive_root` (str), `exponent` (int), `guarantee` (str), `note` (str).
+Example call: `lines.descend("lyndon", 'banana')`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `words` (list), `count` (int), `expected_count` (int), `necklaces` (int), `cost` (int), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("lyndon", {'n': 6, 'k': 2})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
+### Listing 1 — `duval` (extracted verbatim from `engine/toolsets/lyndon.py`)
+
+The mechanism itself, 14 lines, copied from the source by `devtools/build_docs.py` and executed cold in an empty namespace; `tests/test_listings.py` re-runs the extraction, so this block stops existing if it stops running.
+
+```python
+from typing import List, Sequence
+
+def duval(s: Sequence) -> List[Sequence]:
+    """Chen–Fox–Lyndon factorisation, Duval's linear-time algorithm."""
+    n, i, out = len(s), 0, []
+    while i < n:
+        j, k = i + 1, i
+        while j < n and s[k] <= s[j]:
+            k = i if s[k] < s[j] else k + 1
+            j += 1
+        while i <= k:
+            out.append(s[i:i + j - k])
+            i += j - k
+    return out
+```
+
+```text
+>>> duval("banana")
+['b', 'an', 'an', 'a']
+```
+
 ## Provenance
 
 | component | label | source |

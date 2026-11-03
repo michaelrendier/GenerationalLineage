@@ -27,6 +27,63 @@ Exact and exhaustive on the checked groups: every element of the subgroup ⟨g�
 
 **Limits, stated plainly:** Cyclic subgroups of ℤ_p^* for prime p only. Memory for BSGS is √q for the largest prime q handled. The budget default is 5,000,000 group operations. This is the textbook algorithm at teaching scale, not a tool that solves any hard instance.
 
+## API
+
+`engine.toolsets.pohlig_hellman` · registry name `pohlig_hellman` · line **both** · every call below is made as `lines.<direction>("pohlig_hellman", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `p` (int), `group_order_p_minus_1` (int), `factorisation_p_minus_1` (dict), `order_of_g` (int), `order_lineage` (dict), `omega` (int), `largest_prime_factor` (int), `h_in_subgroup` (bool), `predicted_cost_group_ops` (int), `naive_bsgs_cost` (int), `note` (str).
+Example call: `lines.descend("pohlig_hellman", {'p': 101, 'g': 2, 'h': 5})`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target, budget=5000000)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+| `budget` | `5000000` | `int` |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `x` (int), `modulus` (int), `verified` (bool), `cost` (int), `predicted_cost` (int), `order_lineage` (dict), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("pohlig_hellman", {'p': 101, 'g': 2, 'h': 5})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
+### Listing 1 — `element_order` (extracted verbatim from `engine/toolsets/pohlig_hellman.py`)
+
+The mechanism itself, 9 lines, copied from the source by `devtools/build_docs.py` and executed cold in an empty namespace; `tests/test_listings.py` re-runs the extraction, so this block stops existing if it stops running.
+
+```python
+from typing import Dict
+
+def element_order(g: int, p: int, fac: Dict[int, int]) -> int:
+    n = p - 1
+    o = n
+    for q in fac:
+        while o % q == 0 and pow(g, o // q, p) == 1:
+            o //= q
+    return o
+```
+
+```text
+>>> element_order(2, 101, {2: 2, 5: 2})
+100
+```
+
 ## Provenance
 
 | component | label | source |

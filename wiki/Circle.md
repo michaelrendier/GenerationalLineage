@@ -27,6 +27,71 @@ It is the first-line test for 'is this coincidence structure or just π-algebra'
 
 **Limits, stated plainly:** The cosine form of the spherical law cancels catastrophically for radius ≳ 1e5 (the excess is area/R², below double rounding); the check records this limit instead of hiding it. The Add/Scale/Sign placement of π (C → Add, A → Scale, d → Sign) is a proposal, not a theorem; the three circles are computed either way.
 
+## API
+
+`engine.toolsets.circle` · registry name `circle` · line **both** · every call below is made as `lines.<direction>("circle", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x, role='radius')
+```
+
+Number (or UNS-constant name) + role -> the full circle row.
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | `Any` |
+| `role` | `'radius'` | `str` |
+
+**Returns** a dict with keys: `input` (float), `role` (str), `cost` (int), `radius` (float), `diameter` (float), `circumference` (float), `area` (float), `C_over_d` (float), `isoperimetric_C2_over_4piA` (float), `ass` (dict), `imaginary` (bool), `pi_units` (dict), `lattice` (dict), `lp_dual_exponent_if_p` (NoneType).
+Example call: `lines.descend("circle", 0.5, 'radius')`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target, role='area', tol=1e-09)
+```
+
+Which (constant, role) circles have `role`-measure == target? Scan; cost = tried.
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | `float` |
+| `role` | `'area'` | `str` |
+| `tol` | `1e-09` | `float` |
+
+**Returns** a dict with keys: `target` (float), `role` (str), `hits` (list), `cost` (int).
+Example call: `lines.build_up("circle", 3.141592653589793, 'area')`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
+### Listing 1 — `pi_lattice` (extracted verbatim from `engine/toolsets/circle.py`)
+
+The mechanism itself, 12 lines, copied from the source by `devtools/build_docs.py` and executed cold in an empty namespace; `tests/test_listings.py` re-runs the extraction, so this block stops existing if it stops running.
+
+```python
+from typing import Optional, Tuple
+import math
+
+def pi_lattice(x: float, tol: float = 1e-12) -> Optional[Tuple[float, int]]:
+    """(a, b) with x = 2^a·π^b exactly (a in half-integers, b integer), else None."""
+    if not isinstance(x, (int, float)) or x <= 0:
+        return None
+    for b in range(-5, 6):
+        for a2 in range(-24, 25):                       # a = a2/2 (admits √2)
+            if abs(x - 2.0 ** (a2 / 2) * math.pi ** b) <= tol * abs(x):
+                return (a2 / 2, b)
+    return None
+```
+
+```text
+>>> pi_lattice(2 * math.pi)
+(1.0, 1)
+```
+
 ## Provenance
 
 | component | label | source |

@@ -58,6 +58,7 @@ Each page: what it does, a runnable example, a transcript, where it stops.
 
 | page | what it is |
 |---|---|
+| [Engine-API](Engine-API.md) *(generated)* | every public name exported by `import engine`: signature and first docstring line, grouped by module |
 | [Tutorial-Index](Tutorial-Index.md) *(generated)* | all 44 tutorials, each with its transcript |
 | [Relations](Relations.md) *(generated)* | §5 — every self-checked relation |
 | [References](References.md) | the bibliography for every established algorithm |

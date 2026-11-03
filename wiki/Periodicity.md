@@ -27,6 +27,68 @@ Exact and exhaustive: every period is listed, none voted. Checked against brute 
 
 **Limits, stated plainly:** Exact periods only. A string that is *almost* periodic (with errors) has no period here; approximate periodicity is a different problem this tool does not address.
 
+## API
+
+`engine.toolsets.periodicity` · registry name `periodicity` · line **both** · every call below is made as `lines.<direction>("periodicity", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x)
+```
+
+The FREE read: every period, exactly, by one linear pass.
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `n` (int), `periods` (list), `min_period` (int), `borders` (list), `primitive_root` (NoneType), `exponent` (NoneType), `fractional_exponent` (float), `is_primitive` (bool), `agrees_with_z_function` (bool), `fine_wilf_holds` (bool), `guarantee` (str), `note` (str).
+Example call: `lines.descend("periodicity", 'abcabcabca')`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `string` (str), `cost` (int), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("periodicity", {'root': 'ab', 'length': 8})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
+### Listing 1 — `prefix_function` (extracted verbatim from `engine/toolsets/periodicity.py`)
+
+The mechanism itself, 13 lines, copied from the source by `devtools/build_docs.py` and executed cold in an empty namespace; `tests/test_listings.py` re-runs the extraction, so this block stops existing if it stops running.
+
+```python
+from typing import List, Sequence
+
+def prefix_function(s: Sequence) -> List[int]:
+    n = len(s)
+    pi = [0] * n
+    for i in range(1, n):
+        k = pi[i - 1]
+        while k and s[i] != s[k]:
+            k = pi[k - 1]
+        if s[i] == s[k]:
+            k += 1
+        pi[i] = k
+    return pi
+```
+
+```text
+>>> prefix_function("abcabcabca")
+[0, 0, 0, 1, 2, 3, 4, 5, 6, 7]
+```
+
 ## Provenance
 
 | component | label | source |

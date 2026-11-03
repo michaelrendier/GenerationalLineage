@@ -27,6 +27,41 @@ Every property is re-checked, not trusted: S + N = A, SN = NS, Nⁿ = 0, r(S) = 
 
 **Limits, stated plainly:** Exact arithmetic means Fractions grow; intended for small matrices. Over ℚ only.
 
+## API
+
+`engine.toolsets.jordan_chevalley` · registry name `jordan_chevalley` · line **both** · every call below is made as `lines.<direction>("jordan_chevalley", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `n` (int), `S` (list), `N` (list), `charpoly` (list), `squarefree_part` (list), `newton_steps` (int), `nilpotency_index` (int), `jordan_block_sizes_of_N` (list), `is_semisimple` (bool), `is_nilpotent` (bool), `checks` (dict), `ok` (bool), `note` (str).
+Example call: `lines.descend("jordan_chevalley", [[2, 1], [0, 2]])`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `A` (list), `J` (list), `cost` (int), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("jordan_chevalley", {'blocks': [(1, 1), (2, 1), (3, 1)]})`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
 ## Provenance
 
 | component | label | source |

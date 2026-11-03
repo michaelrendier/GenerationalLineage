@@ -27,6 +27,41 @@ The round trip is exact and is checked exhaustively: every binary string of leng
 
 **Limits, stated plainly:** Greedy and deterministic (ties broken by earliest first occurrence); the implementation is O(n²), fine for tutorial-scale input, not for megabyte inputs.
 
+## API
+
+`engine.toolsets.re_pair` · registry name `re_pair` · line **both** · every call below is made as `lines.<direction>("re_pair", ...)` (`from engine import lines`) or directly on the module.
+
+### `descend` — free — `cost = 0`
+
+```python
+descend(x)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `x` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `n` (int), `rules` (dict), `start` (list), `n_rules` (int), `depth` (int), `generation_of_rules` (dict), `grammar_size` (int), `compression_ratio` (float), `round_trip_exact` (bool), `minimal` (NoneType), `note` (str).
+Example call: `lines.descend("re_pair", 'abracadabraabracadabraabracadabra')`
+
+### `build_up` — work — reports `cost`, may refuse
+
+```python
+build_up(target)
+```
+
+| parameter | default | type |
+|---|---|---|
+| `target` | *required* | — |
+
+**Returns** a dict with keys: `toolset` (str), `direction` (str), `sequence` (list), `cost` (int), `note` (str).
+**Raises** `AscentNotFree` (`.owed` names the missing constraint) when the rebuild is undetermined.
+Example call: `lines.build_up("re_pair", {'grammar': {'alphabet': ['a', 'b', 'r', 'c', 'd'], 'rules': {5: (0, 1), 6: (5, 2), 7:…)`
+
+### `verify()`
+
+`verify() -> {"ok": bool, ...}` — the toolset checks itself. `lines.verify_all()` runs this for every toolset.
+
 ## Provenance
 
 | component | label | source |
