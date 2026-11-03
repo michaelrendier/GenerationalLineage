@@ -1,3 +1,6 @@
+# This file is part of GenerationalLineage.
+# Copyright (C) 2026 Cody Michael Allison
+# SPDX-License-Identifier: GPL-3.0-only
 """Firing plans: brackets that carry firing orders (engine/bracketing_firing_order.py, tool 4)."""
 from engine import bracketing_firing_order as b
 

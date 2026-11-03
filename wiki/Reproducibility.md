@@ -10,7 +10,7 @@ command*.
 |---|---|---|---|
 | **1. `verify()` on every toolset** | each of the 29 registered toolsets carries a self-check | `python3 -m engine --verify` | every toolset that ran passed (skips are listed, never counted as passes) |
 | **2. the 44 lineage relations** | named claims about the tier-0 floor, the two trees, the pathway layer, the fractal block, each checked against computed data, three-way status | `python3 engine/lineage.py` (≈ 15 s) | `44/44 HOLD` |
-| **3. the test suite** | 162 tests: every toolset's self-check, the refusal contract of the ten new toolsets, the dispatcher, all 43 tutorials run standalone, every committed transcript equals what the code prints today, every Python block in the README runs, every README anchor and every relative link in the README and wiki resolves, the CLI, package metadata, the GPL notice on every source file | `pip install -r requirements-dev.txt && python3 -m pytest` | Core: `156 passed, 2 skipped`; Extended: `158 passed` |
+| **3. the test suite** | 167 tests: every toolset's self-check, the refusal contract of the ten new toolsets, the dispatcher, all 44 tutorials run standalone, every committed transcript equals what the code prints today, every Python block in the README and the Manual chapters runs, every README anchor and every relative link in the README and wiki resolves, the CLI, package metadata, the GPL notice on every source file | `pip install -r requirements-dev.txt && python3 -m pytest` | Extended layer present: `167 passed` (2026-11-02; the Core-only count has not been re-measured since) |
 | **4. generated documentation** | the tutorial transcripts and the parts of the README/wiki that mirror the code are *generated*, and a staleness check exists for both | `python3 devtools/transcript.py --check-all` · `python3 devtools/build_docs.py --check` | `stale …: none` |
 
 `HOLDS` means the engine's own check passed; it is not a proof of any external conjecture (see the README's *Known limitations*).
@@ -34,8 +34,8 @@ construction), **THEORETICAL** (stated, not established). "Exhaustive" means eve
 | `re_pair` | ESTABLISHED (minimality: not claimed) | exact round trip | exhaustive: 11,471 sequences | [Re-Pair](Re-Pair.md) |
 | `pohlig_hellman` | ESTABLISHED | every element of four subgroups solved and verified | exhaustive: 19,704 elements | [Pohlig-Hellman](Pohlig-Hellman.md) |
 | `unicity` | ESTABLISHED | Shannon's 27.6; counting core exact | exhaustive on a toy language n = 1…7 | [Unicity](Unicity.md) |
-| the 44 relations, the older toolsets | mixed (see each page) | `engine/lineage.py`, each toolset's `verify()` | as each states | README §5, [Tools-Reference](Tools-Reference.md) |
-| Clay-problem mappings, σ_RB / Cayley–Dickson readings | THEORETICAL | consistency checks only | a structural reading, not a solution | README §4.12 |
+| the 44 relations, the older toolsets | mixed (see each page) | `engine/lineage.py`, each toolset's `verify()` | as each states | [Relations](Relations.md), [Tools-Reference](Tools-Reference.md) |
+| Clay-problem mappings, σ_RB / Cayley–Dickson readings | THEORETICAL | consistency checks only | a structural reading, not a solution | [Clay-Millennium](Clay-Millennium.md) |
 
 ## Environment
 

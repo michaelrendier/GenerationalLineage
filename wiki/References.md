@@ -3,7 +3,7 @@
 Every **ESTABLISHED** algorithm or theorem in the ten moves added in 1.0 is cited here (and on that move's own page). Where the
 engine adds its own reading, the page's provenance table labels it **OURS**.
 
-*Scope, stated plainly.* This page is a complete bibliography for the 1.0 moves. The older sections of the README (§§0–4.18), the Clay
+*Scope, stated plainly.* This page is a complete bibliography for the 1.0 moves. The older chapters of the Manual (§§0–4.18), the Clay
 Millennium mappings and the ValaQuenta calibration carry their citations in the pages that use them; a consolidated bibliography for
 that material has not been done yet.
 

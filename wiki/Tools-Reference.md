@@ -116,7 +116,7 @@ The comma sequence (Angelini, Guy & Sloane): each term's step is read off the di
 - **line:** both · **module:** `engine.toolsets.comma_sequence`
 - **descend (free):** the comma-group read — each gap a(n+1)−a(n) = b·L + R is lifted straight off the two digits straddling the comma; one pass says whether the walk is valid and whether it has hit a landmine. Resolution is a RATIO (b²:2 = step alphabet : comma window), not a bandwidth — the Flashlight, and mortality is its coarse end
 - **build_up (work):** walk the lexicographically-earliest comma sequence forward one term at a time (the forced successor is the earliest valid R); cost = terms placed; base<634 dies, base≥634 is immortal
-- tutorial [`examples/28_comma_sequence.py`](../examples/28_comma_sequence.py)
+- tutorial [`examples/28_comma_sequence.py`](../examples/28_comma_sequence.py) · page [`Comma-Sequence.md`](Comma-Sequence.md)
 
 ### `hyper_linear`
 
@@ -125,7 +125,7 @@ Multiplication read as a regular-representation matrix: each digit of b names on
 - **line:** both · **module:** `engine.toolsets.hyper_linear`
 - **descend (free):** a*b -> one tier-0 SCALE op per digit of b (L_d o T^r), the Toeplitz block/spill read, and the DFT convolution-theorem reconstruction of the product — single pass, no search
 - **build_up (work):** which rows spilled an 11th digit, from the product ALONE — genuinely refused (as hard as factoring P); one factor supplied makes it free again (one division)
-- tutorial [`examples/29_hyper_linear.py`](../examples/29_hyper_linear.py)
+- tutorial [`examples/29_hyper_linear.py`](../examples/29_hyper_linear.py) · page [`Hyper-Linear-Algebra.md`](Hyper-Linear-Algebra.md)
 
 ### `equation_space`
 
@@ -134,7 +134,7 @@ Steering through a parametrised family of equations by following a collapse func
 - **line:** both · **module:** `engine.toolsets.equation_space`
 - **descend (free):** rho(s) and its local gradient at one point — one evaluation, one finite difference, no search
 - **build_up (work):** walk from a start point to rho=0 by gradient descent — cost = steps; refuses if the walk stalls or the locus isn't reachable in budget
-- tutorial [`examples/30_equation_space.py`](../examples/30_equation_space.py)
+- tutorial [`examples/30_equation_space.py`](../examples/30_equation_space.py) · page [`Equation-Space.md`](Equation-Space.md)
 
 ### `spectral_primes`
 
@@ -143,7 +143,7 @@ The spin/wobble split read as decomposition versus emerger: the spin rate θ′(
 - **line:** both · **module:** `engine.toolsets.spectral_primes`
 - **descend (free):** theta'(t) at one height — the spin/carrier rate, no resonance, no search
 - **build_up (work):** reconstruct psi(x) from n_zeros known zeros — cost = n_zeros; the primes (Gibbs undershoot at prime jumps) only emerge as more work (more zeros) is spent
-- tutorial [`examples/31_spectral_primes.py`](../examples/31_spectral_primes.py)
+- tutorial [`examples/31_spectral_primes.py`](../examples/31_spectral_primes.py) · page [`Spectral-Primes.md`](Spectral-Primes.md)
 
 ### `cs_benchmark`
 
@@ -152,7 +152,7 @@ Measure a callable's real wall-clock cost, once, honestly; every result carries 
 - **line:** both · **module:** `engine.toolsets.cs_benchmark`
 - **descend (free):** benchmark one callable directly, real wall-clock time, one pass
 - **build_up (work):** rank several candidate callables against a shared reference cost — cost = candidates scanned
-- tutorial [`examples/32_cs_benchmark.py`](../examples/32_cs_benchmark.py)
+- tutorial [`examples/32_cs_benchmark.py`](../examples/32_cs_benchmark.py) · page [`CS-Benchmark.md`](CS-Benchmark.md)
 
 ### `stencil`
 
@@ -161,7 +161,7 @@ The digit-by-digit decomposition machine: `descend` is N = p·q; `build_up` cons
 - **line:** both · **module:** `engine.toolsets.stencil`
 - **descend (free):** N = p·q — one multiplication, no search (the hand-worked long-multiplication pathway, carries and all, walked forward)
 - **build_up (work):** given only N, build candidate factor pairs digit by digit; slide 1 run to full depth is exhaustive and exact — every divisor pair is found, and a prime N raises AscentNotFree (the refusal is the result)
-- tutorial [`examples/33_stencil.py`](../examples/33_stencil.py)
+- tutorial [`examples/33_stencil.py`](../examples/33_stencil.py) · page [`Stencil.md`](Stencil.md)
 
 ### `periodicity`
 
@@ -269,7 +269,7 @@ Every unit circle by constant and role, the imaginary circle and its laws of sin
 - **line:** decomposition · **module:** `engine.oscilloscope`
 - **descend (free):** stack the two facets (Fermat prompt / Riemann firing) of one number
 - **build_up (work):** —
-- tutorial [`examples/90_extended_fermat_facet.py`](../examples/90_extended_fermat_facet.py)
+- tutorial [`examples/90_extended_fermat_facet.py`](../examples/90_extended_fermat_facet.py) · page [`Oscilloscope.md`](Oscilloscope.md)
 
 ### `emerger`
 

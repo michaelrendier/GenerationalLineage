@@ -8,6 +8,7 @@ import subprocess
 import sys
 
 import engine
+from engine import lines
 from devtools.transcript import ROOT
 
 
@@ -56,14 +57,26 @@ def test_license_is_the_canonical_gpl3():
     assert "GNU GENERAL PUBLIC LICENSE" in text and "Version 3, 29 June 2007" in text
 
 
+# The Manual chapters moved out of the old single-file README; their code blocks were already held to "complete and runnable".
+MANUAL_TUTORIAL_PAGES = [
+    "Concepts-What-It-Means", "Concepts-The-Mathematics", "Concepts-What-It-Was-Built-To-Do", "Run-the-Self-Check",
+    "Decompose-a-Number", "Tier-of-an-Operation", "Pathway-and-Tuning", "Smith-Chart-Instruments", "Crystal-and-Join",
+    "Fractal-Block", "Reports", "Factoral-Spiral", "Pathway-Decomposition", "Unit-Lineage", "Clay-Millennium",
+    "Spectral-Decomposition", "The-Emerger-Tutorial", "Ping-RSA-Classifier", "The-Toolsets", "Hyper-Linear-Algebra",
+    "Equation-Space", "Relations", "Where-the-Factorial-Lives", "Corrections", "Whats-Next", "ValaQuenta-Calibration",
+]
+
+
 def test_every_python_block_in_the_readme_runs(tmp_path, monkeypatch):
     """The README's code is held to the same bar as the tutorials: each block is complete and runnable.
     Blocks tagged [EXTENDED ...] need the sibling repositories (and matplotlib, for the two chart writers)."""
     import re
-    text = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
-    text = re.sub(r"<!-- BEGIN: (\w[\w-]*).*?<!-- END: \1 -->", "", text, flags=re.S)   # generated blocks have their own tests
-    blocks = re.findall(r"```python\n(.*?)```", text, re.S)
-    assert len(blocks) >= 20, "the README lost its code blocks?"
+    blocks = []
+    for md in ["README.md"] + [os.path.join("wiki", f + ".md") for f in MANUAL_TUTORIAL_PAGES]:
+        text = open(os.path.join(ROOT, md), encoding="utf-8").read()
+        text = re.sub(r"<!-- BEGIN: (\w[\w-]*).*?<!-- END: \1 -->", "", text, flags=re.S)   # generated blocks have their own tests
+        blocks += re.findall(r"```python\n(.*?)```", text, re.S)
+    assert len(blocks) >= 20, "the README and the Manual lost their code blocks?"
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -76,9 +89,9 @@ def test_every_python_block_in_the_readme_runs(tmp_path, monkeypatch):
         if b.lstrip().startswith("# [EXTENDED") and not (engine.EXTENDED and have_mpl):
             continue
         try:
-            exec(compile(b, f"<README python block {i}>", "exec"), {})
+            exec(compile(b, f"<README/Manual python block {i}>", "exec"), {})
         except Exception as e:                      # noqa: BLE001
-            raise AssertionError(f"README python block {i} failed: {type(e).__name__}: {e}\n---\n{b[:400]}") from e
+            raise AssertionError(f"README/Manual python block {i} failed: {type(e).__name__}: {e}\n---\n{b[:400]}") from e
         ran += 1
     assert ran >= 18
 
@@ -121,3 +134,28 @@ def test_readme_internal_links_and_relative_paths_resolve():
             if path and not os.path.exists(os.path.normpath(os.path.join(base, path))):
                 bad_path.append((md, target))
     assert not bad_path, f"relative links to files that do not exist: {bad_path[:10]}"
+
+
+def test_every_toolset_has_a_manual_page_and_a_readme_row():
+    """The Manual covers every registered tool: a wiki page that exists, linked from the README overview and the Manual index."""
+    import re
+    from devtools import build_docs
+    readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+    index = open(os.path.join(ROOT, "wiki", "README.md"), encoding="utf-8").read()
+    missing = []
+    for name in lines.TOOLSETS:
+        page = build_docs.WIKI_OF.get(name)
+        if not page or not os.path.exists(os.path.join(ROOT, "wiki", page + ".md")):
+            missing.append((name, "no page"))
+            continue
+        if f"wiki/{page}.md" not in readme:
+            missing.append((name, "not in README"))
+        if f"{page}.md" not in index:
+            missing.append((name, "not in Manual index"))
+    assert not missing, missing
+
+
+def test_every_manual_page_is_in_the_manual_index():
+    index = open(os.path.join(ROOT, "wiki", "README.md"), encoding="utf-8").read()
+    orphans = [f for f in os.listdir(os.path.join(ROOT, "wiki")) if f.endswith(".md") and f != "README.md" and f"{f}" not in index]
+    assert not orphans, orphans
