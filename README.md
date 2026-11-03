@@ -7,7 +7,7 @@
 ORCID [0009-0007-7239-6760](https://orcid.org/0009-0007-7239-6760)
 
 **Version 1.0.0** · licence **GNU GPL v3.0** ([`LICENSE`](LICENSE)) · Python 3 + numpy ·
-[Install](#install) · [Quickstart](#quickstart) · [The Manual](#the-manual) · [Tools](#the-tools) · [Tutorials](wiki/Tutorial-Index.md) · [Cite](#how-to-cite)
+[Install](#install) · [Quickstart](#quickstart) · [Contents](#contents) · [Tools](#the-tools) · [Tutorials](wiki/Tutorial-Index.md) · [Cite](#how-to-cite)
 
 ---
 
@@ -34,12 +34,75 @@ Manual, the links, and the command line; and every tutorial transcript is *gener
 what the code does. Where an exact or exhaustive check is possible it is used instead of a sampled one, an unknown is reported as
 unknown, and a claim that has not been established is labelled as such.
 
+## An informal introduction
+
+**The problem.** Most structure in mathematics and computing is *built from* something: an integer from its primes, a word from its
+Lyndon factors, a ciphertext from a key and a period, an operator from a scaling part and a nilpotent part, a process from the
+operators it runs. Taking an object apart — **decomposing** it — and putting it back together — **emerging** it — look like one
+activity run in two directions. They are not. Taking apart is a deductive sieve: one forward pass, no search, nothing stored
+(multiply the primes and you have the number; read the number and the primes are *there*). Building up is induction: you must choose
+a bracketing, a firing order, a key, a pitch, or be handed a constraint, and a choice is work.
+
+**The engine.** The Generational Lineage Engine makes that asymmetry the thing it computes. Every tool serves a **line**:
+
+- the **decomposition line** (*descent*) answers "what built this?" — it is **free**: `cost = 0`;
+- the **emerger line** (*ascent*) answers "what does this build?" — it reports its **cost**, and when the rebuild is genuinely
+  undetermined it **refuses** with `AscentNotFree`, naming exactly what it is owed. *The refusal is the result.*
+
+A **lineage** is the chain of generations an object passes through on its way down to the tier-0 floor — **ADD**, **SCALE**,
+**SIGN** — the three operations everything else is built from. How many generations, and what each one is, is what the engine
+reports. Every tool is a different *kind of factor* (a prime, a period, a conjugacy class, a recurrence, a group order, a circle…),
+and all of them honour one contract — `descend`, `build_up`, `verify` — so they can be called, checked and compared uniformly.
+
+**A first look.** (This block is run by the test suite.)
+
+```python
+import engine
+from engine import lines
+
+# Descent: free. 360 = 2³·3²·5 — three distinct primes, six generations in all.
+r = engine.decompose_number(360)
+print(r["cepstral_primary"], r["omega_distinct"], r["Omega_lineage_length"])   # {2: 3, 3: 2, 5: 1} 3 6
+
+# A different kind of factor, the same call: every period of a string, exactly.
+r = lines.descend("periodicity", "abababab")
+print(r["periods"], r["primitive_root"], r["exponent"], r["free"], r["cost"])  # [2, 4, 6, 8] ab 4 True 0
+
+# Ascent: the same contract, but it costs — and it refuses when it must.
+print(lines.build_up("stencil", 91)["pairs"])           # [(7, 13)]   found by digit-by-digit construction, cost > 0
+try:
+    lines.build_up("stencil", 13)                        # 13 is prime: there is no pair to build
+except engine.AscentNotFree as e:
+    print("refused:", e.owed)                            # refused: N=13 is prime
+```
+
+**What it is not.** It is not a fast factoriser, a proof assistant, or a claim about open problems. Several tools implement textbook
+cryptanalytic methods at teaching scale (see [Responsible use](#responsible-use)); the Clay-problem readings are structural, not
+solutions; anything not established is labelled `THEORETICAL`. What it *is* is a set of exact, self-checking decompositions
+that say plainly what they cost and where they stop.
+
+**How to read this repository.** This page is the introduction and the table of contents. The **Manual** (`wiki/`) is the
+documentation: one page per tool, in the style of a language reference — what it is, the signature, a transcript you can retype, the
+guarantee, the limits. Read the Concepts pages once, then use the rest as a reference.
+
 ## Contents
 
-[Install](#install) · [Quickstart](#quickstart) · [The Manual](#the-manual) · [Which tool do I need?](#which-tool-do-i-need) ·
-[The tools](#the-tools) · [Tutorials and notebooks](#tutorials-and-notebooks) · [How the repository is organised](#how-the-repository-is-organised) ·
-[Provenance labels](#provenance-labels) · [Responsible use](#responsible-use) · [Known limitations](#known-limitations) ·
-[Status](#status) · [How to cite](#how-to-cite)
+The Manual, by chapter. Every page is in [`wiki/`](wiki/README.md); the full index is [wiki/README.md](wiki/README.md).
+
+### Chapters
+
+| part | pages | what it gives you |
+|---|---|---|
+| **1. Concepts** | [What "Generational Lineage" means](wiki/Concepts-What-It-Means.md) · [The mathematics](wiki/Concepts-The-Mathematics.md) · [What it was built to do](wiki/Concepts-What-It-Was-Built-To-Do.md) · [Two lines and jurisdiction](wiki/Two-Lines-and-Jurisdiction.md) · [Glossary](wiki/Glossary.md) | the vocabulary and the one idea: factorisation is relative to the facet you stand at, and the two directions cost differently |
+| **2. The core facets** | [Self-check](wiki/Run-the-Self-Check.md) · [Decompose a number](wiki/Decompose-a-Number.md) · [Tier of an operation](wiki/Tier-of-an-Operation.md) · [Pathway and tuning](wiki/Pathway-and-Tuning.md) · [Smith-chart instruments](wiki/Smith-Chart-Instruments.md) · [Crystal and join](wiki/Crystal-and-Join.md) · [Fractal block](wiki/Fractal-Block.md) · [Reports](wiki/Reports.md) · [Factoral spiral](wiki/Factoral-Spiral.md) · [Pathway decomposition](wiki/Pathway-Decomposition.md) · [Unit lineage](wiki/Unit-Lineage.md) · [Clay Millennium](wiki/Clay-Millennium.md) · [Spectral decomposition](wiki/Spectral-Decomposition.md) · [The Emerger](wiki/The-Emerger-Tutorial.md) · [ping](wiki/Ping-RSA-Classifier.md) | the engine's own analyses, each with a tutorial |
+| **3. The toolsets** | [The toolsets and their contract](wiki/The-Toolsets.md) · [Tools Reference](wiki/Tools-Reference.md) · one page per toolset (table below) | every registered tool, both directions, defined and checked |
+| **4. Reference** | [Relations (44, self-checked)](wiki/Relations.md) · [References](wiki/References.md) · [Reproducibility](wiki/Reproducibility.md) · [Corrections](wiki/Corrections.md) · [Where "the Factorial" lives](wiki/Where-the-Factorial-Lives.md) · [ValaQuenta calibration](wiki/ValaQuenta-Calibration.md) · [Tutorial index](wiki/Tutorial-Index.md) · [What's next](wiki/Whats-Next.md) | the evidence, the bibliography, the record of what was got wrong |
+
+Also on this page: [Install](#install) · [Quickstart](#quickstart) · [API quick reference](#api-quick-reference) ·
+[Which tool do I need?](#which-tool-do-i-need) · [The tools](#the-tools) · [Tutorials and notebooks](#tutorials-and-notebooks) ·
+[Repository layout](#how-the-repository-is-organised) · [Provenance labels](#provenance-labels) · [Responsible use](#responsible-use) ·
+[Known limitations](#known-limitations) · [Status](#status) · [How to cite](#how-to-cite)
+
 
 <!-- BEGIN: install (generated by devtools/build_docs.py — do not edit by hand) -->
 ## Install
@@ -196,17 +259,46 @@ except engine.AscentNotFree as e:
     print("refused; owed:", e.owed)                    # the refusal names what it is owed
 ```
 
-## The Manual
+## API quick reference
 
-This README is the first page. **The Manual is the [`wiki/`](wiki/README.md) directory**: one page per tool saying what it is,
-how to use it (with a transcript you can retype), what it guarantees and where it stops. Read in this order, or jump to a tool.
+Every toolset is called two ways: through the registry (`lines.descend(name, ...)`, `lines.build_up(name, ...)`) or by importing its
+module. The signatures below are **generated from the code** and cannot drift. `descend` is free (`cost = 0`); `build_up` reports
+`cost` and may raise `AscentNotFree` (`.owed` says what is missing). `lines.verify_all()` runs every `verify()`; `python3 -m engine
+--list` prints the registry. Each name links to its Manual page.
 
-| part | pages | what it gives you |
-|---|---|---|
-| **1. Concepts** | [What "Generational Lineage" means](wiki/Concepts-What-It-Means.md) · [The mathematics](wiki/Concepts-The-Mathematics.md) · [What it was built to do](wiki/Concepts-What-It-Was-Built-To-Do.md) · [Two lines and jurisdiction](wiki/Two-Lines-and-Jurisdiction.md) · [Glossary](wiki/Glossary.md) | the vocabulary and the one idea: factorisation is relative to the facet you stand at, and the two directions cost differently |
-| **2. The core facets** | [Self-check](wiki/Run-the-Self-Check.md) · [Decompose a number](wiki/Decompose-a-Number.md) · [Tier of an operation](wiki/Tier-of-an-Operation.md) · [Pathway and tuning](wiki/Pathway-and-Tuning.md) · [Smith-chart instruments](wiki/Smith-Chart-Instruments.md) · [Crystal and join](wiki/Crystal-and-Join.md) · [Fractal block](wiki/Fractal-Block.md) · [Reports](wiki/Reports.md) · [Factoral spiral](wiki/Factoral-Spiral.md) · [Pathway decomposition](wiki/Pathway-Decomposition.md) · [Unit lineage](wiki/Unit-Lineage.md) · [Clay Millennium](wiki/Clay-Millennium.md) · [Spectral decomposition](wiki/Spectral-Decomposition.md) · [The Emerger](wiki/The-Emerger-Tutorial.md) · [ping](wiki/Ping-RSA-Classifier.md) | the engine's own analyses, each with a tutorial |
-| **3. The toolsets** | [The toolsets and their contract](wiki/The-Toolsets.md) · [Tools Reference](wiki/Tools-Reference.md) · one page per toolset (table below) | every registered tool, both directions, defined and checked |
-| **4. Reference** | [Relations (44, self-checked)](wiki/Relations.md) · [References](wiki/References.md) · [Reproducibility](wiki/Reproducibility.md) · [Corrections](wiki/Corrections.md) · [Where "the Factorial" lives](wiki/Where-the-Factorial-Lives.md) · [ValaQuenta calibration](wiki/ValaQuenta-Calibration.md) · [Tutorial index](wiki/Tutorial-Index.md) · [What's next](wiki/Whats-Next.md) | the evidence, the bibliography, the record of what was got wrong |
+<!-- BEGIN: api-reference (generated by devtools/build_docs.py — do not edit by hand) -->
+| toolset | `descend(...)` — free | `build_up(...)` — work | line | page |
+|---|---|---|---|---|
+| **add_scale_sign** | `descend(value, reference=1.0)` | `build_up(target, orders=None)` | both | [ADD-SCALE-SIGN-Datatype](wiki/ADD-SCALE-SIGN-Datatype.md) |
+| **scale** | `descend(value, reference=1.0, chart=False)` | `build_up(target, probes=None)` | both | [Scale](wiki/Scale.md) |
+| **units** | `descend(unit)` | `build_up(signature)` | both | [Units-and-the-Equation-Index](wiki/Units-and-the-Equation-Index.md) |
+| **box_kite** | `descend(pair)` | `build_up(edge)` | both | [Box-Kite](wiki/Box-Kite.md) |
+| **noether** | `descend(readings, tol=1e-09)` | `build_up(orders, total, tol=1e-09)` | both | [Noether](wiki/Noether.md) |
+| **archimedes_screw** | `descend(step)` | `build_up(height)` | both | [Archimedes-Screw](wiki/Archimedes-Screw.md) |
+| **inversion** | `descend(point)` | `build_up(point)` | both | [Inversion](wiki/Inversion.md) |
+| **t32_nilpotency** | `descend(address, base=97)` | `build_up(pattern, base=97)` | both | [T32-Nilpotency](wiki/T32-Nilpotency.md) |
+| **cipher** | `descend(ciphertext, max_period=16)` | `build_up(target, period=None, key=None)` | both | [Cipher](wiki/Cipher.md) |
+| **comma_sequence** | `descend(seq, base=10)` | `build_up(n_terms, base=10, start=1)` | both | [Comma-Sequence](wiki/Comma-Sequence.md) |
+| **hyper_linear** | `descend(a, b)` | `build_up(target, probes=None)` | both | [Hyper-Linear-Algebra](wiki/Hyper-Linear-Algebra.md) |
+| **equation_space** | `descend(s, rho=None)` | `build_up(target, rho=None, max_steps=500, step_scale=0.5, tol=0.0001)` | both | [Equation-Space](wiki/Equation-Space.md) |
+| **spectral_primes** | `descend(t)` | `build_up(x, n_zeros=25)` | both | [Spectral-Primes](wiki/Spectral-Primes.md) |
+| **cs_benchmark** | `descend(fn, args=(), kwargs=None, n=1000)` | `build_up(candidates, reference_s_per_call, args=(), kwargs=None, n=1000)` | both | [CS-Benchmark](wiki/CS-Benchmark.md) |
+| **stencil** | `descend(p, q)` | `build_up(N, run_slide2=False)` | both | [Stencil](wiki/Stencil.md) |
+| **periodicity** | `descend(x)` | `build_up(target)` | both | [Periodicity](wiki/Periodicity.md) |
+| **lyndon** | `descend(x)` | `build_up(target)` | both | [Lyndon-Words](wiki/Lyndon-Words.md) |
+| **berlekamp_massey** | `descend(x, p=2)` | `build_up(target)` | both | [Berlekamp-Massey](wiki/Berlekamp-Massey.md) |
+| **logperiodic** | `descend(data, w_range=(0.5, 30.0), steps=240, compare_flat=False)` | `build_up(target)` | both | [Log-Periodic-and-Mellin](wiki/Log-Periodic-and-Mellin.md) |
+| **permutation** | `descend(x)` | `build_up(target)` | both | [Permutation](wiki/Permutation.md) |
+| **rejewski** | `descend(x, plugboard='')` | `build_up(target)` | both | [Rejewski](wiki/Rejewski.md) |
+| **jordan_chevalley** | `descend(x)` | `build_up(target)` | both | [Jordan-Chevalley](wiki/Jordan-Chevalley.md) |
+| **re_pair** | `descend(x)` | `build_up(target)` | both | [Re-Pair](wiki/Re-Pair.md) |
+| **pohlig_hellman** | `descend(x)` | `build_up(target, budget=5000000)` | both | [Pohlig-Hellman](wiki/Pohlig-Hellman.md) |
+| **unicity** | `descend(x)` | `build_up(target)` | both | [Unicity](wiki/Unicity.md) |
+| **circle** | `descend(x, role='radius')` | `build_up(target, role='area', tol=1e-09)` | both | [Circle](wiki/Circle.md) |
+| **oscilloscope** *(extended)* | `descend(N)` | `build_up(target)` | decomposition | [Oscilloscope](wiki/Oscilloscope.md) |
+| **emerger** | `engine.emerge_brackets(x, mode='sigma_rb')` | `engine.emerge_brackets(x, mode='sigma_rb')` | emerger | [The-Emerger-Ascent-Dual](wiki/The-Emerger-Ascent-Dual.md) |
+| **lineage** | `engine.decompose_number(N)  ·  decompose(operation)` | — | decomposition | [The-Generational-Lineage-Engine](wiki/The-Generational-Lineage-Engine.md) |
+<!-- END: api-reference -->
 
 ## Which tool do I need?
 

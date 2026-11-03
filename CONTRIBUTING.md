@@ -69,7 +69,7 @@ exact check that would make it trustworthy, and the citation if it is establishe
 
 ## Continuous integration
 
-The CI definition is `.github/ci-workflow.yml`; see `.github/README.md` for how it is enabled. Whether or not CI is running, the
+The CI definition is `.github/workflows/ci.yml`; see `.github/CI.md` for what it runs. Whether or not CI is running, the
 checks in *Adding a move*, step 5, are the bar.
 
 ## Conduct and security

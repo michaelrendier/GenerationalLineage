@@ -1,4 +1,4 @@
-# .github
+# .github — CI and templates
 
 | file | what it is |
 |---|---|

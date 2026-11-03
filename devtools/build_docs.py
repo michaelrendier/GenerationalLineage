@@ -24,7 +24,7 @@ What is generated (and therefore cannot drift from the engine):
     wiki/Tools-Reference.md       every registered toolset: definition, both directions, tutorial, page
     wiki/{Comma-Sequence,Spectral-Primes,CS-Benchmark,Stencil,Oscilloscope}.md   toolsets with no hand-written page
     wiki/Tutorial-Index.md        every tutorial and what it shows
-    README.md  between markers    the Install section (from INSTALL.md) and the quickstart transcript
+    README.md  between markers    the Install section (from INSTALL.md), the quickstart transcript and the API quick reference (signatures)
     wiki/ pages between markers   The-Toolsets (registry table), Relations (the relation tables, from the engine's own
                                   log), The-Emerger-Tutorial (Emerger report), Clay-Millennium (Clay output)
 
@@ -551,6 +551,43 @@ The module's own docstring, verbatim — it carries the provenance, the citation
 """
 
 
+# the two anchors whose entry points are not descend/build_up on the module itself (they are dispatched by engine.lines)
+ENTRY_OVERRIDE = {
+    "emerger": ("emerge_brackets(x, mode='sigma_rb')", "emerge_brackets(x, mode='sigma_rb')"),
+    "lineage": ("decompose_number(N)  ·  decompose(operation)", "—"),
+}
+
+
+def _sig(fn) -> str:
+    import inspect
+    ps = [p for p in inspect.signature(fn).parameters.values() if p.kind is not p.VAR_KEYWORD]
+    out = []
+    for p in ps:
+        a = p.name
+        if p.default is not p.empty:
+            a += "=" + repr(p.default)
+        out.append(a)
+    return ", ".join(out)
+
+
+def api_reference() -> str:
+    """A generated signature table: one row per registered toolset, descend and build_up, linked to the Manual page."""
+    import importlib
+    rows = ["| toolset | `descend(...)` — free | `build_up(...)` — work | line | page |", "|---|---|---|---|---|"]
+    for n, d in lines.TOOLSETS.items():
+        page = WIKI_OF.get(n)
+        link = f"[{page}](wiki/{page}.md)" if page else ""
+        if n in ENTRY_OVERRIDE:
+            de, bu = ENTRY_OVERRIDE[n]
+            de, bu = f"`engine.{de}`", (f"`engine.{bu}`" if bu != "—" else "—")
+        else:
+            m = importlib.import_module(d["module"])
+            de, bu = f"`descend({_sig(m.descend)})`", f"`build_up({_sig(m.build_up)})`"
+        ext = " *(extended)*" if d.get("requires") else ""
+        rows.append(f"| **{n}**{ext} | {de} | {bu} | {d['line']} | {link} |")
+    return "\n".join(rows)
+
+
 def toolset_table() -> str:
     rows = ["| toolset | line | `descend()` — free | `build_up()` — work |", "|---|---|---|---|"]
     for n, d in lines.TOOLSETS.items():
@@ -715,7 +752,7 @@ def build() -> dict:
         files[os.path.join("wiki", page + ".md")] = toolset_page(n)
     files[os.path.join("wiki", "Tools-Reference.md")] = tools_reference()
     files[os.path.join("wiki", "Tutorial-Index.md")] = tutorial_index_page()
-    files["README.md"] = fill("README.md", {"install": install_block(), "quickstart": quickstart_block()})
+    files["README.md"] = fill("README.md", {"install": install_block(), "quickstart": quickstart_block(), "api-reference": api_reference()})
     for page, blocks in {
         "The-Toolsets": {"toolset-table": toolset_table().replace("](examples/", "](../examples/")},
         "Relations": {"relations-table": relations_block()},
