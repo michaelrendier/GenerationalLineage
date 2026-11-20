@@ -322,6 +322,32 @@ MOVES = [
         refs=["Gauss1827", "Lambert1766", "Golab1932", "AdlerTanton2000", "vonMises1918", "Langevin1905", "Klein1871", "Yaglom1979"],
         src="engine/toolsets/circle.py",
     ),
+    dict(
+        name="matrix_flow", page="Matrix-Flow", ex="51_matrix_flow", sec="4.30",
+        title="Matrix flow — the nine flows of dx/dt = Ax, and which kind of circle each is",
+        kind="the planar linear flow classified by its eigenvalues, read as the Add:Scale:Sign floor plus one circle",
+        what=("A real 2×2 matrix A drives the flow dx/dt = Ax. Its origin behaves in one of nine ways: centre, stable spiral, unstable spiral, saddle, stable node, "
+              "unstable node, star, degenerate node, line of fixed points. Every real 2×2 matrix splits exactly as A = a·I + b·J + h1·K1 + h2·K2, where I is SCALE "
+              "(uniform growth), J is the quarter turn (J² = −I, the circle) and K1, K2 are the boosts (K² = +I, the hyperbola). The sign of h² − b² (h the boost "
+              "strength, b the turn) says which KIND of circle the flow is: b > h elliptic (round: centre and spirals), b < h hyperbolic (saddle and nodes), "
+              "b = h parabolic (the shear: the circle at infinity). The shear is the nilpotent ADD generator, N² = 0."),
+        why=("It puts the 'what kind of circle' question on a computable footing. The nine flows are not nine different objects: they are the four generators "
+             "I, J, K1, K2 in different proportions, and the Cayley–Klein triple (elliptic / parabolic / hyperbolic) that `circle` already carries as a trace test "
+             "is the same triple seen as a flow. A random integer matrix is almost never a centre: it needs trace 0 and positive determinant."),
+        residual="the Sign: whether the boost or the turn wins, which is the sign of h² − b²",
+        descend="a 2×2 matrix -> its class, kind of circle, eigenvalues, the I/J/K split and the invariant that shows the circle",
+        ascend="an entry bound B -> how many integer matrices with entries in [−B, B] land in each class; cost = matrices tried",
+        guarantee="9 classes each with a representative that classifies as itself. The closed-form exp(tA) (Cayley–Hamilton, no series) agrees with an independent RK4 "
+                  "integration on all nine to 1e-9 (measured 3e-14). The centre conserves x²+y² and has det exp = 1; a spiral's radius is e^{at}; the saddle conserves x·y; "
+                  "the shear is exactly I + tN. The I/J/K split reconstructs A and gives eigenvalues a ± √(h²−b²). The B = 2 scan reaches all nine classes in 625 matrices.",
+        limits="Planar (2×2) only. Class boundaries (det = 0, discriminant = 0, trace = 0) are exact-zero tests under a 1e-12 scaled tolerance, so a matrix within rounding of "
+               "a boundary is placed on it. The nine are the textbook nine; the author's source was a nine-panel reel whose panel list the code could not see, so a differing panel is a correction to make.",
+        prov=[("the nine-way classification of a planar linear flow by trace and determinant", "ESTABLISHED", "Strogatz 2015"),
+              ("elliptic / parabolic / hyperbolic as the kind of rotation", "ESTABLISHED", "Yaglom 1979"),
+              ("the I/J/K split, and reading the nine flows as scale, quarter turn and boost in proportion", "OURS", "—")],
+        refs=["Strogatz2015", "Yaglom1979"],
+        src="engine/toolsets/matrix_flow.py",
+    ),
 ]
 
 REFS = {
@@ -353,6 +379,7 @@ REFS = {
     "vonMises1918": "von Mises, R. (1918). Über die „Ganzzahligkeit“ der Atomgewichte und verwandte Fragen. *Physikalische Zeitschrift* 19, 490–500.",
     "Langevin1905": "Langevin, P. (1905). Magnétisme et théorie des électrons. *Annales de Chimie et de Physique* 5, 70–127.",
     "Klein1871": "Klein, F. (1871). Über die sogenannte Nicht-Euklidische Geometrie. *Mathematische Annalen* 4, 573–625.",
+    "Strogatz2015": "Strogatz, S. H. (2015). *Nonlinear Dynamics and Chaos* (2nd ed.). Westview Press.",
     "Yaglom1979": "Yaglom, I. M. (1979). *A Simple Non-Euclidean Geometry and its Physical Basis.* Springer.",
     "Shannon1949": "Shannon, C. E. (1949). Communication theory of secrecy systems. *Bell System Technical Journal* 28(4), 656–715.",
 }
@@ -383,6 +410,7 @@ DEFINITIONS = {
     "jordan_chevalley": "A = S + N exactly, in rational arithmetic: a semisimple part that only scales and a nilpotent part that dies after a finite number of generations.",
     "re_pair": "A sequence's own lineage tree by repeated pairing: rule depth is generation count; exact round trip; minimality reported as unknown.",
     "pohlig_hellman": "Discrete log via the lineage of the group order: predicted cost from the largest prime factor, a solve by BSGS + CRT, and a refusal over budget.",
+    "matrix_flow": "The nine flows of dx/dt = Ax for a 2×2 matrix, each read as scale, quarter turn and boost in proportion: which KIND of circle (elliptic, hyperbolic, parabolic).",
     "circle": "Every unit circle by constant and role, the imaginary circle and its laws of sines and cosines, the six drawings of a circle and the seventh (the ℓ_p norm).",
     "unicity": "Shannon's unicity distance — how much ciphertext makes a decomposition unique — with a rigorous order-0 bound kept apart from the literature estimate.",
     "oscilloscope": "**EXTENDED layer.** A two-panel SVG: the Fermat N-shape (0…15) and root-system pathway of one number, over the Riemann-facet equidistribution reading. Its ascent is refused: a shape is N mod 16, and recovering N owes the remaining digits.",

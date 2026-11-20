@@ -262,6 +262,15 @@ Every unit circle by constant and role, the imaginary circle and its laws of sin
 - **build_up (work):** a target measure -> every catalogued constant, in every role, whose circle produces it; cost = candidates tried
 - tutorial [`examples/50_circle.py`](../examples/50_circle.py) · page [`Circle.md`](Circle.md)
 
+### `matrix_flow`
+
+The nine flows of dx/dt = Ax for a 2×2 matrix, each read as scale, quarter turn and boost in proportion: which KIND of circle (elliptic, hyperbolic, parabolic).
+
+- **line:** both · **module:** `engine.toolsets.matrix_flow`
+- **descend (free):** a 2x2 matrix -> which of the nine flows of dx/dt = Ax it is, which KIND of circle it is (elliptic / hyperbolic / parabolic), its split A = aI + bJ + h1 K1 + h2 K2 (scale, quarter turn, boost) and the invariant that shows it
+- **build_up (work):** an entry bound B -> how many integer matrices in [-B, B] land in each of the nine classes; cost = matrices tried
+- tutorial [`examples/51_matrix_flow.py`](../examples/51_matrix_flow.py) · page [`Matrix-Flow.md`](Matrix-Flow.md)
+
 ### `oscilloscope`  *(EXTENDED layer — needs the sibling repositories)*
 
 **EXTENDED layer.** A two-panel SVG: the Fermat N-shape (0…15) and root-system pathway of one number, over the Riemann-facet equidistribution reading. Its ascent is refused: a shape is N mod 16, and recovering N owes the remaining digits.

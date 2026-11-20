@@ -35,4 +35,5 @@ SAMPLES = {
     "pohlig_hellman": (({"p": 101, "g": 2, "h": 5},), {}, ({"p": 101, "g": 2, "h": 5},), {}),
     "unicity": (("substitution",), {}, ({"kind": "substitution", "max_spurious": 1e-3},), {}),
     "circle": ((0.5, "radius"), {}, (math.pi, "area"), {}),
+    "matrix_flow": (([[0, -1], [1, 0]],), {}, (2,), {}),
 }

@@ -264,6 +264,12 @@ TOOLSETS: Dict[str, Dict[str, str]] = {
         "work": "a target measure -> every catalogued constant, in every role, whose circle produces it; "
                 "cost = candidates tried",
     },
+    "matrix_flow": {
+        "module": "engine.toolsets.matrix_flow", "line": "both",
+        "free": "a 2x2 matrix -> which of the nine flows of dx/dt = Ax it is, which KIND of circle it is (elliptic / hyperbolic / "
+                "parabolic), its split A = aI + bJ + h1 K1 + h2 K2 (scale, quarter turn, boost) and the invariant that shows it",
+        "work": "an entry bound B -> how many integer matrices in [-B, B] land in each of the nine classes; cost = matrices tried",
+    },
     "oscilloscope": {
         "module": "engine.oscilloscope", "line": "decomposition",
         "requires": "sibling-repos",      # EXTENDED layer: needs AbrikosovTree, ValaQuenta, TuringStack, FourthAgePapers

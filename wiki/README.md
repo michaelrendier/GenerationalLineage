@@ -52,6 +52,7 @@ Each page: what it does, a runnable example, a transcript, where it stops.
 |---|---|
 | **the older toolsets** | [Scale](Scale.md) · [Units-and-the-Equation-Index](Units-and-the-Equation-Index.md) · [Box-Kite](Box-Kite.md) · [Noether](Noether.md) · [Archimedes-Screw](Archimedes-Screw.md) · [Inversion](Inversion.md) · [T32-Nilpotency](T32-Nilpotency.md) · [Cipher](Cipher.md) · [Comma-Sequence](Comma-Sequence.md) *(generated)* · [Hyper-Linear-Algebra](Hyper-Linear-Algebra.md) · [Equation-Space](Equation-Space.md) · [Spectral-Primes](Spectral-Primes.md) *(generated)* · [CS-Benchmark](CS-Benchmark.md) *(generated)* · [Stencil](Stencil.md) *(generated)* |
 | **the ten moves added in 1.0** *(generated)* | [Periodicity](Periodicity.md) · [Lyndon-Words](Lyndon-Words.md) · [Berlekamp-Massey](Berlekamp-Massey.md) · [Log-Periodic-and-Mellin](Log-Periodic-and-Mellin.md) · [Permutation](Permutation.md) · [Rejewski](Rejewski.md) · [Jordan-Chevalley](Jordan-Chevalley.md) · [Re-Pair](Re-Pair.md) · [Pohlig-Hellman](Pohlig-Hellman.md) · [Unicity](Unicity.md) |
+| **the twelfth move** | [Matrix-Flow](Matrix-Flow.md) *(generated)* |
 | **the eleventh move** | [Circle](Circle.md) *(generated)* · [Circle-Catalogue](Circle-Catalogue.md) |
 
 ## 4. Reference and record

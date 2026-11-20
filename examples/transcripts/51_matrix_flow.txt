@@ -1,0 +1,29 @@
+>>> from engine.toolsets import matrix_flow
+>>> # One matrix per flow: its class, the kind of circle, and the split A = a·I + b·J + h1·K1 + h2·K2
+>>> # (a = SCALE, b = the quarter turn J with J² = −I, h = the boost K with K² = +I).
+>>> for name, M in matrix_flow.EXAMPLES.items():
+...     r = matrix_flow.descend(M)
+...     sp = r["split"]
+...     print(f"{name:22s} {r['kind']:26s} a={sp['a_scale']:+.2f} b={sp['b_turn']:+.2f} h={sp['h']:.2f}")
+centre                 elliptic                   a=+0.00 b=+1.00 h=0.00
+stable spiral          elliptic                   a=-0.20 b=+1.00 h=0.00
+unstable spiral        elliptic                   a=+0.20 b=+1.00 h=0.00
+saddle                 hyperbolic                 a=+0.00 b=+0.00 h=1.00
+stable node            hyperbolic                 a=-1.50 b=+0.00 h=0.50
+unstable node          hyperbolic                 a=+1.50 b=+0.00 h=0.50
+star                   scalar (no rotation, no boost) a=+1.00 b=+0.00 h=0.00
+degenerate node        parabolic                  a=+1.00 b=-0.50 h=0.50
+line of fixed points   parabolic or scalar-zero   a=+0.00 b=-0.50 h=0.50
+>>> # The sign of h² − b² decides the kind: rotation wins -> circle, boost wins -> hyperbola, tie -> shear.
+>>> for M in ([[0, -1], [1, 0]], [[1, 0], [0, -1]], [[1, 1], [0, 1]]):
+...     print(M, "h² − b² =", matrix_flow.split(M)["kind_gap"], "->", matrix_flow.classify(M))
+[[0, -1], [1, 0]] h² − b² = -1.0 -> centre
+[[1, 0], [0, -1]] h² − b² = 1.0 -> saddle
+[[1, 1], [0, 1]] h² − b² = 0.0 -> degenerate node
+>>> # exp(tA) in closed form: a centre turns through t radians; a saddle keeps x·y; a shear is I + tN.
+>>> [[round(v, 4) for v in row] for row in matrix_flow.expm([[0, -1], [1, 0]], 3.141592653589793 / 2)]
+[[0.0, -1.0], [1.0, 0.0]]
+>>> # The emerger direction: how many integer matrices with entries in [−2, 2] fall in each class?
+>>> b = matrix_flow.build_up(2)
+>>> b["counts"], b["cost"]
+({'centre': 20, 'stable spiral': 64, 'unstable spiral': 64, 'saddle': 248, 'stable node': 28, 'unstable node': 28, 'star': 4, 'degenerate node': 40, 'line of fixed points': 129}, 625)
