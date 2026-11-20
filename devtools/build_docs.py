@@ -341,7 +341,7 @@ MOVES = [
                   "integration on all nine to 1e-9 (measured 3e-14). The centre conserves x²+y² and has det exp = 1; a spiral's radius is e^{at}; the saddle conserves x·y; "
                   "the shear is exactly I + tN. The I/J/K split reconstructs A and gives eigenvalues a ± √(h²−b²). The B = 2 scan reaches all nine classes in 625 matrices.",
         limits="Planar (2×2) only. Class boundaries (det = 0, discriminant = 0, trace = 0) are exact-zero tests under a 1e-12 scaled tolerance, so a matrix within rounding of "
-               "a boundary is placed on it. The nine are the textbook nine; the author's source was a nine-panel reel whose panel list the code could not see, so a differing panel is a correction to make.",
+               "a boundary is placed on it. The nine are the textbook nine and are exactly the nine panels of the author's source reel (matharium, 2026-10-29); the reel draws one sign for star, saddle and line of fixed points, while here each class covers both signs.",
         prov=[("the nine-way classification of a planar linear flow by trace and determinant", "ESTABLISHED", "Strogatz 2015"),
               ("elliptic / parabolic / hyperbolic as the kind of rotation", "ESTABLISHED", "Yaglom 1979"),
               ("the I/J/K split, and reading the nine flows as scale, quarter turn and boost in proportion", "OURS", "—")],
