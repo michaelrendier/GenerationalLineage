@@ -1,3 +1,5 @@
+<p align="center"><a href="#the-tools"><img src="assets/generational_lineage_header.svg" alt="Generational Lineage: eight kinds of object fall in to the three operations ADD, SCALE and SIGN (descent, free); build_up goes out (ascent, paid or refused); the 30 toolsets listed on the right" width="100%"></a></p>
+
 # The Generational Lineage Engine
 
 ### exact factoral decomposition on two lines — descent (free) and ascent (paid, or refused)
