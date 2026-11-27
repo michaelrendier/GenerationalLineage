@@ -4,3 +4,7 @@
 # Tested with numpy 2.4.6 on Python 3.12.3 (no minimum numpy version has been
 # established; if you run an older one and it works or breaks, please report it).
 numpy
+matplotlib>=3.11  # tested 3.11.1
+nltk>=3.10  # tested 3.10.3
+pytest>=9.1  # tested 9.1.1
+sympy>=1.14  # tested 1.14.0
