@@ -24,6 +24,13 @@ DECOMPOSITION (free): decode an address to its path. One Horner sweep.
 
 EMERGER (work): given a target digit pattern, find the smallest address whose
 path matches it — placing digits one at a time. `cost` = digits placed.
+
+NAME COLLISION (2026-11-26): "nilpotent" here is a property of the address PATH (trailing zero digits:
+the path stepped repeatedly reaches 0). It is NOT the T32/GF(2) notion of ValaQuenta
+`modules/t32_nilpotency`, where a 32-bit word w is nilpotent when w·w = 0 under Cayley-Dickson
+multiplication (the address mod 2^32 is read as a word). The two share the Hyperwebster base-97 address
+and the name, nothing else; do not compare their counts. For the algebra side (square law, detector
+Δ(w) = w·𝟏, radical census) use ValaQuenta `modules.t32_nilpotency`.
 """
 from __future__ import annotations
 
