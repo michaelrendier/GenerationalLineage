@@ -92,8 +92,10 @@ class ASS:
         return len(self.steps) == 1 and self.steps[0] is self
 
     def __invert__(self) -> "ASS":
-        a = -self.sign * self.add / self.scale + 0.0
-        s, g = 1.0 / self.scale, self.sign
+        a = -self.sign * self.add / self.scale
+        if not a:
+            a = a * 0                                       # normalise -0.0, keep the type
+        s, g = 1 / self.scale, self.sign                    # Fraction in, Fraction out
         if self._is_atomic():
             return ASS(a, s, g)
         inv = ASS(a, s, g)
