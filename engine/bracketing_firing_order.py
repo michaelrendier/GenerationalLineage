@@ -426,6 +426,90 @@ def component_plan(a, policy=policy_written, lo=0, hi=None):
 
 
 
+# ── the four orderings of brackets, and the evolving vector (ported from
+#    ValaQuenta.modules.bracketing_firing_order 0.2, tool 4) ────────────────
+def _matvec(M, x):
+    return tuple(sum((m * v for m, v in zip(row, x)), F(0)) for row in M)
+
+
+def plans_bracketing(leaves):
+    """A: every binary grouping of the written sequence, written order at every bracket: Catalan(n-1)."""
+    out = []
+
+    def go(ls):
+        if len(ls) == 1:
+            yield ls[0]
+            return
+        for cut in range(1, len(ls)):
+            for L in go(ls[:cut]):
+                for R in go(ls[cut:]):
+                    yield Bracket([L, R])
+    out.extend(go(list(leaves)))
+    return out
+
+
+def plans_firing_order(leaves):
+    """B: one flat bracket in each of the n! orders."""
+    return list(flat_plans(list(leaves)))
+
+
+def plans_firing_of_brackets(leaves):
+    """C: every binary grouping of the written sequence, either order at every bracket: Catalan(n-1) * 2^(n-1)."""
+    return list(binary_plans(list(leaves)))
+
+
+def plans_bracketing_of_firing(leaves):
+    """D: a firing order first, then a bracketing of the fired sequence: n! * Catalan(n-1)."""
+    out = []
+    for perm in itertools.permutations(list(leaves)):
+        out.extend(plans_bracketing(list(perm)))
+    return out
+
+
+def mode_counts(n):
+    """Exact plan counts of A, B, C, D over n written items."""
+    cat = math.comb(2 * (n - 1), n - 1) // n
+    return {"A": cat, "B": math.factorial(n), "C": cat * 2 ** (n - 1), "D": math.factorial(n) * cat}
+
+
+def evolve_operator(plan, x):
+    """The vector after each leaf fires, in firing order: [('input', x), (leaf, vector), ...]."""
+    leaves = []
+
+    def walk(p):
+        if isinstance(p, Leaf):
+            leaves.append(p)
+        else:
+            for c in p.fired():
+                walk(c)
+    walk(plan)
+    v = tuple(F(a) for a in x)
+    out = [("input", v)]
+    for lf in leaves:
+        v = _matvec(lf.matrix, v)
+        out.append((lf.name, v))
+    return out
+
+
+def evolve_value(plan):
+    """Every product of the element reading in the order it is computed: [(label, vector), ...]."""
+    out = []
+
+    def go(p):
+        if isinstance(p, Leaf):
+            out.append((p.name, p.vec))
+            return p.vec, p.name
+        vals = [go(c) for c in p.fired()]
+        acc, label = vals[0]
+        for v, lab in vals[1:]:
+            acc = tuple(cd_mul(acc, v))
+            label = f"({label} {lab})"
+            out.append((label, acc))
+        return acc, label
+    go(plan)
+    return out
+
+
 def verify_plans() -> Dict[str, bool]:
     import random
     random.seed(7)
